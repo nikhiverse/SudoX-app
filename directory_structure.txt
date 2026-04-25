@@ -20,7 +20,7 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
 8.  app/page.tsx: Yeh website ka main "Home Page" hai. Yahan saare 16 game variants play karne ke liye list mein dikhte hain.
 9.  app/layout.tsx: Yeh website ka basic dhancha ya template hai. Is wajah se website ka upar wala dark bar aur SudoX logo, har naye page par same design ka dikhta hai. Logo ab ek clickable link nahi hai — game page se bahar jaane ke liye "All Variants" button use karo.
 10. app/globals.css: Isme website gori hogi ya kaali, rang ya font style sabki designing ki chitthi likhi hui hai.
-11. app/api/generate-daily/route.ts: Jab naya din chalu hota hai, tab humari website yeh "API route" chalati hai taaki database me roz apne aap naye game aa jayein. Yeh CRON_SECRET se protect hai.
+
 12. app/api/puzzle/[game]/route.ts: Jab user game chunta hai tab ye us game ka level database me dhoond kar lata hai taaki app screen ban sakiye.
 13. app/play/[variant]/page.tsx: Jab hum koi game theek se khelne lagte hain, us waqt screen ka structure is page se milta hai.
 
@@ -67,6 +67,6 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
 
 === SECURITY NOTES (Deployment ke liye zaroori) ===
 - MONGODB_URI: Kabhi bhi NEXT_PUBLIC_ prefix mat lagao. Sirf server-side (API routes, lib/) mein use hoti hai.
-- CRON_SECRET: Sirf generate-daily API mein use hota hai. Bearer token se protect hai.
+
 - Sab MongoDB queries pehle VALID_GAMES whitelist se validate hoti hain — koi bhi raw user input directly DB mein nahi jaata.
 - Deploy karne ke liye VPS zaroori hai (Vercel nahi chalega) kyunki C++ compilation runtime par hoti hai (g++ zaroori hai server par).
