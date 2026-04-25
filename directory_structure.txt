@@ -1,0 +1,72 @@
+Project (SudoX) ki Directory Structure aur Har Ek File ki Jankari - Simple Hinglish Mein
+
+=== MAIN FOLDER KI FILES (Bahar ki files) ===
+1.  README.md: Naye developer ke liye tutorial guide hai ki project ko apne computer par pehli baar kaise chalana hai.
+2.  package.json & package-lock.json: Isme sabhi un softwares/libraries (jise humne bahar se download kiya) ke naam hain jo is project ke banne ke liye zaroori hain.
+3.  next.config.ts / tsconfig.json / eslint.config.mjs / postcss.config.mjs: Yeh saari 'settings' wali files hain. Yeh project me Next.js framework, TypeScript language aur errors ko theek se chalane me help karti hain.
+4.  .env.local: Yahan database ka khufiya (secret) password chupaya jata hai. Yeh kisi ko nahi dikhaya jata aur Git mein bhi upload nahi hota.
+5.  .env.example: Yeh ek safe sample file hai jo dikhati hai ki .env.local mein kaun se variables chahiye — real values nahi hain isme.
+6.  .gitignore: Yeh batata hai ki internet pe final code upload karte waqt kin faltu ya private files ko humein chhod dena hai.
+7.  AGENTS.md / CLAUDE.md: Ye AI assistants (AI dosto) ke liye rules wali files hoti hain, jis se theek se madad mil paye.
+
+NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain):
+  - patcher.py / patch_check.py: C++ code mein automatic patch lagane ke tools.
+  - generate-daily.sh: Shell script jo manually daily puzzle generation trigger karti hai.
+  - clear_db.js / query_db.js: Developer ke kaam aane wali DB test scripts.
+  - output.json / build_log.txt: Build ke waqt bane temporary log files.
+  - start_game.sh / SudoX.desktop: Local machine par ek-click se game chalane ke shortcuts.
+
+=== app/ FOLDER (User ka samne wala screen) ===
+8.  app/page.tsx: Yeh website ka main "Home Page" hai. Yahan saare 16 game variants play karne ke liye list mein dikhte hain.
+9.  app/layout.tsx: Yeh website ka basic dhancha ya template hai. Is wajah se website ka upar wala dark bar aur SudoX logo, har naye page par same design ka dikhta hai. Logo ab ek clickable link nahi hai — game page se bahar jaane ke liye "All Variants" button use karo.
+10. app/globals.css: Isme website gori hogi ya kaali, rang ya font style sabki designing ki chitthi likhi hui hai.
+11. app/api/generate-daily/route.ts: Jab naya din chalu hota hai, tab humari website yeh "API route" chalati hai taaki database me roz apne aap naye game aa jayein. Yeh CRON_SECRET se protect hai.
+12. app/api/puzzle/[game]/route.ts: Jab user game chunta hai tab ye us game ka level database me dhoond kar lata hai taaki app screen ban sakiye.
+13. app/play/[variant]/page.tsx: Jab hum koi game theek se khelne lagte hain, us waqt screen ka structure is page se milta hai.
+
+=== components/ FOLDER (UI ki Choti Cheezein) ===
+14. components/game/PuzzleGrid.tsx: Yeh pura woh bada Sudoku board (dabba) hai jahan hum 1 se 9 tak number bharte hain.
+15. components/game/GridCell.tsx: Sudoku board ke andar ka ek chota hissa (cell box) jise tap karke number likh sakte hain.
+16. components/game/NumberPanel.tsx: Niche diye gaye badhe 1 se 9 tak ke keyboard buttons wala hissa jise click karke cell par number theek kiya jata hai. Buttons hamesha beech (centre) mein aate hain.
+17. components/game/Timer.tsx: Tiktik-wali ghadi jo ye dikhati hai ki aapko solve karne me abhi tak kitne ghante ya minute lag gaye hain.
+18. components/game/PuzzleHeader.tsx: Game ke upar dikhta naam (jaise "Sudoku Jigsaw"), "All Variants" back button, timer aur lives/hearts idhar se aate hain. Saare styles CSS classes mein hain, koi inline style nahi.
+19. components/layout/MenuDrawer.tsx: Yeh woh side ki khulne wali window/menu hai jisme khelne ke niyam (rules), About info, aur login details hoti hain.
+20. components/layout/ClientHamburgerButton.tsx: Wo top-right pe 3 lakkir wala button (hamburger🍔 jaisa) jisme tap karne se side wala menu khulta hai.
+21. components/layout/ClientDateDisplay.tsx: Screen ke upar aaj ki tarik (date) set karta hai.
+22. components/ui/Modal.tsx: Ek reusable popup dialog component jo game ke andar "Leave Game?", "Congratulations!", ya koi aur message dikhane ke liye use hota hai.
+
+=== hooks/ FOLDER (Custom React chabiya) ===
+23. hooks/useGameState.ts: Game kaha pohocha hai, kya chal raha uske current status dhyaan me rakhti hai.
+24. hooks/useKeyboard.ts: Jab hum keyboard wala button ('1','2') dabaate hai, tab software ki setting me number cell me put karati hai.
+25. hooks/usePuzzle.ts: API folder ko pukarti hai game ka puzzle lane ke liye.
+26. hooks/useTimer.ts: Yeh hook bas time ko theek theek gin-ne me, badhane, rokhne (stop) ke kaam ati hai.
+27. hooks/useLives.ts: Har din ke liye 3 lives track karta hai. Zyada mistakes hone par game lock ho jati hai.
+28. hooks/useBeforeUnload.ts: Jab user game ke beech mein galti se page reload karta hai ya tab band karta hai, tab browser ek "Leave site?" warning dikhata hai taaki progress na kho jaye.
+
+=== services/ FOLDER (Dimaag Ya Management wala area) ===
+29. services/GameStateManager.ts: Yeh game ki boss class hai. Player ne kон sa step liya, kon sa galat tha, cursor kahan hai — sab manage karti hai. Pure TypeScript, koi React ya DOM dependency nahi.
+30. services/PdfExportService.ts: Aaj khela huwa poora puzzle hum kisi file me ek print paper (PDF) banakar save kar sakte hain.
+31. services/StorageService.ts: Device browser ki localStorage mein khela gaya puzzle aur progress bachake rakhta hai, taaki app restart hone par kuch kho na jaye. 7 din se purana data apne aap saaf ho jata hai.
+32. services/TimerService.ts: Time ek dam realtime hisab main theek tik-tik kare, yeh service yeh ensure karti hai.
+33. services/PuzzleService.ts: C++ se aaye raw data ko client ke samne theek form mein sudhaar ke bhejta hai.
+
+=== lib/ FOLDER (Chhote sahayak ya helper functions) ===
+34. lib/mongodb.ts: MongoDB Atlas se connect hone ka kaam karta hai. Serverless environments mein connection cache karta hai taaki baar baar naya connection na bane. MONGODB_URI environment variable server-side only hai.
+35. lib/constants.ts: Yahan aise rules likh dete hain jo kabhi na badle — game ke naam, URL mappings, grid sizes, rate limit settings, aur MongoDB collection naam.
+36. lib/date-utils.ts: Waqt, samay aur time zone ko exact theek batane wale math functions.
+37. lib/grid-utils.ts: Puzzle ki display values (jaise '0' ko blank karna) ke helper functions.
+38. lib/puzzle-generator.ts: C++ engines ko bulakar naya game banane ka kaam karta hai. MONGODB_URI sirf yahan server-side use hoti hai.
+39. lib/puzzle-validator.ts: C++ se aaye data ko validate karta hai — koi invalid structure ho to reject kar deta hai.
+40. lib/rate-limiter.ts: Ek IP se zyada requests aane par (60/minute se zyada) block karta hai. In-memory sliding window approach.
+41. lib/types.ts: TypeScript ke types aur interfaces jo poore project mein use hote hain.
+
+=== engine/ FOLDER (Superfast C++ Brain) ===
+42. engine/src/: C++ source files jo alag alag puzzle variants generate karte hain (jaise sudoku9.cpp, jigsawX.cpp etc.)
+43. engine/include/: C++ header files (shared logic).
+44. engine/bin/: Compiled binaries (Git mein commit nahi hoti — .gitignore mein hain). Server par deploy karte waqt ya pehli API call par compile hoti hain.
+
+=== SECURITY NOTES (Deployment ke liye zaroori) ===
+- MONGODB_URI: Kabhi bhi NEXT_PUBLIC_ prefix mat lagao. Sirf server-side (API routes, lib/) mein use hoti hai.
+- CRON_SECRET: Sirf generate-daily API mein use hota hai. Bearer token se protect hai.
+- Sab MongoDB queries pehle VALID_GAMES whitelist se validate hoti hain — koi bhi raw user input directly DB mein nahi jaata.
+- Deploy karne ke liye VPS zaroori hai (Vercel nahi chalega) kyunki C++ compilation runtime par hoti hai (g++ zaroori hai server par).
