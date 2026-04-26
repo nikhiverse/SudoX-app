@@ -61,6 +61,7 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
         isOpen={showLeaveModal} 
         onClose={() => setShowLeaveModal(false)}
         title="Leave Game?"
+        variant="warning"
         footer={
           <>
             <button className="action-btn ghost" onClick={() => setShowLeaveModal(false)}>Cancel</button>

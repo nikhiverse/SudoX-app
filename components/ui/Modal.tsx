@@ -9,9 +9,10 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  variant?: 'default' | 'warning';
 }
 
-export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, footer, variant = 'default' }: ModalProps) {
   // Track first client-side render to enable createPortal safely.
   // The eslint rule is suppressed here because this is the idiomatic
   // React pattern for SSR-safe portals — it only runs once on mount.
@@ -37,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
   if (!isOpen || !mounted) return null;
 
   return createPortal(
-    <div className={`modal-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
+    <div className={`modal-overlay ${isOpen ? 'open' : ''} ${variant === 'warning' ? 'modal-warning' : ''}`} onClick={onClose}>
       <div
         className="modal-content"
         onClick={(e) => e.stopPropagation()} // Prevent close when clicking inside content

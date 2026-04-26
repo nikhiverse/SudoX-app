@@ -126,7 +126,7 @@ function GameActive({
   // No beforeunload dialog needed — all state (grid + timer) is persisted
   // to localStorage so page refresh seamlessly restores everything (Wordle-style).
 
-  const [autoDismissModal, setAutoDismissModal] = useState<{title: string, message: string} | null>(null);
+  const [autoDismissModal, setAutoDismissModal] = useState<{title: string, message: string, type?: 'default' | 'warning'} | null>(null);
 
   // Auto-dismiss effect
   useEffect(() => {
@@ -146,10 +146,10 @@ function GameActive({
       initHandledRef.current = true;
       if (isCompleted) {
         setAutoDismissModal({ title: 'Finished', message: 'You have already finished this puzzle!' });
-      } else if (gameIsLocked) {
-        setAutoDismissModal({ title: 'Locked', message: 'Better luck tomorrow!' });
       } else if (lives === 0) {
-        setAutoDismissModal({ title: 'Warning', message: 'You are out of lives for today.\nPlay wisely!' });
+        setAutoDismissModal({ title: 'Locked', message: 'Better luck tomorrow!', type: 'warning' });
+      } else if (lives === 1) {
+        setAutoDismissModal({ title: 'Warning', message: 'You are out of lives for today.\nPlay wisely!', type: 'warning' });
       }
     }
   }, [isInitialized, isCompleted, gameIsLocked, lives]);
@@ -166,8 +166,8 @@ function GameActive({
     }
     prevIsCompleted.current = isCompleted;
 
-    if (!prevIsLocked.current && gameIsLocked) {
-      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow' });
+    if (!prevIsLocked.current && gameIsLocked && !isCompleted) {
+      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
     }
     prevIsLocked.current = gameIsLocked;
   }, [isCompleted, gameIsLocked, stateVersion]);
@@ -200,7 +200,7 @@ function GameActive({
 
   const wrappedWriteValue = useCallback((r: number, c: number, val: number) => {
     if (gameIsLocked) {
-      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow' });
+      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
       return;
     }
     
@@ -219,7 +219,7 @@ function GameActive({
 
   const wrappedEraseValue = useCallback((r: number, c: number) => {
     if (gameIsLocked) {
-      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow' });
+      setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
       return;
     }
     eraseValue(r, c);
@@ -282,6 +282,7 @@ function GameActive({
         onClose={() => setAutoDismissModal(null)}
         title={autoDismissModal?.title || ''}
         footer={null}
+        variant={autoDismissModal?.type || 'default'}
       >
         <p>{autoDismissModal?.message}</p>
       </Modal>

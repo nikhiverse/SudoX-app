@@ -45,6 +45,12 @@
   --shadow-lg:
     0 12px 32px rgba(45, 42, 36, 0.14), 0 4px 8px rgba(45, 42, 36, 0.06);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Premium Yellowish Warning */
+  --warning-border: #fcd34d;
+  --warning-shadow: rgba(245, 158, 11, 0.15);
+  --warning-text: #92400e;
+  --warning-bg: #fffbeb;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -94,6 +100,12 @@
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
+
+    /* Premium Yellowish Warning (Dark Mode) */
+    --warning-border: #d4af37; /* Gold */
+    --warning-shadow: rgba(212, 175, 55, 0.15);
+    --warning-text: #fcd34d;
+    --warning-bg: #1f1b0f;
   }
 }
 
@@ -1125,6 +1137,16 @@ footer a:hover {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.modal-warning .modal-content {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  box-shadow: 0 0 24px var(--warning-shadow);
+}
+
+.modal-warning .modal-title {
+  color: var(--warning-text);
 }
 
 .modal-overlay.open .modal-content {
