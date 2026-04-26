@@ -126,7 +126,7 @@ function GameActive({
   // No beforeunload dialog needed — all state (grid + timer) is persisted
   // to localStorage so page refresh seamlessly restores everything (Wordle-style).
 
-  const [autoDismissModal, setAutoDismissModal] = useState<{title: string, message: string, type?: 'default' | 'warning'} | null>(null);
+  const [autoDismissModal, setAutoDismissModal] = useState<{ title: string, message: string, type?: 'default' | 'warning' } | null>(null);
 
   // Auto-dismiss effect
   useEffect(() => {
@@ -146,10 +146,12 @@ function GameActive({
       initHandledRef.current = true;
       if (isCompleted) {
         setAutoDismissModal({ title: 'Finished', message: 'You have already finished this puzzle!' });
-      } else if (lives === 0) {
+      } else if (gameIsLocked) {
         setAutoDismissModal({ title: 'Locked', message: 'Better luck tomorrow!', type: 'warning' });
+      } else if (lives === 0) {
+        setAutoDismissModal({ title: '⚠️ Warning', message: 'You have 0 lives left!\nOne mistake will lock this puzzle.', type: 'warning' });
       } else if (lives === 1) {
-        setAutoDismissModal({ title: 'Warning', message: 'You are out of lives for today.\nPlay wisely!', type: 'warning' });
+        setAutoDismissModal({ title: '⚠️ Warning', message: 'You have only 1 life left!\nPlay wisely.', type: 'warning' });
       }
     }
   }, [isInitialized, isCompleted, gameIsLocked, lives]);
@@ -159,10 +161,10 @@ function GameActive({
 
   // Active game changes
   useEffect(() => {
-    if (!initHandledRef.current) return; 
+    if (!initHandledRef.current) return;
 
     if (!prevIsCompleted.current && isCompleted) {
-      setAutoDismissModal({ title: 'Congratulations!', message: 'You did it for today\'s puzzle!' });
+      setAutoDismissModal({ title: '🎉 Congratulations!', message: 'You done with this puzzle! Keep it up.' });
     }
     prevIsCompleted.current = isCompleted;
 
@@ -203,7 +205,7 @@ function GameActive({
       setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
       return;
     }
-    
+
     // Check if it's a mistake before writing
     if (val !== 0 && !manager.isCorrect(r, c) && !manager.isClue(r, c)) {
       if (manager.getState().solutionGrid) {
@@ -213,7 +215,7 @@ function GameActive({
         }
       }
     }
-    
+
     writeValue(r, c, val);
   }, [gameIsLocked, manager, recordMistake, game, writeValue]);
 
