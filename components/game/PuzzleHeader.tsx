@@ -47,7 +47,7 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
           <Timer display={timerDisplay} emoji={timerEmoji} />
           {lives !== undefined && (
             <div className="puzzle-hearts">
-              {[0, 1, 2].map((i) => (
+              {[0, 1, 2, 3].map((i) => (
                 <span key={i} style={{ opacity: i < lives ? 1 : 0.3 }}>❤️</span>
               ))}
             </div>
