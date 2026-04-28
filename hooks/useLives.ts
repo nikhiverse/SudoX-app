@@ -9,7 +9,7 @@ import { StorageService } from '@/services/StorageService';
 import { getTodayDateString } from '@/lib/date-utils';
 
 export function useLives() {
-  const [lives, setLives] = useState(3);
+  const [lives, setLives] = useState(4);
   const [lockedGames, setLockedGames] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   

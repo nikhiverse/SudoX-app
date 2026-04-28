@@ -18,6 +18,8 @@ import { NumberPanel } from '@/components/game/NumberPanel';
 import { Modal } from '@/components/ui/Modal';
 import { GAME_NAMES, VALID_GAMES, getVariantFromUrl } from '@/lib/constants';
 import { onPdfDownloadRequest, exportPuzzleToPdf } from '@/services/PdfExportService';
+import { StorageService } from '@/services/StorageService';
+import { getTodayDateString } from '@/lib/date-utils';
 import type { GameVariant } from '@/lib/types';
 
 interface GamePageProps {
@@ -104,6 +106,21 @@ function GameLoader({ game, gameName }: { game: GameVariant; gameName: string })
   );
 }
 
+// ── Helper: format an ISO timestamp to a friendly "HH:MM AM/PM" string ──
+
+function formatTimestamp(iso: string): string {
+  try {
+    const d = new Date(iso);
+    const h = d.getHours();
+    const m = d.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+  } catch {
+    return '';
+  }
+}
+
 // ── Active game with all hooks ──
 
 function GameActive({
@@ -128,11 +145,22 @@ function GameActive({
 
   const [autoDismissModal, setAutoDismissModal] = useState<{ title: string, message: string, type?: 'default' | 'warning' } | null>(null);
 
+  // Read saved timestamps for display on revisit
+  const [finishedAt, setFinishedAt] = useState<string | undefined>();
+  const [lockedAt, setLockedAt] = useState<string | undefined>();
+
+  useEffect(() => {
+    const today = getTodayDateString();
+    const saved = StorageService.getProgress(game, today);
+    if (saved?.finishedAt) setFinishedAt(saved.finishedAt);
+    if (saved?.lockedAt) setLockedAt(saved.lockedAt);
+  }, [game]);
+
   // Auto-dismiss effect
   useEffect(() => {
     if (autoDismissModal) {
-      const timer = setTimeout(() => setAutoDismissModal(null), 1000);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setAutoDismissModal(null), 1000);
+      return () => clearTimeout(t);
     }
   }, [autoDismissModal]);
 
@@ -144,39 +172,81 @@ function GameActive({
 
     if (!initHandledRef.current) {
       initHandledRef.current = true;
-      if (isCompleted) {
-        setAutoDismissModal({ title: 'Finished', message: 'You have already finished this puzzle!' });
-      } else if (gameIsLocked) {
-        setAutoDismissModal({ title: 'Locked', message: 'Better luck tomorrow!', type: 'warning' });
-      } else if (lives === 0) {
+      
+      // On revisit of a completed or locked puzzle, do NOT show any dialog.
+      // The timer area will show the completion/lock time instead.
+      if (isCompleted || gameIsLocked) {
+        return;
+      }
+
+      // Do not show dialogue boxes on refresh of an in-progress puzzle
+      if (initialTimerSeconds > 0) {
+        return;
+      }
+
+      if (lives === 0) {
         setAutoDismissModal({ title: '⚠️ Warning', message: 'You have 0 lives left!\nOne mistake will lock this puzzle.', type: 'warning' });
       } else if (lives === 1) {
         setAutoDismissModal({ title: '⚠️ Warning', message: 'You have only 1 life left!\nPlay wisely.', type: 'warning' });
       }
     }
-  }, [isInitialized, isCompleted, gameIsLocked, lives]);
+  }, [isInitialized, isCompleted, gameIsLocked, lives, initialTimerSeconds]);
 
   const prevIsCompleted = useRef(isCompleted);
   const prevIsLocked = useRef(gameIsLocked);
 
-  // Active game changes
+  // Active game changes — save timestamp on transition
   useEffect(() => {
     if (!initHandledRef.current) return;
 
     if (!prevIsCompleted.current && isCompleted) {
+      const now = new Date().toISOString();
+      setFinishedAt(now);
+      // Persist the finishedAt timestamp
+      const today = getTodayDateString();
+      const serialized = manager.serialize();
+      StorageService.saveProgress(game, today, {
+        game,
+        date: today,
+        cellValues: serialized.cellValues,
+        cellCorrect: serialized.cellCorrect,
+        cellWasWrong: serialized.cellWasWrong,
+        timerSeconds: timer.seconds,
+        completed: true,
+        finishedAt: now,
+      });
       setAutoDismissModal({ title: '🎉 Congratulations!', message: 'You done with this puzzle! Keep it up.' });
     }
     prevIsCompleted.current = isCompleted;
 
     if (!prevIsLocked.current && gameIsLocked && !isCompleted) {
+      const now = new Date().toISOString();
+      setLockedAt(now);
+      // Persist the lockedAt timestamp
+      const today = getTodayDateString();
+      const existing = StorageService.getProgress(game, today);
+      const serialized = manager.serialize();
+      StorageService.saveProgress(game, today, {
+        game,
+        date: today,
+        cellValues: serialized.cellValues,
+        cellCorrect: serialized.cellCorrect,
+        cellWasWrong: serialized.cellWasWrong,
+        timerSeconds: timer.seconds,
+        completed: false,
+        finishedAt: existing?.finishedAt,
+        lockedAt: now,
+      });
       setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
     }
     prevIsLocked.current = gameIsLocked;
-  }, [isCompleted, gameIsLocked, stateVersion]);
+  }, [isCompleted, gameIsLocked, stateVersion, game, manager, timer.seconds]);
 
-  // Start timer immediately when puzzle loads
+  // Start timer immediately when puzzle loads (only if not already finished/locked)
   useEffect(() => {
-    timer.start(initialTimerSeconds);
+    if (!isCompleted && !gameIsLocked) {
+      timer.start(initialTimerSeconds);
+    }
     return () => timer.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -254,13 +324,25 @@ function GameActive({
     }
   }, [manager, wrappedEraseValue]);
 
+  // Determine timer display — show timestamp if completed/locked, otherwise live timer
+  let timerDisplay = timer.display;
+  let timerEmoji = timer.emoji;
+
+  if (isCompleted && finishedAt) {
+    timerDisplay = `Solved at ${formatTimestamp(finishedAt)}`;
+    timerEmoji = '✅';
+  } else if (gameIsLocked && lockedAt) {
+    timerDisplay = `Locked at ${formatTimestamp(lockedAt)}`;
+    timerEmoji = '🔒';
+  }
+
   return (
     <>
       <PuzzleHeader
         title={gameName}
         puzzleId={uniqueId}
-        timerDisplay={timer.display}
-        timerEmoji={timer.emoji}
+        timerDisplay={timerDisplay}
+        timerEmoji={timerEmoji}
         lives={lives}
         canLeaveDirectly={manager.isCompleted() || gameIsLocked}
       />

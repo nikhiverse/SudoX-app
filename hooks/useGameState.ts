@@ -53,9 +53,10 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
   }, []);
 
   // Persist progress to localStorage on every change
-  const persist = useCallback(() => {
+  const persist = useCallback((extra?: { finishedAt?: string; lockedAt?: string }) => {
     const today = getTodayDateString();
     const serialized = manager.serialize();
+    const existing = StorageService.getProgress(game, today);
     StorageService.saveProgress(game, today, {
       game,
       date: today,
@@ -64,6 +65,8 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
       cellWasWrong: serialized.cellWasWrong,
       timerSeconds: timerRef.current,
       completed: manager.isCompleted(),
+      finishedAt: extra?.finishedAt || existing?.finishedAt,
+      lockedAt: extra?.lockedAt || existing?.lockedAt,
     });
   }, [manager, game]);
 

@@ -103,6 +103,8 @@ export interface GameProgress {
   cellWasWrong?: boolean[][];
   timerSeconds: number;
   completed: boolean;
+  finishedAt?: string;   // ISO timestamp when puzzle was solved
+  lockedAt?: string;     // ISO timestamp when puzzle was locked (0 lives)
 }
 
 // ── Cell state for rendering ──

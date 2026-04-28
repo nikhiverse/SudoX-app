@@ -83,12 +83,12 @@ export const StorageService = {
   // ── Lives & Locking ──
 
   getLives(date: string): number {
-    if (!isLocalStorageAvailable()) return 3;
+    if (!isLocalStorageAvailable()) return 4;
     try {
       const val = localStorage.getItem(`${STORAGE_PREFIX}:lives:${date}`);
-      return val === null ? 3 : parseInt(val, 10);
+      return val === null ? 4 : parseInt(val, 10);
     } catch {
-      return 3;
+      return 4;
     }
   },
 

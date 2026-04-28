@@ -23,7 +23,8 @@
 
   --grid-bg: #2d2a24;
   --grid-cell-bg: #fffdf8;
-  --grid-alt-cell: #fef3c7;
+  --grid-alt-cell: #b45309;
+  /*#fef3c7*/
 
   /* Playability */
   --cursor-bg: #81c784;
@@ -75,13 +76,13 @@
     --border-soft: rgba(255, 255, 255, 0.1);
     --border-mid: rgba(255, 255, 255, 0.15);
 
-    --cell-accent: #fb923c;
-    --cell-accent-2: #ea580c;
+    --cell-accent: #f97316;
+    --cell-accent-2: #f97316;
 
     --grid-bg: rgba(255, 255, 255, 0.2);
     --grid-cell-bg: #050505;
     /* Deep black for empty cells */
-    --grid-alt-cell: #111111;
+    --grid-alt-cell: #f97316;
     /* Slightly lighter for textured grid */
 
     --cursor-bg: #81c784;
@@ -102,7 +103,8 @@
     --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
 
     /* Premium Yellowish Warning (Dark Mode) */
-    --warning-border: #d4af37; /* Gold */
+    --warning-border: #d4af37;
+    /* Gold */
     --warning-shadow: rgba(212, 175, 55, 0.15);
     --warning-text: #fcd34d;
     --warning-bg: #1f1b0f;
@@ -112,48 +114,74 @@
 /* Force dark mode */
 :root.force-dark {
   /* --- Surfaces & Backgrounds --- */
-  --surface-bg: #000000;        /* Deepest background base (pure black) */
-  --surface-card: #0a0a0a;      /* Slightly lighter background for cards/floating containers */
-  --surface-raised: #121212;    /* Even lighter background for elevated elements like modals */
+  --surface-bg: #000000;
+  /* Deepest background base (pure black) */
+  --surface-card: #0a0a0a;
+  /* Slightly lighter background for cards/floating containers */
+  --surface-raised: #121212;
+  /* Even lighter background for elevated elements like modals */
 
   /* --- Brand & Primary Colors --- */
-  --primary: #fb923c;           /* Main brand color (vibrant orange) */
-  --primary-hover: #f97316;     /* Darker orange for button hover states */
+  --primary: #fb923c;
+  /* Main brand color (vibrant orange) */
+  --primary-hover: #f97316;
+  /* Darker orange for button hover states */
 
   /* --- Text Colors --- */
-  --text-primary: #ededed;      /* Main readable text (near white) */
-  --text-secondary: #a1a1aa;    /* Secondary text like subtitles/hints (light gray) */
-  --text-muted: #52525b;        /* Faded text, used for disabled items */
-  --text-on-primary: #000000;   /* Text color to display inside primary colored buttons (black on orange) */
+  --text-primary: #ededed;
+  /* Main readable text (near white) */
+  --text-secondary: #a1a1aa;
+  /* Secondary text like subtitles/hints (light gray) */
+  --text-muted: #52525b;
+  /* Faded text, used for disabled items */
+  --text-on-primary: #000000;
+  /* Text color to display inside primary colored buttons (black on orange) */
 
   /* --- Borders --- */
-  --border-soft: rgba(255, 255, 255, 0.1);  /* Faint white borders for subtle separation */
-  --border-mid: rgba(255, 255, 255, 0.15);  /* Slightly more visible borders */
+  --border-soft: rgba(255, 255, 255, 0.1);
+  /* Faint white borders for subtle separation */
+  --border-mid: rgba(255, 255, 255, 0.2);
+  /* Slightly more visible borders */
 
   /* --- Game Grid Elements & Cells --- */
-  --cell-accent: #ea580c;       /* Highlight color for special cells (e.g., related numbers) */
-  --cell-accent-2: #ea580c;     /* Secondary highlight color (currently same as above) */
+  --cell-accent: #f97316;
+  /* Highlight color for special cells (e.g., related numbers) */
+  --cell-accent-2: #f97316;
+  /* Secondary highlight color (currently same as above) */
 
-  --grid-bg: rgba(255, 255, 255, 0.2);      /* Background for the outer Sudoku grid wrapper */
-  --grid-cell-bg: #050505;      /* Base deep black background for regular cells */
-  --grid-alt-cell: #111111;     /* Lighter background for alternating sub-grid blocks */
+  --grid-bg: rgba(255, 255, 255, 0.2);
+  /* Background for the outer Sudoku grid wrapper */
+  --grid-cell-bg: #050505;
+  /* Base deep black background for regular cells */
+  --grid-alt-cell: #f97316;
+  /* Lighter background for alternating sub-grid blocks */
 
   /* --- Game Interactions (Selectors) --- */
-  --cursor-bg: #81c784;         /* Green highlight for the actively selected cell */
-  --cursor-text: #000000;       /* Black text inside the active green cursor for readability */
-  --crosshair-bg: #1c1c1c;      /* Dark grey highlight for the row/col of the active cell */
+  --cursor-bg: #81c784;
+  /* Green highlight for the actively selected cell */
+  --cursor-text: #000000;
+  /* Black text inside the active green cursor for readability */
+  --crosshair-bg: #1c1c1c;
+  /* Dark grey highlight for the row/col of the active cell */
 
   /* --- Game Feedback Colors --- */
-  --correct-bg: #020617;        /* Background tint for correct answers */
-  --correct-text: #3b82f6;      /* Blue text indicating a correct answer */
+  --correct-bg: #020617;
+  /* Background tint for correct answers */
+  --correct-text: #3b82f6;
+  /* Blue text indicating a correct answer */
 
-  --wrong-bg: #2a0505;          /* Red background tint for mistakes */
-  --wrong-text: #ef4444;        /* Bright red text for wrong answers */
+  --wrong-bg: #2a0505;
+  /* Red background tint for mistakes */
+  --wrong-text: #ef4444;
+  /* Bright red text for wrong answers */
 
   /* --- Shadows & Depth --- */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);   /* Small shadow for buttons */
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);  /* Medium shadow for floating cards */
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7); /* Large shadow for pop-ups and modals */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  /* Small shadow for buttons */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  /* Medium shadow for floating cards */
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
+  /* Large shadow for pop-ups and modals */
 }
 
 /* Force light mode */
@@ -178,7 +206,7 @@
 
   --grid-bg: #2d2a24;
   --grid-cell-bg: #fffdf8;
-  --grid-alt-cell: #fef3c7;
+  --grid-alt-cell: #b45309;
 
   /* Playability */
   --cursor-bg: #81c784;

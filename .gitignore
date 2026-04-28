@@ -54,3 +54,11 @@ clear_db.js
 query_db.js
 patcher.py
 patch_check.py
+directory_structure.txt
+
+# graphify knowledge graph output
+graphify-out/
+.agents/
+
+CLAUDE.md
+AGENTS.md

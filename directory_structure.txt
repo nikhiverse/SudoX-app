@@ -15,6 +15,9 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
   - clear_db.js / query_db.js: Developer ke kaam aane wali DB test scripts.
   - output.json / build_log.txt: Build ke waqt bane temporary log files.
   - start_game.sh / SudoX.desktop: Local machine par ek-click se game chalane ke shortcuts.
+  - directory_structure.txt: Yeh file khud (Git mein nahi jaati).
+  - graphify-out/: AI codebase analysis graph output (Git mein nahi jaata).
+  - .agents/: AI agent rules aur workflows (Git mein nahi jaata).
 
 === app/ FOLDER (User ka samne wala screen) ===
 8.  app/page.tsx: Yeh website ka main "Home Page" hai. Yahan saare 16 game variants play karne ke liye list mein dikhte hain.
@@ -22,7 +25,7 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
 10. app/globals.css: Isme website gori hogi ya kaali, rang ya font style sabki designing ki chitthi likhi hui hai.
 
 12. app/api/puzzle/[game]/route.ts: Jab user game chunta hai tab ye us game ka level database me dhoond kar lata hai taaki app screen ban sakiye.
-13. app/play/[variant]/page.tsx: Jab hum koi game theek se khelne lagte hain, us waqt screen ka structure is page se milta hai.
+13. app/play/[variant]/page.tsx: Jab hum koi game theek se khelne lagte hain, us waqt screen ka structure is page se milta hai. Solved ya locked puzzle par wapas aane par bina koi dialog dikhaye seedha "Solved at 11:30 PM" ya "Locked at 10:15 PM" timer mein dikhata hai.
 
 === components/ FOLDER (UI ki Choti Cheezein) ===
 14. components/game/PuzzleGrid.tsx: Yeh pura woh bada Sudoku board (dabba) hai jahan hum 1 se 9 tak number bharte hain.
@@ -36,11 +39,11 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
 22. components/ui/Modal.tsx: Ek reusable popup dialog component jo game ke andar "Leave Game?", "Congratulations!", ya koi aur message dikhane ke liye use hota hai.
 
 === hooks/ FOLDER (Custom React chabiya) ===
-23. hooks/useGameState.ts: Game kaha pohocha hai, kya chal raha uske current status dhyaan me rakhti hai.
+23. hooks/useGameState.ts: Game kaha pohocha hai, kya chal raha uske current status dhyaan me rakhti hai. Solved/locked hone par timestamp bhi save karta hai.
 24. hooks/useKeyboard.ts: Jab hum keyboard wala button ('1','2') dabaate hai, tab software ki setting me number cell me put karati hai.
 25. hooks/usePuzzle.ts: API folder ko pukarti hai game ka puzzle lane ke liye.
 26. hooks/useTimer.ts: Yeh hook bas time ko theek theek gin-ne me, badhane, rokhne (stop) ke kaam ati hai.
-27. hooks/useLives.ts: Har din ke liye 3 lives track karta hai. Zyada mistakes hone par game lock ho jati hai.
+27. hooks/useLives.ts: Har din ke liye 4 lives track karta hai. Zyada mistakes hone par game lock ho jati hai.
 28. hooks/useBeforeUnload.ts: Jab user game ke beech mein galti se page reload karta hai ya tab band karta hai, tab browser ek "Leave site?" warning dikhata hai taaki progress na kho jaye.
 
 === services/ FOLDER (Dimaag Ya Management wala area) ===
@@ -58,15 +61,21 @@ NOTE: Neeche wali dev-only files Git mein commit NAHI hoti (.gitignore mein hain
 38. lib/puzzle-generator.ts: C++ engines ko bulakar naya game banane ka kaam karta hai. MONGODB_URI sirf yahan server-side use hoti hai.
 39. lib/puzzle-validator.ts: C++ se aaye data ko validate karta hai — koi invalid structure ho to reject kar deta hai.
 40. lib/rate-limiter.ts: Ek IP se zyada requests aane par (60/minute se zyada) block karta hai. In-memory sliding window approach.
-41. lib/types.ts: TypeScript ke types aur interfaces jo poore project mein use hote hain.
+41. lib/types.ts: TypeScript ke types aur interfaces jo poore project mein use hote hain. GameProgress mein finishedAt / lockedAt timestamps bhi hain.
 
 === engine/ FOLDER (Superfast C++ Brain) ===
 42. engine/src/: C++ source files jo alag alag puzzle variants generate karte hain (jaise sudoku9.cpp, jigsawX.cpp etc.)
 43. engine/include/: C++ header files (shared logic).
 44. engine/bin/: Compiled binaries (Git mein commit nahi hoti — .gitignore mein hain). Server par deploy karte waqt ya pehli API call par compile hoti hain.
 
+=== .github/ FOLDER (CI/CD Automation) ===
+45. .github/workflows/generate-daily.yml: GitHub Actions cron job jo har raat 12:00 AM IST (18:30 UTC) par automatically saare 16 puzzle variants generate karke MongoDB mein store karti hai. Node 22 LTS use karti hai.
+
+=== DEPLOYMENT (Vercel) ===
+- App Vercel par deployed hai. Puzzle generation GitHub Actions se hota hai (C++ runtime wahan available hai).
+- Vercel Analytics (free tier) se traffic aur performance track kar sakte hain.
+- MONGODB_URI Vercel ke Environment Variables mein set hona chahiye (sirf server-side).
+
 === SECURITY NOTES (Deployment ke liye zaroori) ===
 - MONGODB_URI: Kabhi bhi NEXT_PUBLIC_ prefix mat lagao. Sirf server-side (API routes, lib/) mein use hoti hai.
-
 - Sab MongoDB queries pehle VALID_GAMES whitelist se validate hoti hain — koi bhi raw user input directly DB mein nahi jaata.
-- Deploy karne ke liye VPS zaroori hai (Vercel nahi chalega) kyunki C++ compilation runtime par hoti hai (g++ zaroori hai server par).
