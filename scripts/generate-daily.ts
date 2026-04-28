@@ -2,17 +2,44 @@
 // SudoX — Daily Generator Script
 // Intended to be run via GitHub Actions cron.
 // Executes C++ binaries and pushes puzzles to MongoDB.
+//
+// Usage:
+//   npx tsx scripts/generate-daily.ts            # generate today's puzzles
+//   npx tsx scripts/generate-daily.ts --tomorrow  # generate tomorrow's puzzles
 // ═══════════════════════════════════════════
 
 import { getDb } from '../lib/mongodb';
 import { VALID_GAMES, PUZZLES_COLLECTION } from '../lib/constants';
-import { getTodayDateString } from '../lib/date-utils';
+import { getTodayDateString, getISTDate } from '../lib/date-utils';
 import { generateAndStorePuzzle } from '../lib/puzzle-generator';
 import type { DailyPuzzleDoc } from '../lib/types';
 
+/**
+ * Get the target date string in YYYY-MM-DD format.
+ * If --tomorrow is passed, returns tomorrow's IST date.
+ */
+function getTargetDate(): string {
+  const isTomorrow = process.argv.includes('--tomorrow');
+
+  if (isTomorrow) {
+    const now = getISTDate();
+    now.setDate(now.getDate() + 1);
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  return getTodayDateString();
+}
+
 async function main() {
-  console.log('🚀 Starting daily puzzle generation...');
-  
+  const targetDate = getTargetDate();
+  const label = process.argv.includes('--tomorrow') ? 'TOMORROW' : 'TODAY';
+
+  console.log(`🚀 Starting puzzle generation for ${label}...`);
+  console.log(`📅 Target Date (IST): ${targetDate}`);
+
   if (!process.env.MONGODB_URI) {
     console.error('❌ MONGODB_URI is required.');
     process.exit(1);
@@ -20,9 +47,6 @@ async function main() {
 
   const db = await getDb();
   const collection = db.collection<DailyPuzzleDoc>(PUZZLES_COLLECTION);
-  const today = getTodayDateString();
-
-  console.log(`📅 Target Date (IST): ${today}`);
 
   // Ensure compound unique index exists (game + date + type must be unique)
   await collection.createIndex(
@@ -38,17 +62,17 @@ async function main() {
 
   for (const game of VALID_GAMES) {
     try {
-      // Skip if already generated today
-      const existing = await collection.findOne({ game, date: today });
+      // Skip if already generated for this date
+      const existing = await collection.findOne({ game, date: targetDate });
       if (existing) {
-        console.log(`⏭️  Skipped ${game} (Already exists)`);
+        console.log(`⏭️  Skipped ${game} (Already exists for ${targetDate})`);
         results.skipped.push(game);
         continue;
       }
 
       // Generate and store
       process.stdout.write(`⚙️  Generating ${game}... `);
-      await generateAndStorePuzzle(game, today);
+      await generateAndStorePuzzle(game, targetDate);
       console.log('✅ Done');
       results.generated.push(game);
 
@@ -59,7 +83,7 @@ async function main() {
     }
   }
 
-  console.log('\n📊 Generation Summary:');
+  console.log(`\n📊 Generation Summary (${label} — ${targetDate}):`);
   console.log(`   Generated: ${results.generated.length}`);
   console.log(`   Skipped:   ${results.skipped.length}`);
   console.log(`   Failed:    ${results.failed.length}`);
@@ -68,7 +92,7 @@ async function main() {
     console.error('⚠️ Some generators failed!');
     process.exit(1);
   } else {
-    console.log('🎉 All puzzles ready for today!');
+    console.log(`🎉 All puzzles ready for ${targetDate}!`);
     process.exit(0);
   }
 }

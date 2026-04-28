@@ -2,13 +2,23 @@ name: Generate Daily SudoX Puzzles
 
 on:
   schedule:
-    # 18:30 UTC is exactly 00:00 IST (Midnight in India)
+    # Primary:   18:30 UTC = 00:00 IST (Midnight India)
     - cron: '30 18 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI for testing
+    # Backup 1:  19:30 UTC = 01:00 IST (1 hour later, in case GitHub skips the first)
+    - cron: '30 19 * * *'
+    # Backup 2:  21:00 UTC = 02:30 IST (last-resort fallback)
+    - cron: '0 21 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+# Prevent duplicate runs — if one is already running, skip the new one
+concurrency:
+  group: daily-puzzle-gen
+  cancel-in-progress: false
 
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Code
@@ -26,7 +36,12 @@ jobs:
       - name: Ensure C++ Compiler is installed
         run: sudo apt-get update && sudo apt-get install -y g++
 
-      - name: Run Puzzle Generator
+      - name: Generate Today's Puzzles
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: npx tsx scripts/generate-daily.ts
+
+      - name: Generate Tomorrow's Puzzles (buffer)
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: npx tsx scripts/generate-daily.ts --tomorrow
