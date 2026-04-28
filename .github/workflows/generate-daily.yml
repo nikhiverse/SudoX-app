@@ -42,6 +42,7 @@ jobs:
         run: npx tsx scripts/generate-daily.ts
 
       - name: Generate Tomorrow's Puzzles (buffer)
+        continue-on-error: true
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: npx tsx scripts/generate-daily.ts --tomorrow

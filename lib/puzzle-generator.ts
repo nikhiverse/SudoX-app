@@ -64,8 +64,8 @@ export async function generateAndStorePuzzle(game: string, date: string): Promis
     throw new Error(`Validation failed: ${validation.error}`);
   }
 
-  const uniqueId = buildUniqueId(game as GameVariant);
-  const generationId = buildGenerationId(game as GameVariant);
+  const uniqueId = buildUniqueId(game as GameVariant, date);
+  const generationId = buildGenerationId(game as GameVariant, date);
 
   const { solution, ...puzzleOnlyData } = puzzleData as Record<string, unknown>;
   if (!solution) {

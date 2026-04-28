@@ -40,23 +40,42 @@ export function formatDisplayDate(): string {
 }
 
 /**
- * Build the 8-digit unique puzzle ID: yymmddcc based on IST.
+ * Build the 8-digit unique puzzle ID: yymmddcc.
+ * If dateStr (YYYY-MM-DD) is provided, uses that date; otherwise uses current IST.
  */
-export function buildUniqueId(game: GameVariant): string {
-  const now = getISTDate();
-  const yy = String(now.getFullYear()).slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
+export function buildUniqueId(game: GameVariant, dateStr?: string): string {
+  let yy: string, mm: string, dd: string;
+
+  if (dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    yy = year.slice(-2);
+    mm = month;
+    dd = day;
+  } else {
+    const now = getISTDate();
+    yy = String(now.getFullYear()).slice(-2);
+    mm = String(now.getMonth() + 1).padStart(2, '0');
+    dd = String(now.getDate()).padStart(2, '0');
+  }
+
   const cc = GAME_CODES[game] || '00';
   return `${yy}${mm}${dd}${cc}`;
 }
 
 /**
- * Build the 6-digit generation ID: ddccrr based on IST.
+ * Build the 6-digit generation ID: ddccrr.
+ * If dateStr (YYYY-MM-DD) is provided, uses that day; otherwise uses current IST.
  */
-export function buildGenerationId(game: GameVariant): string {
-  const now = getISTDate();
-  const dd = String(now.getDate()).padStart(2, '0');
+export function buildGenerationId(game: GameVariant, dateStr?: string): string {
+  let dd: string;
+
+  if (dateStr) {
+    dd = dateStr.split('-')[2];
+  } else {
+    const now = getISTDate();
+    dd = String(now.getDate()).padStart(2, '0');
+  }
+
   const cc = GAME_CODES[game] || '00';
   const rr = String(Math.floor(Math.random() * 99) + 1).padStart(2, '0');
   return `${dd}${cc}${rr}`;
