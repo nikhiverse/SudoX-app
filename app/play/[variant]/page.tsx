@@ -113,9 +113,7 @@ function formatTimestamp(iso: string): string {
     const d = new Date(iso);
     const h = d.getHours();
     const m = d.getMinutes();
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 || 12;
-    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
   } catch {
     return '';
   }
@@ -135,7 +133,7 @@ function GameActive({
   uniqueId: string;
 }) {
   const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, initialTimerSeconds } = useGameState(puzzleData, game);
-  const timer = useTimer();
+  const timer = useTimer(initialTimerSeconds);
   const { lives, recordMistake, isLocked, isInitialized } = useLives();
   const gameIsLocked = isLocked(game);
   const isCompleted = manager.isCompleted();
@@ -324,17 +322,9 @@ function GameActive({
     }
   }, [manager, wrappedEraseValue]);
 
-  // Determine timer display — show timestamp if completed/locked, otherwise live timer
+  // Always use the live timer display and the clock emoji
   let timerDisplay = timer.display;
   let timerEmoji = timer.emoji;
-
-  if (isCompleted && finishedAt) {
-    timerDisplay = `Solved at ${formatTimestamp(finishedAt)}`;
-    timerEmoji = '✅';
-  } else if (gameIsLocked && lockedAt) {
-    timerDisplay = `Locked at ${formatTimestamp(lockedAt)}`;
-    timerEmoji = '🔒';
-  }
 
   return (
     <>
@@ -354,12 +344,22 @@ function GameActive({
         game={game}
       />
 
-      <NumberPanel
-        manager={manager}
-        stateVersion={stateVersion}
-        onNumberClick={handleNumberClick}
-        onErase={handleErase}
-      />
+      {isCompleted && finishedAt ? (
+        <div className="status-panel">
+          Solved@{formatTimestamp(finishedAt)}
+        </div>
+      ) : gameIsLocked && lockedAt ? (
+        <div className="status-panel">
+          Locked@{formatTimestamp(lockedAt)}
+        </div>
+      ) : (
+        <NumberPanel
+          manager={manager}
+          stateVersion={stateVersion}
+          onNumberClick={handleNumberClick}
+          onErase={handleErase}
+        />
+      )}
 
       <Modal
         isOpen={autoDismissModal !== null}

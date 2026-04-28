@@ -17,11 +17,20 @@ interface UseTimerResult {
   isRunning: boolean;
 }
 
-export function useTimer(): UseTimerResult {
-  const [seconds, setSeconds] = useState(0);
+export function useTimer(initialSeconds: number = 0): UseTimerResult {
+  const [seconds, setSeconds] = useState(initialSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const secondsRef = useRef(0);
+  const secondsRef = useRef(initialSeconds);
+
+  // When initialSeconds change (e.g. from 0 to the actual saved value on mount),
+  // update the state if the timer hasn't started yet.
+  useEffect(() => {
+    if (!isRunning && initialSeconds > 0 && seconds === 0) {
+      setSeconds(initialSeconds);
+      secondsRef.current = initialSeconds;
+    }
+  }, [initialSeconds, isRunning, seconds]);
 
   // Cleanup on unmount
   useEffect(() => {
