@@ -344,13 +344,13 @@ function GameActive({
         game={game}
       />
 
-      {isCompleted && finishedAt ? (
+      {isCompleted ? (
         <div className="status-panel">
-          Solved@{formatTimestamp(finishedAt)}
+          Solved@{finishedAt ? formatTimestamp(finishedAt) : '00:00'}
         </div>
-      ) : gameIsLocked && lockedAt ? (
+      ) : gameIsLocked ? (
         <div className="status-panel">
-          Locked@{formatTimestamp(lockedAt)}
+          Locked@{lockedAt ? formatTimestamp(lockedAt) : '00:00'}
         </div>
       ) : (
         <NumberPanel
