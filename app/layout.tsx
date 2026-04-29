@@ -3,14 +3,15 @@
 
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { Analytics } from '@vercel/analytics/react';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'SudoX — Sudoku Puzzle Variants',
+  title: 'SudoX - Sudoku Puzzle Variants',
   description:
     'Play 16 unique Sudoku variants daily — standard, jigsaw, windoku, twodoku, and more. Free, no login required.',
   openGraph: {
-    title: 'SudoX — Sudoku Puzzle Variants',
+    title: 'SudoX - Sudoku Puzzle Variants',
     description: 'Play 16 unique Sudoku variants daily.',
     type: 'website',
   },
@@ -27,7 +28,8 @@ export default function RootLayout({
         <link rel="icon" type="image/png" href="/favicon.png" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
         {/* Restore saved theme before first paint to avoid flash */}
-        <script dangerouslySetInnerHTML={{ __html: `
+        <script dangerouslySetInnerHTML={{
+          __html: `
           (function() {
             try {
               var t = localStorage.getItem('sudox:theme');
@@ -68,7 +70,8 @@ export default function RootLayout({
             </a>
           </p>
         </footer>
-      </body>
+        <Analytics />
+        -      </body>
     </html>
   );
 }

@@ -42,6 +42,12 @@ const icons = {
       <path d="M3 18h18" />
     </svg>
   ),
+  reachout: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+      <polyline points="22,6 12,13 2,6" />
+    </svg>
+  ),
 };
 
 export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
@@ -81,6 +87,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { label: 'Download PDF', icon: icons.download, action: 'download' },
     { divider: true },
+    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.webdna@gmail.com' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 
@@ -88,6 +95,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'About', icon: icons.about, action: 'about' },
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { divider: true },
+    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.webdna@gmail.com' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 
@@ -128,6 +136,24 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
           {items.map((item, i) => {
             if ('divider' in item && item.divider) {
               return <li key={`div-${i}`} className="drawer-divider" />;
+            }
+            if ('href' in item) {
+              const href = item.href as string;
+              return (
+                <li key={`href-${i}`}>
+                  <a
+                    href={href}
+                    className="drawer-item"
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                    onClick={() => {
+                      setTimeout(onClose, 300);
+                    }}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </a>
+                </li>
+              );
             }
             if ('action' in item) {
               const action = item.action as string;
