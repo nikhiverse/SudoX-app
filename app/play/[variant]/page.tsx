@@ -323,8 +323,8 @@ function GameActive({
   }, [manager, wrappedEraseValue]);
 
   // Always use the live timer display and the clock emoji
-  let timerDisplay = timer.display;
-  let timerEmoji = timer.emoji;
+  const timerDisplay = timer.display;
+  const timerEmoji = timer.emoji;
 
   return (
     <>
