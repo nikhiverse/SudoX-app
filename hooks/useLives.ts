@@ -15,6 +15,7 @@ export function useLives() {
   
   useEffect(() => {
     const today = getTodayDateString();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLives(StorageService.getLives(today));
     setLockedGames(StorageService.getLockedGames(today));
     setIsInitialized(true);

@@ -83,6 +83,7 @@ export type DailyPuzzleDoc = PuzzleDoc | SolutionDoc;
 
 export interface PuzzleApiResponse {
   puzzleData: PuzzleData;
+  encodedSolution?: string;  // XOR-encoded solution (opaque to DevTools)
   uniqueId: string;
   generationId: string;
   game: string;

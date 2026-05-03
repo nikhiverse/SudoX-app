@@ -77,7 +77,7 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
 
         // Compute visual flags
         const flags = computeCellFlags(puzzleData, r, c, game);
-        const borders = computeBorders(puzzleData, r, c, state.totalRows, state.totalCols);
+        const borders = computeBorders(puzzleData, r, c);
 
         cellArray.push(
           <GridCell
@@ -114,6 +114,8 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
   return (
     <div className="puzzle-output" ref={containerRef}>
       <div
+        role="grid"
+        aria-label="Sudoku Puzzle"
         className={`sudoku-grid ${puzzleData.type === 'twodoku' ? 'is-twodoku' : ''}`}
         style={{
           gridTemplateColumns: `repeat(${state.totalCols}, ${cellSize}px)`,
@@ -208,8 +210,7 @@ function computeBorders(
   data: PuzzleData,
   r: number,
   c: number,
-  totalRows: number,
-  totalCols: number,
+
 ): { top: 'thick' | 'thin' | 'none'; bottom: 'thick' | 'thin' | 'none'; left: 'thick' | 'thin' | 'none'; right: 'thick' | 'thin' | 'none' } {
   type BorderWeight = 'thick' | 'thin' | 'none';
   const result: { top: BorderWeight; bottom: BorderWeight; left: BorderWeight; right: BorderWeight } = { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' };
@@ -242,7 +243,7 @@ function computeBorders(
       for (const g of d.grids) {
         if (!g.subR || !g.subC) continue;
         if (r >= g.r && r < g.r + g.size && c >= g.c && c < g.c + g.size) {
-          const nr = r - 1, nc = c - 1;
+
           // Top sub-block border
           if (r > g.r && (r - g.r) % g.subR === 0) result.top = 'thick';
           // Bottom

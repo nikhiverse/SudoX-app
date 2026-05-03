@@ -4,11 +4,11 @@
 
 'use client';
 
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { GameStateManager } from '@/services/GameStateManager';
 import { StorageService } from '@/services/StorageService';
 import { getTodayDateString } from '@/lib/date-utils';
-import type { PuzzleData, GameProgress } from '@/lib/types';
+import type { PuzzleData } from '@/lib/types';
 
 interface UseGameStateResult {
   manager: GameStateManager;
@@ -21,32 +21,30 @@ interface UseGameStateResult {
 }
 
 export function useGameState(puzzleData: PuzzleData, game: string): UseGameStateResult {
-  const managerRef = useRef<GameStateManager | null>(null);
-  const timerRef = useRef<number>(0);
-  const initialTimerSecondsRef = useRef<number>(0);
-  const [stateVersion, setStateVersion] = useState(0);
-
-  // Initialize manager once per puzzle
-  if (!managerRef.current) {
-    managerRef.current = new GameStateManager(puzzleData);
+  const [{ manager, initialTimerSeconds }] = useState(() => {
+    const mgr = new GameStateManager(puzzleData);
+    let initialSecs = 0;
 
     // Restore progress from localStorage
     const today = getTodayDateString();
     const saved = StorageService.getProgress(game, today);
     if (saved) {
-      managerRef.current.restore({
+      mgr.restore({
         cellValues: saved.cellValues,
         cellCorrect: saved.cellCorrect,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellWasWrong: (saved as any).cellWasWrong, // Handle backwards compatibility
       });
       if (saved.timerSeconds) {
-        initialTimerSecondsRef.current = saved.timerSeconds;
-        timerRef.current = saved.timerSeconds;
+        initialSecs = saved.timerSeconds;
       }
     }
-  }
+    
+    return { manager: mgr, initialTimerSeconds: initialSecs };
+  });
 
-  const manager = managerRef.current;
+  const timerRef = useRef<number>(initialTimerSeconds);
+  const [stateVersion, setStateVersion] = useState(0);
 
   const bump = useCallback(() => {
     setStateVersion(v => v + 1);
@@ -102,6 +100,6 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
     writeValue, 
     eraseValue,
     syncTimer,
-    initialTimerSeconds: initialTimerSecondsRef.current
+    initialTimerSeconds
   };
 }

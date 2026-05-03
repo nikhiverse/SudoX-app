@@ -3,7 +3,6 @@
 // ═══════════════════════════════════════════
 // Validates C++ output JSON before storing in MongoDB.
 
-import type { PuzzleData } from './types';
 
 interface ValidationResult {
   valid: boolean;

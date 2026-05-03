@@ -6,7 +6,7 @@ import { useSyncExternalStore, useEffect, useState } from 'react';
 // Client-side date display — avoids useEffect+setState pattern
 // which triggers cascading renders in React 19 strict lint.
 
-function subscribeNoop(_: () => void) {
+function subscribeNoop() {
   return () => {};
 }
 

@@ -3,8 +3,7 @@
 // Pure TypeScript class, no React/DOM deps.
 // ═══════════════════════════════════════════
 
-import { displayVal, parseVal } from '@/lib/grid-utils';
-import type { PuzzleData, StandardPuzzle, JigsawPuzzle, TwodokuPuzzle } from '@/lib/types';
+import type { PuzzleData } from '@/lib/types';
 
 export interface GameState {
   totalRows: number;
@@ -35,7 +34,7 @@ export class GameStateManager {
     let gridSize: number;
     let grid: number[][];
     let activeMap: boolean[][];
-    let solutionGrid: number[][] | null = data.solution ?? null;
+    const solutionGrid: number[][] | null = data.solution ?? null;
 
     if (data.type === 'twodoku') {
       totalRows = data.totalRows;
@@ -185,7 +184,7 @@ export class GameStateManager {
    */
   getHighlightedCells(): Set<string> {
     const highlighted = new Set<string>();
-    const { cursorR, cursorC, totalRows, totalCols, cellValues, activeMap, clueMap } = this.state;
+    const { cursorR, cursorC, totalRows, totalCols, cellValues, activeMap } = this.state;
 
     if (cursorR < 0 || cursorC < 0) return highlighted;
     if (!this.isActive(cursorR, cursorC)) return highlighted;

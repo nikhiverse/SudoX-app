@@ -27,6 +27,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
   // update the state if the timer hasn't started yet.
   useEffect(() => {
     if (!isRunning && initialSeconds > 0 && seconds === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSeconds(initialSeconds);
       secondsRef.current = initialSeconds;
     }

@@ -47,6 +47,7 @@ function GridCellInner({
     return (
       <div
         className="grid-cell inactive-cell"
+        aria-hidden="true"
         style={{
           width: cellSize,
           height: cellSize,
@@ -67,8 +68,13 @@ function GridCellInner({
   if (wasWrong) classes.push('was-wrong');
   if (isWrong) classes.push('wrong');
 
+  const ariaLabel = `Row ${row + 1}, column ${col + 1}${value ? `, value ${displayVal(value)}` : ', empty'}${isClue ? ', clue' : ''}`;
+
   return (
     <div
+      role="gridcell"
+      aria-label={ariaLabel}
+      aria-selected={isCursor}
       className={classes.join(' ')}
       style={{
         width: cellSize,

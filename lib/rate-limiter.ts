@@ -1,70 +1,36 @@
 // ═══════════════════════════════════════════
-// SudoX — In-Memory Sliding Window Rate Limiter
+// SudoX — Redis-backed Rate Limiter
 // ═══════════════════════════════════════════
 
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 import { RATE_LIMIT } from './constants';
 
-interface RateLimitEntry {
-  timestamps: number[];
-}
-
-const store = new Map<string, RateLimitEntry>();
-
-// Clean up stale entries every 5 minutes
-let lastCleanup = Date.now();
-const CLEANUP_INTERVAL = 5 * 60 * 1000;
-
-function cleanupStaleEntries() {
-  const now = Date.now();
-  if (now - lastCleanup < CLEANUP_INTERVAL) return;
-  lastCleanup = now;
-
-  const cutoff = now - RATE_LIMIT.windowMs;
-  for (const [key, entry] of store.entries()) {
-    entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
-    if (entry.timestamps.length === 0) {
-      store.delete(key);
-    }
-  }
-}
+// Create a new ratelimiter, that allows ${RATE_LIMIT.maxRequests} requests per ${RATE_LIMIT.windowMs} ms
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(RATE_LIMIT.maxRequests, `${Math.floor(RATE_LIMIT.windowMs / 1000)} s`),
+  analytics: true,
+});
 
 /**
  * Check if a request from the given IP is within rate limits.
  * Returns true if allowed, false if rate-limited.
  */
-export function checkRateLimit(ip: string): boolean {
-  cleanupStaleEntries();
-
-  const now = Date.now();
-  const cutoff = now - RATE_LIMIT.windowMs;
-
-  let entry = store.get(ip);
-  if (!entry) {
-    entry = { timestamps: [] };
-    store.set(ip, entry);
+export async function checkRateLimit(ip: string): Promise<boolean> {
+  // If no Redis URL is provided, fail open (allow all) to prevent breaking the app
+  // during local development if the developer hasn't set up Upstash yet.
+  if (!process.env.UPSTASH_REDIS_REST_URL) {
+    console.warn('UPSTASH_REDIS_REST_URL is missing. Rate limiting is disabled.');
+    return true;
   }
 
-  // Remove timestamps outside the window
-  entry.timestamps = entry.timestamps.filter((t) => t > cutoff);
-
-  // Check if over limit
-  if (entry.timestamps.length >= RATE_LIMIT.maxRequests) {
-    return false;
+  try {
+    const { success } = await ratelimit.limit(ip);
+    return success;
+  } catch (error) {
+    console.error('Rate limiter error:', error);
+    // Fail open if Redis is down
+    return true;
   }
-
-  // Record this request
-  entry.timestamps.push(now);
-  return true;
-}
-
-/**
- * Get remaining requests for an IP.
- */
-export function getRemainingRequests(ip: string): number {
-  const entry = store.get(ip);
-  if (!entry) return RATE_LIMIT.maxRequests;
-
-  const cutoff = Date.now() - RATE_LIMIT.windowMs;
-  const recent = entry.timestamps.filter((t) => t > cutoff);
-  return Math.max(0, RATE_LIMIT.maxRequests - recent.length);
 }

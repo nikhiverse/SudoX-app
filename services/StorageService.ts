@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════
 
 import { STORAGE_PREFIX, STORAGE_KEEP_DAYS } from '@/lib/constants';
-import type { PuzzleData, GameProgress, PuzzleApiResponse } from '@/lib/types';
+import type { GameProgress, PuzzleApiResponse } from '@/lib/types';
 
 // Key formats:
 //   sudox:puzzle:sudoku9:2026-04-15     → PuzzleApiResponse

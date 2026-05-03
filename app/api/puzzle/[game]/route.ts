@@ -6,10 +6,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getDb } from '@/lib/mongodb';
-import { VALID_GAMES, PUZZLES_COLLECTION, RATE_LIMIT } from '@/lib/constants';
+import { VALID_GAMES, PUZZLES_COLLECTION } from '@/lib/constants';
 import { getTodayDateString } from '@/lib/date-utils';
 import { checkRateLimit } from '@/lib/rate-limiter';
-import type { GameVariant, DailyPuzzleDoc, PuzzleDoc, SolutionDoc, PuzzleData } from '@/lib/types';
+import { encodeSolution } from '@/lib/solution-codec';
+import type { GameVariant, DailyPuzzleDoc, PuzzleDoc, SolutionDoc } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -23,7 +24,7 @@ export async function GET(
 
   // 1. Rate limit
   const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
-  if (!checkRateLimit(ip)) {
+  if (!(await checkRateLimit(ip))) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again in a minute.' },
       { status: 429 }
@@ -73,15 +74,16 @@ export async function GET(
       );
     }
 
-    // Merge solution back into puzzleData for the client
-    const mergedPuzzle: PuzzleData & { solution: number[][] } = {
-      ...puzzleDoc.puzzleData,
-      solution: solutionDoc.solution,
-    };
+    // Encode solution so it's not visible as plain JSON in DevTools
+    const encodedSolution = encodeSolution(
+      solutionDoc.solution,
+      puzzleDoc.uniqueId
+    );
 
-    // 4. Return puzzle data
+    // 4. Return puzzle data with encoded (opaque) solution
     return NextResponse.json({
-      puzzleData: mergedPuzzle,
+      puzzleData: puzzleDoc.puzzleData,
+      encodedSolution,
       uniqueId: puzzleDoc.uniqueId,
       generationId: puzzleDoc.generationId,
       game: puzzleDoc.game,

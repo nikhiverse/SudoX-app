@@ -4,13 +4,14 @@
 //
 // Flow:
 // 1. Check localStorage → instant if found
-// 2. Fetch from API (MongoDB) → save to localStorage
+// 2. Fetch from API (MongoDB) → decode solution → save to localStorage
 // 3. Never runs C++
 // ═══════════════════════════════════════════
 
 import { getTodayDateString } from '@/lib/date-utils';
+import { decodeSolution } from '@/lib/solution-codec';
 import { StorageService } from './StorageService';
-import type { PuzzleApiResponse, PuzzleData } from '@/lib/types';
+import type { PuzzleApiResponse } from '@/lib/types';
 
 export const PuzzleService = {
   /**
@@ -34,12 +35,27 @@ export const PuzzleService = {
       throw new Error(body.error || `HTTP ${res.status}`);
     }
 
-    const data: PuzzleApiResponse = await res.json();
+    const raw = await res.json();
 
-    // 3. Save to localStorage for future clicks
+    // 3. Decode the encoded solution and merge into puzzleData
+    let data: PuzzleApiResponse;
+    if (raw.encodedSolution && raw.uniqueId) {
+      const solution = decodeSolution(raw.encodedSolution, raw.uniqueId);
+      data = {
+        ...raw,
+        puzzleData: { ...raw.puzzleData, solution },
+      };
+      // Remove the encoded payload — no need to persist it
+      delete data.encodedSolution;
+    } else {
+      // Backwards-compat: if the server still sends solution inline
+      data = raw as PuzzleApiResponse;
+    }
+
+    // 4. Save to localStorage for future clicks
     StorageService.savePuzzle(game, today, data);
 
-    // 4. Run cleanup on old entries (async, non-blocking)
+    // 5. Run cleanup on old entries (async, non-blocking)
     StorageService.cleanupOldEntries();
 
     return data;
@@ -53,3 +69,4 @@ export const PuzzleService = {
     return StorageService.getPuzzle(game, today) !== null;
   },
 };
+

@@ -28,6 +28,7 @@ export function NumberPanel({ manager, stateVersion, onNumberClick, onErase }: N
           key={v}
           className={`num-btn ${exhausted ? 'num-btn--exhausted' : ''}`}
           data-val={v}
+          aria-label={`Input number ${displayVal(v)}`}
           onClick={() => {
             if (!exhausted) onNumberClick(v);
           }}
@@ -53,6 +54,7 @@ export function NumberPanel({ manager, stateVersion, onNumberClick, onErase }: N
       <button
         className="num-btn num-btn--erase"
         title="Erase cell"
+        aria-label="Erase selected cell"
         onClick={onErase}
       >
         <svg

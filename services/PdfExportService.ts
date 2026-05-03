@@ -169,7 +169,7 @@ function _drawGrid(
 
   const {
     gridDark, clueText, altCell, diagCell, winCell,
-    correctBg, correctTx, wrongBg, wrongTx, whitish, primary,
+    whitish,
   } = PDF_PALETTE;
 
   const border = PDF_BORDER;
@@ -383,7 +383,7 @@ export async function exportPuzzleToPdf(
   yPos = _drawSectionLabel(doc, yPos, gameName);
 
   // Grid
-  yPos = _drawGrid(doc, yPos, totalRows, totalCols, cellAt);
+  _drawGrid(doc, yPos, totalRows, totalCols, cellAt);
 
   // Footer
   _drawFooter(doc);
