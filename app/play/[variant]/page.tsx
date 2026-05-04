@@ -12,6 +12,7 @@ import { useGameState } from '@/hooks/useGameState';
 import { useTimer } from '@/hooks/useTimer';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useLives } from '@/hooks/useLives';
+import { useWebviewDetect } from '@/hooks/useWebviewDetect';
 import { PuzzleHeader } from '@/components/game/PuzzleHeader';
 import { PuzzleGrid } from '@/components/game/PuzzleGrid';
 import { NumberPanel } from '@/components/game/NumberPanel';
@@ -142,6 +143,11 @@ function GameActive({
   // to localStorage so page refresh seamlessly restores everything (Wordle-style).
 
   const [autoDismissModal, setAutoDismissModal] = useState<{ title: string, message: string, type?: 'default' | 'warning' } | null>(null);
+
+  // ── Webview detection: nudge users to open in a real browser ──
+  const isWebview = useWebviewDetect();
+  const webviewInputCountRef = useRef(0);
+  const [showWebviewModal, setShowWebviewModal] = useState(false);
 
   // Read saved timestamps for display on revisit
   const [finishedAt, setFinishedAt] = useState<string | undefined>();
@@ -285,7 +291,16 @@ function GameActive({
     }
 
     writeValue(r, c, val);
-  }, [gameIsLocked, manager, recordMistake, game, writeValue]);
+
+    // Webview nudge: after every 5 inputs, remind user to open in browser
+    if (isWebview && val !== 0) {
+      webviewInputCountRef.current += 1;
+      if (webviewInputCountRef.current >= 5) {
+        webviewInputCountRef.current = 0;
+        setShowWebviewModal(true);
+      }
+    }
+  }, [gameIsLocked, manager, recordMistake, game, writeValue, isWebview]);
 
   const wrappedEraseValue = useCallback((r: number, c: number) => {
     if (gameIsLocked) {
@@ -369,6 +384,48 @@ function GameActive({
         variant={autoDismissModal?.type || 'default'}
       >
         <p>{autoDismissModal?.message}</p>
+      </Modal>
+
+      {/* Webview nudge modal */}
+      <Modal
+        isOpen={showWebviewModal}
+        onClose={() => setShowWebviewModal(false)}
+        title="📱 Open in Browser"
+        variant="warning"
+        footer={
+          <>
+            <button
+              className="action-btn ghost"
+              onClick={() => setShowWebviewModal(false)}
+            >
+              Stay
+            </button>
+            <button
+              className="action-btn primary"
+              onClick={() => {
+                // Attempt to open in the system default browser.
+                // Different platforms use different intent schemes:
+                // - Android: intent:// scheme
+                // - iOS: window.open may trigger Safari in some webviews
+                const url = window.location.href;
+                const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;end`;
+
+                // Try Android intent first (works in most Android webviews)
+                window.location.href = intentUrl;
+
+                // Fallback: window.open (works in some iOS webviews)
+                setTimeout(() => {
+                  window.open(url, '_system');
+                }, 300);
+              }}
+            >
+              Open in Browser
+            </button>
+          </>
+        }
+      >
+        <p>For the best experience and to save your game progress, open this page in your default browser.</p>
+        <p style={{ marginTop: 8, fontSize: 13, color: 'var(--text-muted)' }}>Your progress may not be saved in this in-app browser.</p>
       </Modal>
     </>
   );
