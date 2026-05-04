@@ -386,46 +386,37 @@ function GameActive({
         <p>{autoDismissModal?.message}</p>
       </Modal>
 
-      {/* Webview nudge modal */}
+      {/* Webview suggestion modal */}
       <Modal
         isOpen={showWebviewModal}
         onClose={() => setShowWebviewModal(false)}
         title="📱 Open in Browser"
-        variant="warning"
         footer={
-          <>
+          <div className="webview-modal-actions">
             <button
-              className="action-btn ghost"
+              className="webview-modal-btn webview-modal-btn--secondary"
               onClick={() => setShowWebviewModal(false)}
             >
               Stay
             </button>
             <button
-              className="action-btn primary"
+              className="webview-modal-btn webview-modal-btn--primary"
               onClick={() => {
                 // Attempt to open in the system default browser.
-                // Different platforms use different intent schemes:
-                // - Android: intent:// scheme
-                // - iOS: window.open may trigger Safari in some webviews
+                // Android: intent:// scheme | iOS: window.open fallback
                 const url = window.location.href;
                 const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;end`;
-
-                // Try Android intent first (works in most Android webviews)
                 window.location.href = intentUrl;
-
-                // Fallback: window.open (works in some iOS webviews)
-                setTimeout(() => {
-                  window.open(url, '_system');
-                }, 300);
+                setTimeout(() => { window.open(url, '_system'); }, 300);
               }}
             >
               Open in Browser
             </button>
-          </>
+          </div>
         }
       >
-        <p>For the best experience and to save your game progress, open this page in your default browser.</p>
-        <p style={{ marginTop: 8, fontSize: 13, color: 'var(--text-muted)' }}>Your progress may not be saved in this in-app browser.</p>
+        <p style={{ fontSize: 14 }}>For the best experience and to save your game progress, open this page in your default browser.</p>
+        <p style={{ marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>Progress may not be saved in this in-app browser.</p>
       </Modal>
     </>
   );
