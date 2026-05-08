@@ -117,7 +117,7 @@ export const RATE_LIMIT = {
 
 // ── localStorage key prefix ──
 export const STORAGE_PREFIX = 'sudox';
-export const STORAGE_KEEP_DAYS = 7;
+export const STORAGE_KEEP_DAYS = 2;
 
 // ── MongoDB collection name ──
 export const PUZZLES_COLLECTION = 'daily_puzzles';
