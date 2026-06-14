@@ -2,40 +2,16 @@
 //  PdfExportService.ts — SudoX puzzle PDF export (Next.js port)
 //
 //  Port of downloadPDF.js for the React/Next.js architecture.
-//  Uses jsPDF loaded via CDN (window.jspdf).
+//  Uses jsPDF loaded via dynamic import (npm package).
 //
 //  Reads the puzzle grid directly from the DOM,
 //  so it captures the current visual state exactly.
 // ═══════════════════════════════════════════════════════════════
 
-// ── Type declarations for jsPDF on window ──
-declare global {
-  interface Window {
-    jspdf?: {
-      jsPDF: new (opts: {
-        orientation: string;
-        unit: string;
-        format: string;
-      }) => JsPDFDoc;
-    };
-  }
-}
+import type jsPDF from 'jspdf';
 
-interface JsPDFDoc {
-  setFillColor(r: number, g: number, b: number): void;
-  setDrawColor(r: number, g: number, b: number): void;
-  setTextColor(r: number, g: number, b: number): void;
-  setLineWidth(w: number): void;
-  setFont(name: string, style: string): void;
-  setFontSize(size: number): void;
-  setCharSpace(space: number): void;
-  rect(x: number, y: number, w: number, h: number, style: string): void;
-  roundedRect(x: number, y: number, w: number, h: number, rx: number, ry: number, style: string): void;
-  line(x1: number, y1: number, x2: number, y2: number): void;
-  text(text: string, x: number, y: number, opts?: { align?: string }): void;
-  addImage(imageData: string | HTMLImageElement | HTMLCanvasElement | Uint8Array, format: string, x: number, y: number, w: number, h: number): void;
-  save(filename: string): void;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsPDFDoc = jsPDF & Record<string, any>;
 
 // ── COLOUR PALETTE (light-mode, matches globals.css tokens) ──
 const PDF_PALETTE = {
@@ -331,14 +307,10 @@ export async function exportPuzzleToPdf(
   gameName: string,
   puzzleId: string,
 ): Promise<void> {
-  // Check jsPDF availability
-  if (!window.jspdf) {
-    alert('PDF library is still loading. Please try again in a moment.');
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  // Dynamically import jsPDF from the npm package (code-split)
+  const jspdfModule = await import('jspdf');
+  const JsPDFConstructor = jspdfModule.default;
+  const doc = new JsPDFConstructor({ orientation: "portrait", unit: "mm", format: "a4" }) as JsPDFDoc;
 
   // Query the grid from the DOM
   const gridEl = document.querySelector('.sudoku-grid') as HTMLElement | null;
