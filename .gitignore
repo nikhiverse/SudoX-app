@@ -64,3 +64,5 @@ CLAUDE.md
 AGENTS.md
 sudox_production_audit.md
 .gemini
+
+venv/
