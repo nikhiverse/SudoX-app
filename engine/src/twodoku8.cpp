@@ -152,7 +152,7 @@ private:
                 for (int r = qr*4; r < qr*4+4; r++)
                     for (int c = qc*4; c < qc*4+4; c++)
                         if (g[r*8+c] != 0) cnt++;
-                if (cnt != 8) return false;
+                if (cnt > 8) return false;
             }
         return true;
     }
