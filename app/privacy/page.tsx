@@ -25,7 +25,7 @@ export default function PrivacyPage() {
       </h1>
 
       <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> May 2026</p>
+        <p><strong>Last updated:</strong> June 2026</p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>What We Collect</h2>
         <p>

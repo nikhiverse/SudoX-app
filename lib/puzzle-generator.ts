@@ -40,12 +40,12 @@ export async function generateAndStorePuzzle(game: string, date: string): Promis
   if (needsCompile) {
     execSync(
       `g++ -O2 -std=c++17 -I"${INCLUDE_DIR}" -o "${binPath}" "${srcPath}"`,
-      { timeout: 15000 }
+      { timeout: 60000 }
     );
   }
 
   const output = execFileSync(binPath, [], {
-    timeout: 30000,
+    timeout: 60000,
     encoding: 'utf-8',
     env: { ...process.env, TERM: 'dumb' },
   });

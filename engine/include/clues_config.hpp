@@ -52,7 +52,7 @@ const PuzzleConfig SUDOKU_9_CONFIG = {36,    5,     5, 5,     9,
 
 // Sudoku X: 9x9 puzzle.
 #define SUDOKU_X_CONFIG                                                        \
-  (PuzzleConfig{getRandomClues(28, 40), 5, 5, 5, 5, true, false, 9, false,      \
+  (PuzzleConfig{getRandomClues(28, 40), 5, 5, 5, 5, true, false, 9, false,     \
                 false})
 
 // Windoku: 9x9 puzzle.
@@ -62,7 +62,8 @@ const PuzzleConfig SUDOKU_9_CONFIG = {36,    5,     5, 5,     9,
 
 // Windoku X: 9x9 puzzle.
 #define WINDOKU_X_CONFIG                                                       \
-  (PuzzleConfig{getRandomClues(27, 36), 4, 4, 4, 4, true, false, 4, true, false})
+  (PuzzleConfig{getRandomClues(27, 36), 4, 4, 4, 4, true, false, 4, true,      \
+                false})
 
 // Jigsaw 8: 8x8 puzzle.
 #define JIGSAW_8_CONFIG                                                        \
@@ -76,7 +77,7 @@ const PuzzleConfig SUDOKU_9_CONFIG = {36,    5,     5, 5,     9,
 
 // Jigsaw X: 9x9 puzzle.
 #define JIGSAW_X_CONFIG                                                        \
-  (PuzzleConfig{getRandomClues(28, 40), 5, 5, 5, 5, true, false, 9, false,      \
+  (PuzzleConfig{getRandomClues(28, 40), 5, 5, 5, 5, true, false, 9, false,     \
                 false})
 
 // Windoku Jigsaw: 9x9 puzzle.

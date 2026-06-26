@@ -16,11 +16,16 @@ template <int SIZE, int SUB_R, int SUB_C>
 class SymmetricPuzzleGenerator {
 public:
     int* gridMap = nullptr;
+    int* altGridMap = nullptr;
+    bool* activeMap = nullptr;
 
 private:
     static constexpr int NUM_GRIDS = (SIZE / SUB_R) * (SIZE / SUB_C);
     mt19937 rng;
     int gridLookup[SIZE * SIZE];
+    int target_d1 = 0;
+    int target_d2 = 0;
+    int target_parity = 0;
 
     void computeGridLookup() {
         for (int pos = 0; pos < SIZE * SIZE; pos++) {
@@ -33,6 +38,7 @@ private:
     bool satisfiesConstraints(const int* board, const PuzzleConfig& config) {
         int clues = 0;
         int rowCounts[SIZE] = {0}, colCounts[SIZE] = {0}, gridCounts[NUM_GRIDS] = {0};
+        int diag1Count = 0, diag2Count = 0;
         int winCounts[4] = {0};
 
         for (int pos = 0; pos < SIZE * SIZE; pos++) {
@@ -42,6 +48,10 @@ private:
                 rowCounts[r]++;
                 colCounts[c]++;
                 gridCounts[gridLookup[pos]]++;
+                if (config.check_diagonals) {
+                    if (r == c) diag1Count++;
+                    if (r + c == SIZE - 1) diag2Count++;
+                }
                 if (config.check_windows) {
                     const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                     for (int w = 0; w < 4; w++) {
@@ -63,6 +73,10 @@ private:
         }
         for (int i = 0; i < NUM_GRIDS; i++) {
             if (gridCounts[i] > config.max_per_grid) return false;
+        }
+        if (config.check_diagonals) {
+            if (diag1Count != target_d1) return false;
+            if (diag2Count != target_d2) return false;
         }
         if (config.check_windows) {
             for (int i = 0; i < 4; i++) {
@@ -99,11 +113,32 @@ public:
         int attempts = 0;
 
         checker.gridMap = this->gridMap;
+        checker.altGridMap = this->altGridMap;
+        checker.activeMap = this->activeMap;
+        checker.check_diagonals = config.check_diagonals;
         checker.check_windows = config.check_windows;
 
         while (attempts < 1000) {
             attempts++;
             for (int pos = 0; pos < SIZE * SIZE; pos++) board[pos] = original[pos];
+
+            if (config.check_diagonals) {
+                if (config.exact_diagonal) {
+                    target_d1 = config.max_per_diagonal;
+                    target_d2 = config.max_per_diagonal;
+                    target_parity = target_d1 % 2;
+                } else {
+                    target_d1 = uniform_int_distribution<int>(0, config.max_per_diagonal)(rng);
+                    target_parity = target_d1 % 2;
+                    vector<int> valid_d2;
+                    for (int d = 0; d <= config.max_per_diagonal; d++) {
+                        if (d % 2 == target_parity) {
+                            valid_d2.push_back(d);
+                        }
+                    }
+                    target_d2 = valid_d2[uniform_int_distribution<int>(0, valid_d2.size() - 1)(rng)];
+                }
+            }
 
             int currentClues = SIZE * SIZE;
             int stuckCount = 0;
@@ -204,11 +239,9 @@ public:
                         if (colCounts[c] - 1 < min_col) valid_counts = false;
                         if (gridCounts[gIdx] - 1 < min_grid) valid_counts = false;
                         if (config.check_diagonals) {
-                            if (r == c && diag1Count - 1 < min_diag) valid_counts = false;
-                            if (r + c == SIZE - 1 && diag2Count - 1 < min_diag) valid_counts = false;
-                            if (config.exact_diagonal && r == c && r + c == SIZE - 1) {
-                                if (config.max_per_diagonal % 2 != 0) valid_counts = false;
-                            }
+                            if (target_parity == 1) valid_counts = false;
+                            if (r == c && diag1Count - 1 < target_d1) valid_counts = false;
+                            if (r + c == SIZE - 1 && diag2Count - 1 < target_d2) valid_counts = false;
                         }
                         if (config.check_windows) {
                             const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
@@ -240,8 +273,8 @@ public:
                         if (config.check_diagonals) {
                             int d1_rem = (r == c ? 1 : 0) + (r_sym == c_sym ? 1 : 0);
                             int d2_rem = (r + c == SIZE - 1 ? 1 : 0) + (r_sym + c_sym == SIZE - 1 ? 1 : 0);
-                            if (diag1Count - d1_rem < min_diag) valid_counts = false;
-                            if (diag2Count - d2_rem < min_diag) valid_counts = false;
+                            if (diag1Count - d1_rem < target_d1) valid_counts = false;
+                            if (diag2Count - d2_rem < target_d2) valid_counts = false;
                         }
                         
                         if (config.check_windows) {
@@ -291,8 +324,9 @@ public:
                         
                         bool skip = false;
                         if (config.check_diagonals) {
-                            if (r == c && diag1Count - 1 < min_diag) skip = true;
-                            if (r + c == SIZE - 1 && diag2Count - 1 < min_diag) skip = true;
+                            if (r == c && diag1Count - 1 < target_d1) skip = true;
+                            if (r + c == SIZE - 1 && diag2Count - 1 < target_d2) skip = true;
+                            if (SIZE % 2 != 0 && r == SIZE / 2 && c == SIZE / 2 && target_parity == 1) skip = true;
                         }
                         if (config.check_windows) {
                             const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};

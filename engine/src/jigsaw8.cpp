@@ -10,198 +10,278 @@ using namespace std;
 
 const int SIZE = 8;
 
-struct Block {
-  int r, c, w, h;
-};
-
-// TilingSudoku / Jigsaw8: 8x8 matrix par custom varying rectangles overlap karte hain
-// Generally block sizes (2x4) aur (4x2) ko combine mix krke lagaya jata hai
+// TilingSudoku / Jigsaw8: 8x8 grid with irregular regions that can
+// wrap around the board edges (toroidal topology).
+// Har generation mein standard aur wraparound pieces ka mix randomize
+// hota hai — visually distinct aur challenging layouts produce karta hai.
 class TilingSudoku {
 private:
   int gridMap[SIZE * SIZE];
   int numberMap[SIZE * SIZE];
   int solution[SIZE * SIZE];
-  vector<Block> blocks;
 
-  // Bitmasks for fast verification checking setup
+  // 4x4 Macro Grid: har cell ek 2x2 chunk represent karta hai final 8x8 board ka.
+  // Isse toroidal (edge-wrapping) geometries naturally express hoti hain.
+  int macroGrid[4][4];
+
+  // Bitmasks for O(1) constraint checking (bits 0-7 = digits 1-8)
   uint16_t rowMask[SIZE], colMask[SIZE], blockMask[SIZE];
 
   mt19937 rng;
-  long long solveCounter;
+
+  // Total recursive work cap — resets before each solve attempt
+  long long backtrackNodeCount;
+
+  // Unfilled cell tracking for fast MRV lookup (swap-remove pattern)
+  int unfilledCells[SIZE * SIZE];
+  int unfilledCount;
 
   void reset() {
-    blocks.clear();
-    solveCounter = 0; // infinite loops bachane ke liye counter zaroori hai
+    backtrackNodeCount = 0;
     for (int i = 0; i < SIZE; i++) {
-        rowMask[i] = colMask[i] = blockMask[i] = 0;
+      rowMask[i] = colMask[i] = blockMask[i] = 0;
     }
     for (int pos = 0; pos < SIZE * SIZE; pos++) {
-        gridMap[pos] = -1; // -1 khali jagah dikha raha hai
-        numberMap[pos] = 0;
+      gridMap[pos]   = -1;
+      numberMap[pos] = 0;
+      solution[pos]  = 0;
+    }
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        macroGrid[i][j] = -1;
+      }
     }
   }
 
-  // --- STEP 1: Generate Geometry (Tiling Phase) ---
-  // Yeah loop try karta hai grid par rectangles fit karne ki completely tile hone tak
-  bool solveGeometry(int hRem, int vRem) {
-    int r = -1, c = -1;
-    for (int i = 0; i < SIZE; i++) {
-      for (int j = 0; j < SIZE; j++) {
-        if (gridMap[i * SIZE + j] == -1) {
-          r = i; // Pehla khula location (empty cell) identify kara
-          c = j;
-          break;
-        }
+  // --- STEP 1: Macro-Level Geometry with Toroidal Wrapping ---
+  // vRem     = remaining vertical dominoes   (2x1 macro = 4x2 real cells)
+  // hRem     = remaining horizontal dominoes  (1x2 macro = 2x4 real cells)
+  // splitRem = remaining wraparound pairs     (non-adjacent macro cells linked across edges)
+  // nextId   = explicit block ID counter      (0 to 7, safe for any piece mix)
+  bool solveMacroGeometry(int vRem, int hRem, int splitRem, int nextId = 0) {
+    int mr = -1, mc = -1;
+
+    // Pehla khali macro-cell dhundho (top-left scan order)
+    for (int i = 0; i < 4 && mr == -1; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (macroGrid[i][j] == -1) { mr = i; mc = j; break; }
       }
-      if (r != -1)
-        break;
     }
 
-    // Saari jagah bhar gayi toh return True
-    if (r == -1)
-      return true;
+    // Sab 16 macro-cells bhar gaye → success
+    if (mr == -1) return true;
 
-    // Type of blocks: h (horizontal flat) ya v (vertical long) blocks
-    struct Choice {
-      char type;
-      int w, h; // Width aur Height
-    };
-    vector<Choice> choices;
-    // Condition of quotas left checks limit constraint count
-    if (hRem > 0)
-      choices.push_back({'h', 4, 2});
-    if (vRem > 0)
-      choices.push_back({'v', 2, 4});
-    shuffle(choices.begin(), choices.end(), rng);
+    // Build option list from remaining piece counts
+    int options[4];
+    int optCount = 0;
+    if (vRem > 0)     options[optCount++] = 0; // Vertical domino
+    if (hRem > 0)     options[optCount++] = 1; // Horizontal domino
+    if (splitRem > 0) options[optCount++] = 2; // Horizontal edge wrap (col 0 ↔ col 3)
+    if (splitRem > 0) options[optCount++] = 3; // Vertical edge wrap   (row 0 ↔ row 3)
 
-    // Iterating randomly choices over remaining slots
-    for (auto &ch : choices) {
-      if (r + ch.h <= SIZE && c + ch.w <= SIZE) {
-        bool fits = true;
-        // Collision check algorithm
-        for (int i = r; i < r + ch.h; i++) {
-          for (int j = c; j < c + ch.w; j++) {
-            // Agar pehle se occupy ho toh overlap nahi kar sakte
-            if (gridMap[i * SIZE + j] != -1) {
-              fits = false;
-              break;
+    shuffle(options, options + optCount, rng);
+
+    for (int k = 0; k < optCount; k++) {
+      int opt = options[k];
+
+      if (opt == 0) {
+        // Vertical domino: occupies (mr,mc) aur (mr+1,mc) — 2 rows, 1 col macro mein
+        if (mr + 1 < 4 && macroGrid[mr + 1][mc] == -1) {
+          macroGrid[mr][mc]     = nextId;
+          macroGrid[mr + 1][mc] = nextId;
+          if (solveMacroGeometry(vRem - 1, hRem, splitRem, nextId + 1)) return true;
+          macroGrid[mr][mc]     = -1;
+          macroGrid[mr + 1][mc] = -1;
+        }
+      }
+      else if (opt == 1) {
+        // Horizontal domino: occupies (mr,mc) aur (mr,mc+1) — 1 row, 2 cols macro mein
+        if (mc + 1 < 4 && macroGrid[mr][mc + 1] == -1) {
+          macroGrid[mr][mc]     = nextId;
+          macroGrid[mr][mc + 1] = nextId;
+          if (solveMacroGeometry(vRem, hRem - 1, splitRem, nextId + 1)) return true;
+          macroGrid[mr][mc]     = -1;
+          macroGrid[mr][mc + 1] = -1;
+        }
+      }
+      else if (opt == 2) {
+        // Horizontal wrap: col 0 aur col 3 ko same row mein pair karo (toroidal edge)
+        // Scanner ke current position se try, warna koi bhi available row dhundho
+        int wr = -1;
+        if (mc == 0 && macroGrid[mr][3] == -1) {
+          wr = mr; // Current scan position already col 0 pe hai
+        } else {
+          // Koi aur row dhundho jahan col 0 aur col 3 dono khali hain
+          for (int i = 0; i < 4; i++) {
+            if (macroGrid[i][0] == -1 && macroGrid[i][3] == -1) {
+              wr = i; break;
             }
           }
         }
-
-        if (fits) {
-          int blockId = blocks.size(); // Naya block id generate hua list number ke relative
-          for (int i = r; i < r + ch.h; i++) {
-            for (int j = c; j < c + ch.w; j++)
-              gridMap[i * SIZE + j] = blockId; // Region pe painting ID marking
+        if (wr != -1) {
+          macroGrid[wr][0] = nextId;
+          macroGrid[wr][3] = nextId;
+          if (solveMacroGeometry(vRem, hRem, splitRem - 1, nextId + 1)) return true;
+          macroGrid[wr][0] = -1;
+          macroGrid[wr][3] = -1;
+        }
+      }
+      else if (opt == 3) {
+        // Vertical wrap: row 0 aur row 3 ko same column mein pair karo (toroidal edge)
+        int wc = -1;
+        if (mr == 0 && macroGrid[3][mc] == -1) {
+          wc = mc;
+        } else {
+          for (int j = 0; j < 4; j++) {
+            if (macroGrid[0][j] == -1 && macroGrid[3][j] == -1) {
+              wc = j; break;
+            }
           }
-          blocks.push_back({r, c, ch.w, ch.h});
-
-          // Check for continuous nested iteration success recursion
-          if (solveGeometry(ch.type == 'h' ? hRem - 1 : hRem,
-                            ch.type == 'v' ? vRem - 1 : vRem))
-            return true;
-
-          // Backtrack step for collision fallback map unpaint
-          blocks.pop_back();
-          for (int i = r; i < r + ch.h; i++) {
-            for (int j = c; j < c + ch.w; j++)
-              gridMap[i * SIZE + j] = -1;
-          }
+        }
+        if (wc != -1) {
+          macroGrid[0][wc] = nextId;
+          macroGrid[3][wc] = nextId;
+          if (solveMacroGeometry(vRem, hRem, splitRem - 1, nextId + 1)) return true;
+          macroGrid[0][wc] = -1;
+          macroGrid[3][wc] = -1;
         }
       }
     }
     return false;
   }
 
-  // --- STEP 2: MRV Solver (Number Placement Phase) ---
-  uint16_t getPossible(int r, int c) {
-    // blockMask index dynamically gridMap array se pass out nikal rha hai naaki calculation se (like r/3)
+  // --- STEP 2: MRV Solver with Optimized Backtracking ---
+  // Returns bitmask of valid digits (bits 0-7 → digits 1-8) for cell (r,c)
+  inline uint16_t getPossible(int r, int c) const {
     uint16_t used = rowMask[r] | colMask[c] | blockMask[gridMap[r * SIZE + c]];
-    return (~used) & 0xFF; // Only bits for allowed numbers 1-8
+    return (~used) & 0x00FF;
+  }
+
+  void initUnfilled() {
+    unfilledCount = 0;
+    for (int pos = 0; pos < SIZE * SIZE; pos++) {
+      unfilledCells[unfilledCount++] = pos;
+    }
   }
 
   bool solveNumbers() {
-    if (++solveCounter > 10000)
-      return false; // Fail-safe for tight restricted shapes aur unsolvable geometries
+    // backtrackNodeCount total recursive calls count karta hai — bad geometries ke liye cap
+    if (++backtrackNodeCount > 100000) return false;
 
-    int bR = -1, bC = -1, minChoices = 10;
-    uint16_t bMask = 0;
+    if (unfilledCount == 0) return true; // Sab cells filled → done
 
-    for (int r = 0; r < SIZE; r++) {
-      for (int c = 0; c < SIZE; c++) {
-        int pos = r * SIZE + c;
-        if (numberMap[pos] == 0) { // Cell abhi khali hai
-          uint16_t mask = getPossible(r, c);
-          int count = 0;
-          for (int i = 0; i < 8; i++)
-            if (mask & (1 << i))
-              count++;
-          if (count == 0)
-            return false; // dead path
-          if (count < minChoices) {
-            minChoices = count;
-            bR = r; // Row store update
-            bC = c; // Column store update
-            bMask = mask;
-          }
-        }
+    // MRV: unfilled cell dhundho jisme sabse kam valid digit choices hain
+    int bestIdx   = -1;
+    int minCount  = 9;
+    uint16_t bestMask = 0;
+
+    for (int k = 0; k < unfilledCount; k++) {
+      int pos  = unfilledCells[k];
+      int r    = pos / SIZE;
+      int c    = pos % SIZE;
+      uint16_t mask  = getPossible(r, c);
+      int count = __builtin_popcount(mask);
+
+      if (count == 0) return false; // Dead end — is cell ke liye koi valid digit nahi
+
+      if (count < minCount) {
+        minCount = count;
+        bestIdx  = k;
+        bestMask = mask;
+        if (count == 1) break; // Naked single — isse better nahi ho sakta
       }
     }
 
-    if (bR == -1) // Sub complete!
-      return true;
+    // Swap-remove chosen cell from unfilled list
+    int chosenPos = unfilledCells[bestIdx];
+    unfilledCells[bestIdx] = unfilledCells[--unfilledCount];
 
-    vector<int> nums;
+    int r    = chosenPos / SIZE;
+    int c    = chosenPos % SIZE;
+    int bIdx = gridMap[chosenPos];
+
+    // Stack-allocated candidates (no heap allocation in hot path)
+    int nums[8];
+    int numCount = 0;
     for (int i = 0; i < 8; i++)
-      if (bMask & (1 << i)) // Only options valid available 
-        nums.push_back(i + 1);
-    shuffle(nums.begin(), nums.end(), rng); // Shuffle for randomization effect
+      if (bestMask & (1 << i)) nums[numCount++] = i + 1;
 
-    int pos = bR * SIZE + bC;
-    int bIdx = gridMap[pos]; // Region id lookup layout
-    for (int n : nums) {
+    shuffle(nums, nums + numCount, rng);
+
+    for (int ni = 0; ni < numCount; ni++) {
+      int      n   = nums[ni];
       uint16_t bit = 1 << (n - 1);
-      
-      numberMap[pos] = n; // value daaldo
-      
-      // Masks limits check set bits memory array logic update
-      rowMask[bR] |= bit;
-      colMask[bC] |= bit;
-      blockMask[bIdx] |= bit;
 
-      if (solveNumbers())
-        return true;
+      numberMap[chosenPos] = n;
+      rowMask[r]           |= bit;
+      colMask[c]           |= bit;
+      blockMask[bIdx]      |= bit;
 
-      // Unassign for checking next configuration combinations
-      rowMask[bR] &= ~bit;
-      colMask[bC] &= ~bit;
+      if (solveNumbers()) return true;
+
+      rowMask[r]      &= ~bit;
+      colMask[c]      &= ~bit;
       blockMask[bIdx] &= ~bit;
-      numberMap[pos] = 0;
+      numberMap[chosenPos] = 0;
     }
+
+    // Backtrack pe cell wapas unfilled list mein daaldo
+    unfilledCells[unfilledCount++] = chosenPos;
     return false;
   }
 
-  bool isB(int r, int c, int dr, int dc) {
-    int nr = r + dr, nc = c + dc;
-    if (nr < 0 || nr >= SIZE || nc < 0 || nc >= SIZE)
-      return true; // Edge coordinates limits boundary detection true map function validation
-    return gridMap[r * SIZE + c] != gridMap[nr * SIZE + nc];
+  // Validate ki har cell ko valid block ID (0-7) mila hai expansion ke baad
+  bool validateGridMap() const {
+    for (int pos = 0; pos < SIZE * SIZE; pos++) {
+      if (gridMap[pos] < 0 || gridMap[pos] >= SIZE) return false;
+    }
+    return true;
   }
 
 public:
   TilingSudoku() : rng(random_device{}()) {}
 
-  // Main puzzle constructor trigger method
+  // Main puzzle generation — har baar naya random piece distribution
   void generate() {
-    SymmetricPuzzleGenerator<SIZE, 2, 4> clueGen; // Symmetric generation variant lagaya hai
     bool success = false;
+
     while (!success) {
       reset();
-      // Total 8 blocks allocate karte hain (4 horizontal + 4 vertical = 8 shapes x 8 cells each = 64 cells target completely packed)
-      if (solveGeometry(4, 4)) {
+
+      // Randomize piece distribution har attempt mein — visual variety ke liye:
+      // splitCount (wraparound pairs): 1 to 3 — ensures har puzzle mein toroidal regions hon
+      // Baaki pieces vertical aur horizontal dominoes mein split hote hain randomly
+      int splitCount = uniform_int_distribution<int>(1, 3)(rng);
+      int remaining  = 8 - splitCount;
+      int vCount     = uniform_int_distribution<int>(1, remaining - 1)(rng);
+      int hCount     = remaining - vCount;
+
+      if (solveMacroGeometry(vCount, hCount, splitCount)) {
+
+        // Expand 4x4 macro grid → full 8x8 gridMap
+        // Har macro cell ek 2x2 real cell chunk ban jaata hai
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j < 4; j++) {
+            int bId = macroGrid[i][j];
+            int r   = i * 2;
+            int c   = j * 2;
+            gridMap[ r      * SIZE + c    ] = bId;
+            gridMap[ r      * SIZE + c + 1] = bId;
+            gridMap[(r + 1) * SIZE + c    ] = bId;
+            gridMap[(r + 1) * SIZE + c + 1] = bId;
+          }
+        }
+
+        // Guard against any cell left unassigned before solving
+        if (!validateGridMap()) continue;
+
+        // Fresh clue generator construction — clean state har retry pe
+        SymmetricPuzzleGenerator<SIZE, 2, 4> clueGen;
+
+        initUnfilled(); // Populate unfilled-cell list for MRV
+
         if (solveNumbers()) {
-                    for(int i=0; i<SIZE*SIZE; i++) solution[i] = numberMap[i];
+          for (int i = 0; i < SIZE * SIZE; i++) solution[i] = numberMap[i];
           clueGen.gridMap = gridMap;
           success = clueGen.generate(numberMap, JIGSAW_8_CONFIG);
         }
@@ -212,39 +292,35 @@ public:
   void printJSON() {
     cout << "{\"type\":\"jigsaw\",\"size\":8,\"grid\":[";
     for (int r = 0; r < SIZE; r++) {
-      if (r)
-        cout << ",";
+      if (r) cout << ",";
       cout << "[";
       for (int c = 0; c < SIZE; c++) {
-        if (c)
-          cout << ",";
+        if (c) cout << ",";
         cout << numberMap[r * SIZE + c];
       }
       cout << "]";
     }
     cout << "],\"groups\":[";
     for (int r = 0; r < SIZE; r++) {
-      if (r)
-        cout << ",";
+      if (r) cout << ",";
       cout << "[";
       for (int c = 0; c < SIZE; c++) {
-        if (c)
-          cout << ",";
+        if (c) cout << ",";
         cout << gridMap[r * SIZE + c];
       }
       cout << "]";
     }
     cout << "],\"solution\":[";
-        for (int r = 0; r < SIZE; r++) {
-            if (r) cout << ",";
-            cout << "[";
-            for (int c = 0; c < SIZE; c++) {
-                if (c) cout << ",";
-                cout << solution[r * SIZE + c];
-            }
-            cout << "]";
+    for (int r = 0; r < SIZE; r++) {
+        if (r) cout << ",";
+        cout << "[";
+        for (int c = 0; c < SIZE; c++) {
+            if (c) cout << ",";
+            cout << solution[r * SIZE + c];
         }
-        cout << "]}" << endl;
+        cout << "]";
+    }
+    cout << "]}" << endl;
   }
 };
 

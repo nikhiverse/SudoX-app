@@ -63,8 +63,20 @@ export function useWebviewDetect(): boolean {
   const [isWebview, setIsWebview] = useState(false);
 
   useEffect(() => {
-    setIsWebview(detectWebview());
+    let active = true;
+    const isWeb = detectWebview();
+    if (isWeb) {
+      setTimeout(() => {
+        if (active) {
+          setIsWebview(true);
+        }
+      }, 0);
+    }
+    return () => {
+      active = false;
+    };
   }, []);
 
   return isWebview;
 }
+

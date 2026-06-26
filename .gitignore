@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next_corrupted/
 /out/
 
 # production
@@ -45,6 +46,7 @@ next-env.d.ts
 
 # ── Developer-only local files ──
 # These are only useful on the developer's machine and must not be committed.
+engine/test.sh
 output.json
 build_log.txt
 SudoX.desktop

@@ -5,6 +5,7 @@
 #include <numeric>
 #include <string>
 #include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
 
 using namespace std;
 
@@ -95,14 +96,20 @@ public:
     Sudoku12() : rng(random_device{}()) {}
 
     void generate() {
-        PuzzleGenerator<SIZE, SUB_R, SUB_C> clueGen;
         bool success = false;
         while (!success) {
             reset();
             // Agar solve ho raha hai 50k timeout ke andar, tabhi final check me pass hoga
             if (solve()) {
-                    for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
-                success = clueGen.generate(board, SUDOKU_12_CONFIG);
+                for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
+                PuzzleConfig config = SUDOKU_12_CONFIG;
+                if (config.target_clues % 2 == 0) {
+                    SymmetricPuzzleGenerator<SIZE, SUB_R, SUB_C> clueGen;
+                    success = clueGen.generate(board, config);
+                } else {
+                    PuzzleGenerator<SIZE, SUB_R, SUB_C> clueGen;
+                    success = clueGen.generate(board, config);
+                }
             }
         }
     }

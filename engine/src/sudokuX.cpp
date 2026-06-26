@@ -4,6 +4,7 @@
 #include <random>
 #include <numeric>
 #include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
 
 using namespace std;
 
@@ -103,13 +104,20 @@ public:
     SudokuX() : rng(random_device{}()) {}
 
     void generate() {
-        PuzzleGenerator<SIZE, 3, 3> clueGen;
         bool success = false;
         while (!success) {
             reset();
             solve();
             for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
-            success = clueGen.generate(board, SUDOKU_X_CONFIG);
+            
+            PuzzleConfig config = SUDOKU_X_CONFIG;
+            if (config.target_clues % 2 == 0) {
+                SymmetricPuzzleGenerator<SIZE, 3, 3> clueGen;
+                success = clueGen.generate(board, config);
+            } else {
+                PuzzleGenerator<SIZE, 3, 3> clueGen;
+                success = clueGen.generate(board, config);
+            }
         }
     }
 

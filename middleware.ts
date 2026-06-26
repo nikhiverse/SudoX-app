@@ -32,17 +32,25 @@ export function middleware() {
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
 
+  const isDev = process.env.NODE_ENV === 'development';
+  const scriptSrc = isDev
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com"
+    : "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com";
+  const connectSrc = isDev
+    ? "connect-src 'self' ws: wss: https://va.vercel-scripts.com https://vitals.vercel-insights.com"
+    : "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com";
+
   // Content Security Policy — allow self, Vercel Analytics, Google Fonts,
   // and the inline theme-restore script (via 'unsafe-inline' for style/script).
   response.headers.set(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob:",
-      "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+      connectSrc,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

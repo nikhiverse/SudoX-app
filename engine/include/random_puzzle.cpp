@@ -24,6 +24,8 @@ private:
     static constexpr int NUM_GRIDS = (SIZE / SUB_R) * (SIZE / SUB_C);
     mt19937 rng;
     int gridLookup[SIZE * SIZE];
+    int target_d1 = 0;
+    int target_d2 = 0;
 
     // Compute Grid Lookup: Taaki baar baar arithmetic division calculations na karni padein
     void computeGridLookup() {
@@ -82,9 +84,8 @@ private:
             if (gridCounts[i] > config.max_per_grid) return false;
         }
         if (config.check_diagonals) {
-            if (diag1Count > config.max_per_diagonal) return false;
-            if (diag2Count > config.max_per_diagonal) return false;
-            if (config.exact_diagonal && (diag1Count != config.max_per_diagonal || diag2Count != config.max_per_diagonal)) return false;
+            if (diag1Count != target_d1) return false;
+            if (diag2Count != target_d2) return false;
         }
         if (config.check_windows) {
             for (int i = 0; i < 4; i++) {
@@ -136,11 +137,20 @@ public:
         checker.check_diagonals = config.check_diagonals;
         checker.check_windows = config.check_windows;
 
-        // Generator ko 250 chances denge retry karne ke liye
         while (attempts < 250) {
             attempts++;
             // Board ko complete filled state me reset karo
             for (int i = 0; i < SIZE * SIZE; i++) board[i] = original[i];
+
+            if (config.check_diagonals) {
+                if (config.exact_diagonal) {
+                    target_d1 = config.max_per_diagonal;
+                    target_d2 = config.max_per_diagonal;
+                } else {
+                    target_d1 = uniform_int_distribution<int>(0, config.max_per_diagonal)(rng);
+                    target_d2 = uniform_int_distribution<int>(0, config.max_per_diagonal)(rng);
+                }
+            }
 
             int currentClues = SIZE * SIZE;
             int stuckCount = 0;
@@ -186,8 +196,8 @@ public:
                             bool can_remove = (rowCounts[r] > min_row && colCounts[c] > min_col && gridCounts[gridLookup[pos]] > min_grid);
                             
                             if (can_remove && config.check_diagonals) {
-                                if (r == c && diag1Count <= min_diag) can_remove = false;
-                                if (r + c == SIZE - 1 && diag2Count <= min_diag) can_remove = false;
+                                if (r == c && diag1Count <= target_d1) can_remove = false;
+                                if (r + c == SIZE - 1 && diag2Count <= target_d2) can_remove = false;
                             }
                             if (can_remove && config.check_windows) {
                                 const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};

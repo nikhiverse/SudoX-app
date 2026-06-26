@@ -4,6 +4,7 @@
 #include <random>
 #include <numeric>
 #include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
 
 using namespace std;
 
@@ -99,16 +100,21 @@ public:
     }
 
     void generate() {
-        // Apply Mixed Puzzle Generator for Dozaku Configs (72 clues, 7 max row/col, grid limit 12 setup)
-        PuzzleGenerator<12, 3, 4> clueGen;
-        clueGen.altGridMap = altGridMap; // Dozaku requires the UniquenessChecker to test the 4x3 alternate blocks too!
-
         bool success = false;
         while (!success) {
             reset();
             if (solve()) {
-                    for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
-                success = clueGen.generate(board, DOZAKU_CONFIG);
+                for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
+                PuzzleConfig config = DOZAKU_CONFIG;
+                if (config.target_clues % 2 == 0) {
+                    SymmetricPuzzleGenerator<12, 3, 4> clueGen;
+                    clueGen.altGridMap = altGridMap;
+                    success = clueGen.generate(board, config);
+                } else {
+                    PuzzleGenerator<12, 3, 4> clueGen;
+                    clueGen.altGridMap = altGridMap;
+                    success = clueGen.generate(board, config);
+                }
             }
         }
     }

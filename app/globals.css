@@ -1317,3 +1317,141 @@ footer a:hover {
     border-radius: 6px;
   }
 }
+
+/* ── Auth Forms & Cards (Login / Signup) ── */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  position: relative;
+  background: var(--surface-card);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-lg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+.auth-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 20px 40px rgba(0, 0, 0, 0.04);
+}
+
+.auth-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s var(--ease-out);
+  text-decoration: none;
+}
+
+.auth-close-btn:hover {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+.auth-title {
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: 8px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s var(--ease-out);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  background: var(--surface-card);
+  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.15);
+}
+
+.auth-link-text {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 8px;
+}
+
+.auth-link-text a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s ease;
+}
+
+.auth-link-text a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.otp-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.otp-row .form-group {
+  flex: 1;
+}
+
+.otp-btn {
+  white-space: nowrap;
+  height: 45px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}

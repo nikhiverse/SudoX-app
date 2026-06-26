@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
 
 using namespace std;
 
@@ -132,15 +133,20 @@ public:
   Windoku() : rng(random_device{}()) {}
 
   void generate() {
-    PuzzleGenerator<SIZE, 3, 3> clueGen;
     bool success = false;
     while (!success) {
       reset(); // Pattern reset variable checks algorithm
       solve();
-            for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
+      for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
       
-      // Sudoku Windoku configuration ke through layout remove pass setup map execution sequence step criteria checks arrays loop
-      success = clueGen.generate(board, WINDOKU_CONFIG); 
+      PuzzleConfig config = WINDOKU_CONFIG;
+      if (config.target_clues % 2 == 0) {
+        SymmetricPuzzleGenerator<SIZE, 3, 3> clueGen;
+        success = clueGen.generate(board, config);
+      } else {
+        PuzzleGenerator<SIZE, 3, 3> clueGen;
+        success = clueGen.generate(board, config);
+      }
     }
   }
 
