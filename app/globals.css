@@ -57,7 +57,7 @@
 @media (prefers-color-scheme: dark) {
 
   /* Dark Mode Colors - Premium Black */
-  :root:not(.light) {
+  :root:not(.force-light) {
     --surface-bg: #000000;
     /* Main background */
     --surface-card: #0a0a0a;
@@ -182,6 +182,13 @@
   /* Medium shadow for floating cards */
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
   /* Large shadow for pop-ups and modals */
+
+  /* Premium Yellowish Warning (Dark Mode) */
+  --warning-border: #d4af37;
+  /* Gold */
+  --warning-shadow: rgba(212, 175, 55, 0.15);
+  --warning-text: #fcd34d;
+  --warning-bg: #1f1b0f;
 }
 
 /* Force light mode */
@@ -227,6 +234,12 @@
     0 4px 12px rgba(45, 42, 36, 0.1), 0 2px 4px rgba(45, 42, 36, 0.06);
   --shadow-lg:
     0 12px 32px rgba(45, 42, 36, 0.14), 0 4px 8px rgba(45, 42, 36, 0.06);
+
+  /* Premium Yellowish Warning */
+  --warning-border: #fcd34d;
+  --warning-shadow: rgba(245, 158, 11, 0.15);
+  --warning-text: #92400e;
+  --warning-bg: #fffbeb;
 }
 
 /* Basic Reset Options */
