@@ -943,6 +943,82 @@ img {
   }
 }
 
+/* Shimmer / Skeleton loading animation */
+.skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 25%,
+    var(--border-mid) 50%,
+    var(--surface-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-title {
+  height: 32px;
+  width: 180px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.skeleton-id {
+  height: 14px;
+  width: 100px;
+  border-radius: 4px;
+}
+
+.skeleton-timer {
+  height: 32px;
+  width: 90px;
+  border-radius: 8px;
+}
+
+.skeleton-hearts {
+  height: 14px;
+  width: 60px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.skeleton-grid-cell {
+  background-color: var(--grid-cell-bg);
+  border: 1px solid var(--border-soft);
+  box-sizing: border-box;
+  opacity: 0.6;
+}
+
+.skeleton-num-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-mid);
+}
+
+@media (max-width: 520px) {
+  .skeleton-num-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 380px) {
+  .skeleton-num-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+  }
+}
+
 /* Footer Area */
 footer {
   width: 100%;

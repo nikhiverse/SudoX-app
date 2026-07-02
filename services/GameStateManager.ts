@@ -208,6 +208,32 @@ export class GameStateManager {
           return groups[r][c] === groups[cr][cc];
         }
       }
+      if (this.puzzleData.type === 'standard') {
+        const d = this.puzzleData as import('@/lib/types').StandardPuzzle;
+        const { subRows, subCols } = d;
+        if (subRows && subCols) {
+          return (
+            Math.floor(r / subRows) === Math.floor(cr / subRows) &&
+            Math.floor(c / subCols) === Math.floor(cc / subCols)
+          );
+        }
+      }
+      if (this.puzzleData.type === 'twodoku') {
+        const d = this.puzzleData as import('@/lib/types').TwodokuPuzzle;
+        if (d.grids) {
+          return d.grids.some(g => {
+            const cursorInGrid = cr >= g.r && cr < g.r + g.size && cc >= g.c && cc < g.c + g.size;
+            const cellInGrid = r >= g.r && r < g.r + g.size && c >= g.c && c < g.c + g.size;
+            if (cursorInGrid && cellInGrid && g.subR && g.subC) {
+              return (
+                Math.floor((r - g.r) / g.subR) === Math.floor((cr - g.r) / g.subR) &&
+                Math.floor((c - g.c) / g.subC) === Math.floor((cc - g.c) / g.subC)
+              );
+            }
+            return false;
+          });
+        }
+      }
       return false;
     };
 

@@ -70,4 +70,7 @@ sudox_production_audit.md
 venv/
 
 # check folder
-/check/
+check/
+
+# clue pool states
+*clues_pool_state.txt*

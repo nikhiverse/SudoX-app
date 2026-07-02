@@ -42,7 +42,7 @@ export function usePuzzle(game: string): UsePuzzleResult {
   useEffect(() => {
     console.log('usePuzzle: useEffect running for game =', game);
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, game]);
 
   return { data, loading, error, retry: fetchData };
 }

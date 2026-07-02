@@ -16,6 +16,7 @@ import { useWebviewDetect } from '@/hooks/useWebviewDetect';
 import { PuzzleHeader } from '@/components/game/PuzzleHeader';
 import { PuzzleGrid } from '@/components/game/PuzzleGrid';
 import { NumberPanel } from '@/components/game/NumberPanel';
+import { PuzzleSkeleton } from '@/components/game/PuzzleSkeleton';
 import { Modal } from '@/components/ui/Modal';
 import { GAME_NAMES, VALID_GAMES, getVariantFromUrl } from '@/lib/constants';
 import { onPdfDownloadRequest, exportPuzzleToPdf } from '@/services/PdfExportService';
@@ -61,19 +62,7 @@ function GameLoader({ game, gameName }: { game: GameVariant; gameName: string })
   const { data, loading, error, retry } = usePuzzle(game);
 
   if (loading) {
-    return (
-      <>
-        <PuzzleHeader
-          title={gameName}
-          puzzleId=""
-          timerDisplay="0:00"
-          timerEmoji="🕐"
-        />
-        <div className="puzzle-output">
-          <div className="loading-spinner" />
-        </div>
-      </>
-    );
+    return <PuzzleSkeleton game={game} gameName={gameName} />;
   }
 
   if (error || !data) {
