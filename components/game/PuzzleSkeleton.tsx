@@ -99,7 +99,7 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
     const cellArray: React.ReactNode[] = [];
 
     const borderStyle = (isThick: boolean) =>
-      isThick ? '2.5px solid var(--grid-bg)' : '1px solid var(--border-soft)';
+      isThick ? '2.5px solid var(--grid-border-thick)' : '1px solid var(--grid-border-thin)';
 
     for (let r = 0; r < totalRows; r++) {
       for (let c = 0; c < totalCols; c++) {

@@ -1,6 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SudoX 🧩
 
-## Getting Started
+SudoX is a modern, high-performance, and deeply customizable Sudoku platform. Powered by a lightning-fast C++ generation engine and a sleek Next.js (React) frontend, it offers a vast variety of unique puzzles that go far beyond classic Sudoku. 
+
+With carefully crafted UI, responsive themes, daily puzzle persistence, and robust puzzle variations, SudoX is built for both casual players and hardcore Sudoku enthusiasts.
+
+## 🌟 Features
+- **Extensive Puzzle Variations**: 16 unique game types including Jigsaw, Windoku, Twodoku, and Dozaku.
+- **High-Performance Generator**: Custom-built C++ engine ensures puzzles are generated efficiently and have unique solutions.
+- **Beautiful & Responsive UI**: Clean design, responsive grid layouts, and full support for Light/Dark themes.
+- **Daily Challenges**: Puzzles are generated dynamically based on the day.
+- **Interactive Gameplay**: Highlight tracking, mistake feedback, intelligent cursors, and custom controls.
+
+---
+
+## 🎮 Game Variations
+
+SudoX features 16 distinct variations of Sudoku across different grid sizes and logic paradigms:
+
+### Classic & Grids
+- **Sudoku Mini (6x6)**: A smaller, faster 6x6 grid. Perfect for beginners or quick sessions.
+- **Sudoku Eazy (9x9)**: A relaxed, simpler variant of the classic 9x9 game.
+- **Sudoku 9 (9x9)**: The traditional, classic 9x9 Sudoku experience.
+- **Sudoku A (9x9)**: An advanced logic spin on the classic 9x9 formula.
+- **Sudoku 12 (12x12)**: A massive 12x12 grid with 3x4 blocks for a longer, more challenging experience.
+- **Dozaku (12x12)**: A unique and intricate 12x12 puzzle paradigm.
+
+### X & Diagonal Logic
+- **Sudoku X (9x9)**: Classic 9x9 rules, plus both main diagonals must contain digits 1-9.
+- **Jigsaw X (9x9)**: Irregular blocks combined with the X-diagonal constraint.
+- **Windoku X (9x9)**: The 4 extra hyper-blocks of Windoku combined with the X-diagonal constraint.
+
+### Jigsaw (Irregular Shapes)
+- **Jigsaw 8 (8x8)**: Instead of standard squares, blocks are drawn as irregular, interlocking 8-cell shapes.
+- **Jigsaw 9 (9x9)**: The classic 9x9 grid divided into 9 irregular, non-square regions.
+- **Windoku Jigsaw (9x9)**: A challenging combination of Windoku constraints and irregular Jigsaw blocks.
+
+### Windoku (Hyper Sudoku)
+- **Windoku (9x9)**: Classic rules, plus 4 extra interior 3x3 regions (windows) that must also contain digits 1-9.
+
+### Twodoku (Overlapping Grids)
+- **Twodoku Mini (Overlapping 6x6)**: Two 6x6 Sudoku grids overlapping each other sharing a quadrant.
+- **Twodoku 8 (Overlapping 8x8)**: Two 8x8 grids fused together to create a multi-grid puzzle.
+- **Twodoku 9 (Overlapping 9x9)**: The ultimate overlapping challenge featuring two interconnected 9x9 grids.
+
+---
+
+## 🚀 Getting Started
 
 First, run the development server:
 
@@ -14,24 +59,10 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to play SudoX.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# SudoX-app
+## 🛠 Tech Stack
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Vanilla CSS for complex grid rendering
+- **Puzzle Engine**: Custom C++ Binaries for instantaneous puzzle generation and constraints resolution
+- **Persistence**: MongoDB (for daily puzzle storage) + LocalStorage (for user progress)

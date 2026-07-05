@@ -17,6 +17,8 @@
 
   --border-soft: rgba(45, 42, 36, 0.1);
   --border-mid: rgba(45, 42, 36, 0.2);
+  --grid-border-thick: #000000;
+  --grid-border-thin: rgba(0, 0, 0, 0.15);
 
   --cell-accent: #b45309;
   --cell-accent-2: #b45309;
@@ -75,6 +77,8 @@
 
     --border-soft: rgba(255, 255, 255, 0.1);
     --border-mid: rgba(255, 255, 255, 0.15);
+    --grid-border-thick: #ffffff;
+    --grid-border-thin: rgba(255, 255, 255, 0.15);
 
     --cell-accent: #f97316;
     --cell-accent-2: #f97316;
@@ -142,6 +146,8 @@
   /* Faint white borders for subtle separation */
   --border-mid: rgba(255, 255, 255, 0.2);
   /* Slightly more visible borders */
+  --grid-border-thick: #ffffff;
+  --grid-border-thin: rgba(255, 255, 255, 0.15);
 
   /* --- Game Grid Elements & Cells --- */
   --cell-accent: #f97316;
@@ -207,6 +213,8 @@
 
   --border-soft: rgba(45, 42, 36, 0.1);
   --border-mid: rgba(45, 42, 36, 0.2);
+  --grid-border-thick: #000000;
+  --grid-border-thin: rgba(0, 0, 0, 0.15);
 
   --cell-accent: #b45309;
   --cell-accent-2: #b45309;
@@ -708,7 +716,7 @@ img {
   border-radius: 4px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  outline: 3px solid var(--grid-bg);
+  outline: 2.5px solid var(--grid-border-thick);
   outline-offset: 0;
   max-width: 100%;
 }

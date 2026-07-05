@@ -31,9 +31,9 @@ interface GridCellProps {
 }
 
 function borderStyle(type: 'thick' | 'thin' | 'none'): string {
-  if (type === 'thick') return '2.5px solid var(--grid-bg)';
-  if (type === 'thin') return '1px solid var(--border-soft)';
-  return '1px solid var(--border-soft)';
+  if (type === 'thick') return '2.5px solid var(--grid-border-thick)';
+  if (type === 'thin') return '1px solid var(--grid-border-thin)';
+  return 'none';
 }
 
 function GridCellInner({
