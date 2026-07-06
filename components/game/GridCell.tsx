@@ -23,14 +23,15 @@ interface GridCellProps {
   isWindow: boolean;
   isBothCell: boolean;
   cellSize: number;
-  borderTop: 'thick' | 'thin' | 'none';
-  borderBottom: 'thick' | 'thin' | 'none';
-  borderLeft: 'thick' | 'thin' | 'none';
-  borderRight: 'thick' | 'thin' | 'none';
+  borderTop: 'outer' | 'thick' | 'thin' | 'none';
+  borderBottom: 'outer' | 'thick' | 'thin' | 'none';
+  borderLeft: 'outer' | 'thick' | 'thin' | 'none';
+  borderRight: 'outer' | 'thick' | 'thin' | 'none';
   onClick: (r: number, c: number) => void;
 }
 
-function borderStyle(type: 'thick' | 'thin' | 'none'): string {
+function borderStyle(type: 'outer' | 'thick' | 'thin' | 'none'): string {
+  if (type === 'outer') return '3.5px solid var(--grid-border-thick)';
   if (type === 'thick') return '2.5px solid var(--grid-border-thick)';
   if (type === 'thin') return '1px solid var(--grid-border-thin)';
   return 'none';

@@ -98,8 +98,12 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
 
     const cellArray: React.ReactNode[] = [];
 
-    const borderStyle = (isThick: boolean) =>
-      isThick ? '2.5px solid var(--grid-border-thick)' : '1px solid var(--grid-border-thin)';
+    const borderStyle = (type: 'outer' | 'thick' | 'thin' | 'none') => {
+      if (type === 'outer') return '3.5px solid var(--grid-border-thick)';
+      if (type === 'thick') return '2.5px solid var(--grid-border-thick)';
+      if (type === 'thin') return '1px solid var(--grid-border-thin)';
+      return 'none';
+    };
 
     for (let r = 0; r < totalRows; r++) {
       for (let c = 0; c < totalCols; c++) {
@@ -120,7 +124,10 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
         }
 
         // Determine thick boundaries
-        let bt = false, bb = false, bl = false, br = false;
+        let bt: 'outer' | 'thick' | 'thin' | 'none' = 'thin';
+        let bb: 'outer' | 'thick' | 'thin' | 'none' = 'thin';
+        let bl: 'outer' | 'thick' | 'thin' | 'none' = 'thin';
+        let br: 'outer' | 'thick' | 'thin' | 'none' = 'thin';
 
         if (game.startsWith('twodoku')) {
           let size = 9;
@@ -155,22 +162,22 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
                    (row >= g2R && row < g2R + size && col >= g2C && col < g2C + size);
           };
 
-          bt = !parentActive(r - 1, c);
-          bb = !parentActive(r + 1, c);
-          bl = !parentActive(r, c - 1);
-          br = !parentActive(r, c + 1);
+          bt = !parentActive(r - 1, c) ? 'outer' : 'thin';
+          bb = !parentActive(r + 1, c) ? 'outer' : 'thin';
+          bl = !parentActive(r, c - 1) ? 'outer' : 'thin';
+          br = !parentActive(r, c + 1) ? 'outer' : 'thin';
 
           if (isG1) {
-            if (r > g1R && (r - g1R) % g1SubR === 0) bt = true;
-            if (r < g1R + size - 1 && (r - g1R + 1) % g1SubR === 0) bb = true;
-            if (c > g1C && (c - g1C) % g1SubC === 0) bl = true;
-            if (c < g1C + size - 1 && (c - g1C + 1) % g1SubC === 0) br = true;
+            if (r > g1R && (r - g1R) % g1SubR === 0) bt = 'thick';
+            if (r < g1R + size - 1 && (r - g1R + 1) % g1SubR === 0) bb = 'thick';
+            if (c > g1C && (c - g1C) % g1SubC === 0) bl = 'thick';
+            if (c < g1C + size - 1 && (c - g1C + 1) % g1SubC === 0) br = 'thick';
           }
           if (isG2) {
-            if (r > g2R && (r - g2R) % g2SubR === 0) bt = true;
-            if (r < g2R + size - 1 && (r - g2R + 1) % g2SubR === 0) bb = true;
-            if (c > g2C && (c - g2C) % g2SubC === 0) bl = true;
-            if (c < g2C + size - 1 && (c - g2C + 1) % g2SubC === 0) br = true;
+            if (r > g2R && (r - g2R) % g2SubR === 0) bt = 'thick';
+            if (r < g2R + size - 1 && (r - g2R + 1) % g2SubR === 0) bb = 'thick';
+            if (c > g2C && (c - g2C) % g2SubC === 0) bl = 'thick';
+            if (c < g2C + size - 1 && (c - g2C + 1) % g2SubC === 0) br = 'thick';
           }
         } else {
           // Standard block layout
@@ -187,10 +194,10 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
             subCols = 4;
           }
 
-          bt = r % subRows === 0;
-          bb = (r + 1) % subRows === 0 || r === totalRows - 1;
-          bl = c % subCols === 0;
-          br = (c + 1) % subCols === 0 || c === totalCols - 1;
+          bt = r % subRows === 0 ? (r === 0 ? 'outer' : 'thick') : 'thin';
+          bb = (r + 1) % subRows === 0 || r === totalRows - 1 ? (r === totalRows - 1 ? 'outer' : 'thick') : 'thin';
+          bl = c % subCols === 0 ? (c === 0 ? 'outer' : 'thick') : 'thin';
+          br = (c + 1) % subCols === 0 || c === totalCols - 1 ? (c === totalCols - 1 ? 'outer' : 'thick') : 'thin';
         }
 
         cellArray.push(

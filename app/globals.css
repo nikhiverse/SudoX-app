@@ -716,8 +716,6 @@ img {
   border-radius: 4px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
-  outline: 2.5px solid var(--grid-border-thick);
-  outline-offset: 0;
   max-width: 100%;
 }
 

@@ -211,32 +211,32 @@ function computeBorders(
   r: number,
   c: number,
 
-): { top: 'thick' | 'thin' | 'none'; bottom: 'thick' | 'thin' | 'none'; left: 'thick' | 'thin' | 'none'; right: 'thick' | 'thin' | 'none' } {
-  type BorderWeight = 'thick' | 'thin' | 'none';
+): { top: 'outer' | 'thick' | 'thin' | 'none'; bottom: 'outer' | 'thick' | 'thin' | 'none'; left: 'outer' | 'thick' | 'thin' | 'none'; right: 'outer' | 'thick' | 'thin' | 'none' } {
+  type BorderWeight = 'outer' | 'thick' | 'thin' | 'none';
   const result: { top: BorderWeight; bottom: BorderWeight; left: BorderWeight; right: BorderWeight } = { top: 'thin', bottom: 'thin', left: 'thin', right: 'thin' };
 
   if (data.type === 'standard') {
     const d = data as StandardPuzzle;
     const { size, subRows, subCols } = d;
-    if (r % subRows === 0) result.top = 'thick';
-    if ((r + 1) % subRows === 0 || r === size - 1) result.bottom = 'thick';
-    if (c % subCols === 0) result.left = 'thick';
-    if ((c + 1) % subCols === 0 || c === size - 1) result.right = 'thick';
+    if (r % subRows === 0) result.top = r === 0 ? 'outer' : 'thick';
+    if ((r + 1) % subRows === 0 || r === size - 1) result.bottom = r === size - 1 ? 'outer' : 'thick';
+    if (c % subCols === 0) result.left = c === 0 ? 'outer' : 'thick';
+    if ((c + 1) % subCols === 0 || c === size - 1) result.right = c === size - 1 ? 'outer' : 'thick';
   } else if (data.type === 'jigsaw') {
     const d = data as JigsawPuzzle;
     const { size, groups } = d;
     const gid = groups[r][c];
-    result.top = (r === 0 || groups[r - 1]?.[c] !== gid) ? 'thick' : 'thin';
-    result.bottom = (r === size - 1 || groups[r + 1]?.[c] !== gid) ? 'thick' : 'thin';
-    result.left = (c === 0 || groups[r][c - 1] !== gid) ? 'thick' : 'thin';
-    result.right = (c === size - 1 || groups[r][c + 1] !== gid) ? 'thick' : 'thin';
+    result.top = (r === 0 || groups[r - 1]?.[c] !== gid) ? (r === 0 ? 'outer' : 'thick') : 'thin';
+    result.bottom = (r === size - 1 || groups[r + 1]?.[c] !== gid) ? (r === size - 1 ? 'outer' : 'thick') : 'thin';
+    result.left = (c === 0 || groups[r][c - 1] !== gid) ? (c === 0 ? 'outer' : 'thick') : 'thin';
+    result.right = (c === size - 1 || groups[r][c + 1] !== gid) ? (c === size - 1 ? 'outer' : 'thick') : 'thin';
   } else if (data.type === 'twodoku') {
     const d = data as TwodokuPuzzle;
     // Outer edge of active area
-    if (!d.active[r - 1]?.[c]) result.top = 'thick';
-    if (!d.active[r + 1]?.[c]) result.bottom = 'thick';
-    if (!d.active[r]?.[c - 1]) result.left = 'thick';
-    if (!d.active[r]?.[c + 1]) result.right = 'thick';
+    if (!d.active[r - 1]?.[c]) result.top = 'outer';
+    if (!d.active[r + 1]?.[c]) result.bottom = 'outer';
+    if (!d.active[r]?.[c - 1]) result.left = 'outer';
+    if (!d.active[r]?.[c + 1]) result.right = 'outer';
 
     // Sub-block borders within each grid
     if (d.grids) {
