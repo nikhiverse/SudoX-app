@@ -226,10 +226,34 @@ function computeBorders(
     const d = data as JigsawPuzzle;
     const { size, groups } = d;
     const gid = groups[r][c];
-    result.top = (r === 0 || groups[r - 1]?.[c] !== gid) ? (r === 0 ? 'outer' : 'thick') : 'thin';
-    result.bottom = (r === size - 1 || groups[r + 1]?.[c] !== gid) ? (r === size - 1 ? 'outer' : 'thick') : 'thin';
-    result.left = (c === 0 || groups[r][c - 1] !== gid) ? (c === 0 ? 'outer' : 'thick') : 'thin';
-    result.right = (c === size - 1 || groups[r][c + 1] !== gid) ? (c === size - 1 ? 'outer' : 'thick') : 'thin';
+    
+    // Top border: wraps vertically if top row shares group with bottom row
+    if (r === 0) {
+      result.top = (groups[size - 1]?.[c] === gid) ? 'thin' : 'outer';
+    } else {
+      result.top = (groups[r - 1]?.[c] !== gid) ? 'thick' : 'thin';
+    }
+
+    // Bottom border: wraps vertically if bottom row shares group with top row
+    if (r === size - 1) {
+      result.bottom = (groups[0]?.[c] === gid) ? 'thin' : 'outer';
+    } else {
+      result.bottom = (groups[r + 1]?.[c] !== gid) ? 'thick' : 'thin';
+    }
+
+    // Left border: wraps horizontally if leftmost column shares group with rightmost column
+    if (c === 0) {
+      result.left = (groups[r]?.[size - 1] === gid) ? 'thin' : 'outer';
+    } else {
+      result.left = (groups[r]?.[c - 1] !== gid) ? 'thick' : 'thin';
+    }
+
+    // Right border: wraps horizontally if rightmost column shares group with leftmost column
+    if (c === size - 1) {
+      result.right = (groups[r]?.[0] === gid) ? 'thin' : 'outer';
+    } else {
+      result.right = (groups[r]?.[c + 1] !== gid) ? 'thick' : 'thin';
+    }
   } else if (data.type === 'twodoku') {
     const d = data as TwodokuPuzzle;
     // Outer edge of active area

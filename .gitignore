@@ -74,3 +74,14 @@ check/
 
 # clue pool states
 *clues_pool_state.txt*
+
+# Generated social media images
+/public/social/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+

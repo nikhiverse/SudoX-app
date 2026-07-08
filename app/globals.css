@@ -77,7 +77,7 @@
 
     --border-soft: rgba(255, 255, 255, 0.1);
     --border-mid: rgba(255, 255, 255, 0.15);
-    --grid-border-thick: #ffffff;
+    --grid-border-thick: #cccccc;
     --grid-border-thin: rgba(255, 255, 255, 0.15);
 
     --cell-accent: #f97316;
@@ -146,7 +146,7 @@
   /* Faint white borders for subtle separation */
   --border-mid: rgba(255, 255, 255, 0.2);
   /* Slightly more visible borders */
-  --grid-border-thick: #ffffff;
+  --grid-border-thick: #cccccc;
   --grid-border-thin: rgba(255, 255, 255, 0.15);
 
   /* --- Game Grid Elements & Cells --- */

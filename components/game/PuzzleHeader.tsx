@@ -24,13 +24,13 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
 
   const confirmLeave = () => {
     setShowLeaveModal(false);
-    router.push('/');
+    router.replace('/');
   };
 
   return (
     <div className="puzzle-header">
       <div className="puzzle-nav">
-        <button onClick={() => canLeaveDirectly ? router.push('/') : setShowLeaveModal(true)} className="nav-back">
+        <button onClick={() => canLeaveDirectly ? router.replace('/') : setShowLeaveModal(true)} className="nav-back">
           <svg
             viewBox="0 0 16 16"
             fill="none"
