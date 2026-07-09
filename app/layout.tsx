@@ -121,16 +121,7 @@ export default function RootLayout({
 
         {/* ── FOOTER ── */}
         <footer>
-          <p>
-            created by{' '}
-            <a
-              href="https://www.linkedin.com/in/rathodnk"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              rathodnk
-            </a>
-          </p>
+
           <p style={{ marginTop: '6px', fontSize: '12px' }}>
             <Link href="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
             {' · '}

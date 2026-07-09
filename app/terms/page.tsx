@@ -85,11 +85,29 @@ export default function TermsPage() {
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Changes</h2>
         <p>We may modify these terms at any time. Continued use constitutes acceptance of updated terms.</p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Contact</h2>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Reach Out</h2>
         <p>
-          Questions? Reach out at{' '}
+          Questions? Mail Me at{' '}
           <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
             nikhil.sudox@gmail.com
+          </a>
+        </p>
+        <p>
+          X handle at{' '}
+          <a href="https://x.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            SudoXDaily
+          </a>
+        </p>
+        <p>
+          Facebook handle at{' '}
+          <a href="https://facebook.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            SudoXDaily
+          </a>
+        </p>
+        <p>
+          Instagram handle at{' '}
+          <a href="https://instagram.com/sudox.ig" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            sudox.ig
           </a>
         </p>
       </div>

@@ -48,6 +48,14 @@ const icons = {
       <polyline points="22,6 12,13 2,6" />
     </svg>
   ),
+  follow: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+      <circle cx="8.5" cy="7" r="4" />
+      <line x1="20" y1="8" x2="20" y2="14" />
+      <line x1="23" y1="11" x2="17" y2="11" />
+    </svg>
+  ),
 };
 
 export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
@@ -60,6 +68,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const [isThemeOpen, setIsThemeOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isFollowOpen, setIsFollowOpen] = useState(false);
 
   const handleAction = (action: string) => {
     onClose();
@@ -79,6 +88,9 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
       case 'login':
         setIsLoginOpen(true);
         break;
+      case 'follow':
+        setIsFollowOpen(true);
+        break;
     }
   };
 
@@ -87,7 +99,8 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { label: 'Download PDF', icon: icons.download, action: 'download' },
     { divider: true },
-    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
+    { label: 'Mail Me', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
+    { label: 'Follow Us', icon: icons.follow, action: 'follow' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 
@@ -95,7 +108,8 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'About', icon: icons.about, action: 'about' },
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { divider: true },
-    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
+    { label: 'Mail Me', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
+    { label: 'Follow Us', icon: icons.follow, action: 'follow' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 
@@ -181,7 +195,30 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
         <p>With 16 unique Sudoku variants daily; standard, jigsaw, windoku, twodoku, and more.</p>
         <p>You&apos;ll always have a fun, new way to test your logic!</p>
         <p>No login required to play for now. Just click and start solving.</p>
-        <p style={{ marginTop: '0.5rem' }}>Created by <a href="https://www.linkedin.com/in/rathodnk" target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'none' }}>rathodnk</a>.</p>
+        <p style={{ marginTop: '0.5rem' }}>Created and Built by <a href="https://www.linkedin.com/in/rathodnk" target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'none' }}>rathodnk</a>.</p>
+      </Modal>
+
+      <Modal isOpen={isFollowOpen} onClose={() => setIsFollowOpen(false)} title="Follow Us">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '8px 0' }}>
+          <a href="https://x.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'var(--text-primary)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+            </svg>
+            <span style={{ fontSize: '16px', fontWeight: 500 }}>SudoXDaily</span>
+          </a>
+          <a href="https://www.facebook.com/SudoXDaily/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'var(--text-primary)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+            </svg>
+            <span style={{ fontSize: '16px', fontWeight: 500 }}>SudoXDaily</span>
+          </a>
+          <a href="https://www.instagram.com/sudox.ig/" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'var(--text-primary)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
+            <span style={{ fontSize: '16px', fontWeight: 500 }}>sudox.ig</span>
+          </a>
+        </div>
       </Modal>
 
       <Modal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} title="How to Play">
@@ -236,7 +273,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
           <ol style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li>Fill the empty cells in the 8x8 grid using only the numbers 1 to 8.</li>
             <li>Ensure that every horizontal row and vertical column contains each number exactly once without any repeats.</li>
-            <li>Grid is made up from two different shape of subgrids <b>i.e., 2x4 and 4x2</b> placed randomly. Make sure they also contain each number exactly once without any repeats.</li>
+            <li>Grid is made up from two different shape of subgrids <b>i.e., 2x4, 4x2 and two wrapped 2x2</b> placed randomly. Make sure they also contain each number exactly once without any repeats.</li>
             <li><strong>Green</strong> = correct, <strong>Red</strong> = wrong.</li>
             <li>Use the eraser (or Backspace) to clear a cell.</li>
             <li>Complete all cells correctly to solve the puzzle!</li>

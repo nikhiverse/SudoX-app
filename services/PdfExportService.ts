@@ -43,7 +43,7 @@ const PDF_LAYOUT = {
   sectionGap:  10,
 };
 
-const PDF_FOOTER_TEXT = "© rathodnk — SudoX Sudoku Variants";
+const PDF_FOOTER_TEXT = "© SudoX Sudoku Variants";
 
 const PDF_BORDER = {
   thin:  0.3,

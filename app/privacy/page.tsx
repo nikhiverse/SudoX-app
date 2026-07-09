@@ -3,7 +3,6 @@
 // ═══════════════════════════════════════════
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — SudoX',
@@ -13,37 +12,20 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: '28px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            margin: 0,
-          }}
-        >
-          Privacy Policy
-        </h1>
-        <Link href="/" className="nav-back" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ width: '12px', height: '12px' }}
-          >
-            <line x1="4" y1="4" x2="12" y2="12" />
-            <line x1="12" y1="4" x2="4" y2="12" />
-          </svg>
-          Close
-        </Link>
-      </div>
+      <h1
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: '28px',
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+          marginBottom: '24px',
+        }}
+      >
+        Privacy Policy
+      </h1>
 
       <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> July 2026</p>
+        <p><strong>Last updated:</strong> June 2026</p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>What We Collect</h2>
         <p>
@@ -68,7 +50,7 @@ export default function PrivacyPage() {
         <p>
           Your puzzle progress, game state, and theme preference are stored locally in your browser
           using <strong>localStorage</strong>. This data never leaves your device and is not sent to
-          our servers. Data older than 2 days is automatically cleaned up.
+          our servers. Data older than 7 days is automatically cleaned up.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Cookies</h2>
@@ -87,11 +69,29 @@ export default function PrivacyPage() {
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Changes</h2>
         <p>We may update this policy from time to time. Changes will be reflected on this page.</p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Contact</h2>
+        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Reach Out</h2>
         <p>
-          Questions? Reach out at{' '}
+          Questions? Mail Me at{' '}
           <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
             nikhil.sudox@gmail.com
+          </a>
+        </p>
+        <p>
+          X handle at{' '}
+          <a href="https://x.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            SudoXDaily
+          </a>
+        </p>
+        <p>
+          Facebook handle at{' '}
+          <a href="https://facebook.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            SudoXDaily
+          </a>
+        </p>
+        <p>
+          Instagram handle at{' '}
+          <a href="https://instagram.com/sudox.ig" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            sudox.ig
           </a>
         </p>
       </div>
