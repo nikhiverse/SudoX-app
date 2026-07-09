@@ -43,7 +43,7 @@ export default function PrivacyPage() {
       </div>
 
       <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> June 2026</p>
+        <p><strong>Last updated:</strong> July 2026</p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>What We Collect</h2>
         <p>
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
         <p>
           Your puzzle progress, game state, and theme preference are stored locally in your browser
           using <strong>localStorage</strong>. This data never leaves your device and is not sent to
-          our servers. Data older than 7 days is automatically cleaned up.
+          our servers. Data older than 2 days is automatically cleaned up.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Cookies</h2>
@@ -90,8 +90,8 @@ export default function PrivacyPage() {
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Contact</h2>
         <p>
           Questions? Reach out at{' '}
-          <a href="mailto:nikhil.webdna@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-            nikhil.webdna@gmail.com
+          <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            nikhil.sudox@gmail.com
           </a>
         </p>
       </div>

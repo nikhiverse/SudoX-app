@@ -43,7 +43,7 @@ export default function TermsPage() {
       </div>
 
       <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> June 2026</p>
+        <p><strong>Last updated:</strong> July 2026</p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Acceptance</h2>
         <p>
@@ -88,8 +88,8 @@ export default function TermsPage() {
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Contact</h2>
         <p>
           Questions? Reach out at{' '}
-          <a href="mailto:nikhil.webdna@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-            nikhil.webdna@gmail.com
+          <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            nikhil.sudox@gmail.com
           </a>
         </p>
       </div>

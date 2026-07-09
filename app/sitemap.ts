@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════
 // SudoX — Dynamic Sitemap
-// Lists home page + all 16 puzzle variant pages.
+// Lists home page + all 16 puzzle variant pages + legal pages.
 // ═══════════════════════════════════════════
 
 import type { MetadataRoute } from 'next';
@@ -31,17 +31,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // Legal pages
+  // Legal pages (updated July 2026)
+  const legalUpdated = new Date('2026-07-09');
   pages.push(
     {
       url: `${BASE_URL}/privacy`,
-      lastModified: now,
+      lastModified: legalUpdated,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${BASE_URL}/terms`,
-      lastModified: now,
+      lastModified: legalUpdated,
       changeFrequency: 'yearly',
       priority: 0.3,
     }

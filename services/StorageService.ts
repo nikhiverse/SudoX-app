@@ -9,6 +9,8 @@ import type { GameProgress, PuzzleApiResponse } from '@/lib/types';
 // Key formats:
 //   sudox:puzzle:sudoku9:2026-04-15     → PuzzleApiResponse
 //   sudox:progress:sudoku9:2026-04-15   → GameProgress
+//   sudox:lives:sudoku9:2026-04-15      → number (per-puzzle lives, starts at 3)
+//   sudox:locked:sudoku9:2026-04-15     → boolean (1 = locked for that puzzle)
 
 function puzzleKey(game: string, date: string): string {
   return `${STORAGE_PREFIX}:puzzle:${game}:${date}`;
@@ -80,51 +82,55 @@ export const StorageService = {
     }
   },
 
-  // ── Lives & Locking ──
+  // ── Lives & Locking (per-puzzle) ──
+  // Each game gets its own independent 3-life budget.
+  // Key: sudox:lives:{game}:{date}
 
-  getLives(date: string): number {
-    if (!isLocalStorageAvailable()) return 4;
+  getLives(game: string, date: string): number {
+    if (!isLocalStorageAvailable()) return 3;
     try {
-      const val = localStorage.getItem(`${STORAGE_PREFIX}:lives:${date}`);
-      return val === null ? 4 : parseInt(val, 10);
+      const val = localStorage.getItem(`${STORAGE_PREFIX}:lives:${game}:${date}`);
+      return val === null ? 3 : parseInt(val, 10);
     } catch {
-      return 4;
+      return 3;
     }
   },
 
-  setLives(date: string, count: number): void {
+  setLives(game: string, date: string, count: number): void {
     if (!isLocalStorageAvailable()) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}:lives:${date}`, count.toString());
+      localStorage.setItem(`${STORAGE_PREFIX}:lives:${game}:${date}`, count.toString());
     } catch {
       // Silently ignore
     }
   },
 
-  getLockedGames(date: string): string[] {
-    if (!isLocalStorageAvailable()) return [];
+  isGameLocked(game: string, date: string): boolean {
+    if (!isLocalStorageAvailable()) return false;
     try {
-      const val = localStorage.getItem(`${STORAGE_PREFIX}:locked:${date}`);
-      return val ? JSON.parse(val) : [];
+      const val = localStorage.getItem(`${STORAGE_PREFIX}:locked:${game}:${date}`);
+      return val === '1';
     } catch {
-      return [];
+      return false;
     }
   },
 
-  setLockedGames(date: string, games: string[]): void {
+  setGameLocked(game: string, date: string): void {
     if (!isLocalStorageAvailable()) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}:locked:${date}`, JSON.stringify(games));
+      localStorage.setItem(`${STORAGE_PREFIX}:locked:${game}:${date}`, '1');
     } catch {
       // Silently ignore
     }
   },
+
+
 
   // ── Cleanup ──
 
   /**
    * Remove localStorage entries older than `keepDays` days.
-   * Defaults to STORAGE_KEEP_DAYS (7).
+   * Defaults to STORAGE_KEEP_DAYS (2).
    */
   cleanupOldEntries(keepDays: number = STORAGE_KEEP_DAYS): void {
     if (!isLocalStorageAvailable()) return;

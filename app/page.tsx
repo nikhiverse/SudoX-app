@@ -24,20 +24,24 @@ export default function HomePage() {
 
   useEffect(() => {
     const today = getTodayDateString();
-    const lockedGames = StorageService.getLockedGames(today);
 
     const comp: Record<string, boolean> = {};
+    const lock: string[] = [];
+
     for (const variant of HOME_VARIANTS) {
       const prog = StorageService.getProgress(variant, today);
       if (prog?.completed) {
         comp[variant] = true;
+      }
+      if (StorageService.isGameLocked(variant, today)) {
+        lock.push(variant);
       }
     }
 
     // Reading localStorage on mount and setting initial state is a valid
     // one-time initialisation pattern.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocked(lockedGames);
+    setLocked(lock);
     setCompleted(comp);
   }, []);
 

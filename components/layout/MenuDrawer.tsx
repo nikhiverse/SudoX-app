@@ -87,7 +87,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { label: 'Download PDF', icon: icons.download, action: 'download' },
     { divider: true },
-    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.webdna@gmail.com' },
+    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 
@@ -95,7 +95,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     { label: 'About', icon: icons.about, action: 'about' },
     { label: 'Theme', icon: icons.theme, action: 'theme' },
     { divider: true },
-    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.webdna@gmail.com' },
+    { label: 'Reach Out', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
     { label: 'Login', icon: icons.login, action: 'login' },
   ];
 

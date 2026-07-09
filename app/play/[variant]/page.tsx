@@ -124,8 +124,8 @@ function GameActive({
 }) {
   const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, initialTimerSeconds } = useGameState(puzzleData, game);
   const timer = useTimer(initialTimerSeconds);
-  const { lives, recordMistake, isLocked, isInitialized } = useLives();
-  const gameIsLocked = isLocked(game);
+  const { lives, recordMistake, isLocked, isInitialized } = useLives(game);
+  const gameIsLocked = isLocked;
   const isCompleted = manager.isCompleted();
 
   // No beforeunload dialog needed — all state (grid + timer) is persisted
@@ -274,7 +274,7 @@ function GameActive({
       if (manager.getState().solutionGrid) {
         const expected = manager.getState().solutionGrid![r][c];
         if (expected !== undefined && val !== expected) {
-          recordMistake(game);
+          recordMistake();
         }
       }
     }
