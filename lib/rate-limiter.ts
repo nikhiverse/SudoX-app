@@ -23,15 +23,13 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
  * Returns true if allowed, false if rate-limited.
  */
 export async function checkRateLimit(ip: string): Promise<boolean> {
-  // If rate limiter isn't configured:
-  // - Production: fail CLOSED (block traffic) to protect infrastructure
-  // - Development: fail OPEN (allow traffic) for local convenience
+  // If rate limiter isn't configured (Upstash env vars missing),
+  // fail open to avoid breaking the app. The CDN cache headers
+  // (s-maxage=3600) already protect against cost explosions.
   if (!ratelimit) {
     if (process.env.NODE_ENV === 'production') {
-      console.error('CRITICAL: Rate limiter env vars missing in production. Blocking request.');
-      return false;
+      console.error('WARNING: Rate limiter not configured in production. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to Vercel env vars.');
     }
-    console.warn('UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing in dev. Bypassing rate limit.');
     return true;
   }
 
