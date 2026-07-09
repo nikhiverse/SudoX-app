@@ -9,10 +9,18 @@ import { HOME_VARIANTS, GAME_NAMES, getVariantUrl } from '@/lib/constants';
 import { StorageService } from '@/services/StorageService';
 import { getTodayDateString } from '@/lib/date-utils';
 import type { GameVariant } from '@/lib/types';
+import { useBackNavigationTrap } from '@/hooks/useBackNavigationTrap';
+import { Modal } from '@/components/ui/Modal';
 
 export default function HomePage() {
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [locked, setLocked] = useState<string[]>([]);
+  const [showExitModal, setShowExitModal] = useState(false);
+
+  const { exitApp } = useBackNavigationTrap({
+    active: true,
+    onTrapTriggered: () => setShowExitModal(true),
+  });
 
   useEffect(() => {
     const today = getTodayDateString();
@@ -54,6 +62,21 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      <Modal
+        isOpen={showExitModal}
+        onClose={() => setShowExitModal(false)}
+        title="Exit SudoX?"
+        variant="warning"
+        footer={
+          <>
+            <button className="action-btn ghost" onClick={() => setShowExitModal(false)}>Cancel</button>
+            <button className="action-btn primary" onClick={exitApp} style={{ backgroundColor: 'var(--wrong-text)', borderColor: 'var(--wrong-text)' }}>Yes, exit</button>
+          </>
+        }
+      >
+        <p>Are you sure you want to leave SudoX?<br />You will be returned to your previous page.</p>
+      </Modal>
     </div>
   );
 }

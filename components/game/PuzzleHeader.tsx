@@ -29,7 +29,7 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
 
   return (
     <div className="puzzle-header">
-      <div className="puzzle-nav">
+      <div className="puzzle-nav-row">
         <button onClick={() => canLeaveDirectly ? router.replace('/') : setShowLeaveModal(true)} className="nav-back">
           <svg
             viewBox="0 0 16 16"
@@ -43,19 +43,21 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
           </svg>
           All Variants
         </button>
-        <div className="puzzle-nav-right">
-          <Timer display={timerDisplay} emoji={timerEmoji} />
-          {lives !== undefined && (
-            <div className="puzzle-hearts">
-              {[0, 1, 2, 3].map((i) => (
-                <span key={i} style={{ opacity: i < lives ? 1 : 0.3 }}>❤️</span>
-              ))}
-            </div>
-          )}
-        </div>
+        <Timer display={timerDisplay} emoji={timerEmoji} />
       </div>
-      <h2 className="puzzle-title">{title}</h2>
-      {puzzleId && <p className="puzzle-id">#{puzzleId}</p>}
+      <div className="puzzle-title-row">
+        <div className="puzzle-title-block">
+          <h2 className="puzzle-title">{title}</h2>
+          {puzzleId && <p className="puzzle-id">#{puzzleId}</p>}
+        </div>
+        {lives !== undefined && (
+          <div className="puzzle-hearts">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} style={{ opacity: i < lives ? 1 : 0.3 }}>❤️</span>
+            ))}
+          </div>
+        )}
+      </div>
 
       <Modal 
         isOpen={showLeaveModal} 

@@ -238,15 +238,17 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
     <>
       {/* Skeleton Header matching PuzzleHeader layout */}
       <div className="puzzle-header">
-        <div className="puzzle-nav">
+        <div className="puzzle-nav-row">
           <div className="nav-back skeleton-pulse" style={{ width: 100, border: 'none' }} />
-          <div className="puzzle-nav-right">
-            <div className="skeleton-timer skeleton-pulse" />
-            <div className="skeleton-hearts skeleton-pulse" />
-          </div>
+          <div className="skeleton-timer skeleton-pulse" />
         </div>
-        <h2 className="puzzle-title">{gameName}</h2>
-        <div className="skeleton-id skeleton-pulse" style={{ marginTop: 8 }} />
+        <div className="puzzle-title-row">
+          <div className="puzzle-title-block">
+            <h2 className="puzzle-title">{gameName}</h2>
+            <div className="skeleton-id skeleton-pulse" style={{ marginTop: 8 }} />
+          </div>
+          <div className="skeleton-hearts skeleton-pulse" />
+        </div>
       </div>
 
       {/* Grid skeleton */}
