@@ -12,10 +12,10 @@ import { checkRateLimit } from '@/lib/rate-limiter';
 import { encodeSolution } from '@/lib/solution-codec';
 import type { GameVariant, DailyPuzzleDoc, PuzzleDoc, SolutionDoc } from '@/lib/types';
 
-// Cache the response for 1 hour (3600s). Daily puzzles don't change, so
-// thousands of users share a single DB read per cache window. This prevents
-// cost explosions from traffic spikes or botnet abuse on Vercel + MongoDB.
-export const revalidate = 3600;
+// Route must be dynamic because we read request headers for IP-based rate
+// limiting. Cost protection is handled via CDN cache headers on the response
+// (s-maxage=3600) so Vercel's edge serves cached responses to most users.
+export const dynamic = 'force-dynamic';
 
 
 export async function GET(
@@ -83,6 +83,8 @@ export async function GET(
     );
 
     // 4. Return puzzle data with encoded (opaque) solution
+    //    CDN caching: Vercel edge caches for 1 hour, serves stale while revalidating.
+    //    This prevents cost explosions — most requests never reach the serverless function.
     return NextResponse.json({
       puzzleData: puzzleDoc.puzzleData,
       encodedSolution,
@@ -90,6 +92,10 @@ export async function GET(
       generationId: puzzleDoc.generationId,
       game: puzzleDoc.game,
       date: puzzleDoc.date,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=60',
+      },
     });
   } catch (err) {
     console.error(`Error fetching puzzle for ${game}:`, err);
