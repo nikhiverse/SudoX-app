@@ -12,8 +12,10 @@ import { checkRateLimit } from '@/lib/rate-limiter';
 import { encodeSolution } from '@/lib/solution-codec';
 import type { GameVariant, DailyPuzzleDoc, PuzzleDoc, SolutionDoc } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Cache the response for 1 hour (3600s). Daily puzzles don't change, so
+// thousands of users share a single DB read per cache window. This prevents
+// cost explosions from traffic spikes or botnet abuse on Vercel + MongoDB.
+export const revalidate = 3600;
 
 
 export async function GET(

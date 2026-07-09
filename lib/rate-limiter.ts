@@ -23,10 +23,15 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
  * Returns true if allowed, false if rate-limited.
  */
 export async function checkRateLimit(ip: string): Promise<boolean> {
-  // If no Redis URL is provided, fail open (allow all) to prevent breaking the app
-  // during local development if the developer hasn't set up Upstash yet.
+  // If rate limiter isn't configured:
+  // - Production: fail CLOSED (block traffic) to protect infrastructure
+  // - Development: fail OPEN (allow traffic) for local convenience
   if (!ratelimit) {
-    console.warn('UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing. Rate limiting is disabled.');
+    if (process.env.NODE_ENV === 'production') {
+      console.error('CRITICAL: Rate limiter env vars missing in production. Blocking request.');
+      return false;
+    }
+    console.warn('UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN is missing in dev. Bypassing rate limit.');
     return true;
   }
 
