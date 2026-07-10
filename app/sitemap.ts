@@ -45,6 +45,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: legalUpdated,
       changeFrequency: 'yearly',
       priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/copyright`,
+      lastModified: legalUpdated,
+      changeFrequency: 'yearly',
+      priority: 0.3,
     }
   );
 

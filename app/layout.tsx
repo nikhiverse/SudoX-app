@@ -126,6 +126,8 @@ export default function RootLayout({
             <Link href="/privacy" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
             {' · '}
             <Link href="/terms" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Terms</Link>
+            {' · '}
+            <Link href="/copyright" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Copyright</Link>
           </p>
         </footer>
         <Analytics />
