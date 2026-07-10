@@ -84,4 +84,5 @@ __pycache__/
 *.pyo
 *.pyd
 
+check_db.mjs
 
