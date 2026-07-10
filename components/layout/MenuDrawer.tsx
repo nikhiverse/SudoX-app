@@ -195,7 +195,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
         <p>With 16 unique Sudoku variants daily; standard, jigsaw, windoku, twodoku, and more.</p>
         <p>You&apos;ll always have a fun, new way to test your logic!</p>
         <p>No login required to play for now. Just click and start solving.</p>
-        <p style={{ marginTop: '0.5rem' }}>Created and Built by <a href="https://www.linkedin.com/in/rathodnk" target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'none' }}>rathodnk</a>.</p>
+        <p style={{ marginTop: '0.5rem' }}>Created and Built by <a href="https://www.linkedin.com/in/rathodnk" target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'none' }}>Nikhil Rathod</a>.</p>
       </Modal>
 
       <Modal isOpen={isFollowOpen} onClose={() => setIsFollowOpen(false)} title="Follow Us">
