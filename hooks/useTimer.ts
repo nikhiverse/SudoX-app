@@ -21,7 +21,10 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const secondsRef = useRef(initialSeconds);
+  
+  // Track start time for background execution accuracy
+  const startTimeRef = useRef<number>(0);
+  const startSecondsRef = useRef<number>(initialSeconds);
 
   // When initialSeconds change (e.g. from 0 to the actual saved value on mount),
   // update the state if the timer hasn't started yet.
@@ -29,7 +32,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
     if (!isRunning && initialSeconds > 0 && seconds === 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSeconds(initialSeconds);
-      secondsRef.current = initialSeconds;
+      startSecondsRef.current = initialSeconds;
     }
   }, [initialSeconds, isRunning, seconds]);
 
@@ -49,13 +52,15 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
       clearInterval(intervalRef.current);
     }
 
-    secondsRef.current = fromSeconds;
+    startSecondsRef.current = fromSeconds;
+    startTimeRef.current = Date.now();
     setSeconds(fromSeconds);
     setIsRunning(true);
 
     intervalRef.current = setInterval(() => {
-      secondsRef.current += 1;
-      setSeconds(secondsRef.current);
+      const now = Date.now();
+      const elapsedSeconds = Math.floor((now - startTimeRef.current) / 1000);
+      setSeconds(startSecondsRef.current + elapsedSeconds);
     }, 1000);
   }, []);
 
@@ -72,7 +77,7 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    secondsRef.current = 0;
+    startSecondsRef.current = 0;
     setSeconds(0);
     setIsRunning(false);
   }, []);

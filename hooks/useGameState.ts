@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { GameStateManager } from '@/services/GameStateManager';
 import { StorageService } from '@/services/StorageService';
 import { getTodayDateString } from '@/lib/date-utils';
@@ -70,11 +70,37 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
 
   const syncTimer = useCallback((seconds: number) => {
     timerRef.current = seconds;
-    // Persist every 5 seconds so timer survives page refresh seamlessly
-    if (seconds % 5 === 0) {
-      persist();
-    }
+    // Persist every 1 second so timer survives page refresh seamlessly
+    persist();
   }, [persist]);
+
+  // Sync state automatically across different browser tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      const today = getTodayDateString();
+      const expectedKey = `sudox:progress:${game}:${today}`;
+      
+      if (e.key === expectedKey && e.newValue) {
+        try {
+          const saved = JSON.parse(e.newValue);
+          manager.restore({
+            cellValues: saved.cellValues,
+            cellCorrect: saved.cellCorrect,
+            cellWasWrong: saved.cellWasWrong,
+          });
+          if (saved.timerSeconds && saved.timerSeconds > timerRef.current) {
+            timerRef.current = saved.timerSeconds;
+          }
+          bump();
+        } catch (err) {
+          console.error('Failed to sync progress across tabs', err);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [game, manager, bump]);
 
   const moveCursor = useCallback((r: number, c: number) => {
     manager.moveCursor(r, c);
