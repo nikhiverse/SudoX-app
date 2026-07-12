@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════
-// SudoX — Copyright Policy
+// SudoX Daily — Copyright Policy
 // ═══════════════════════════════════════════
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Copyright Policy — SudoX',
-  description: 'SudoX copyright policy and intellectual property notice.',
+  title: 'Copyright Policy — SudoX Daily',
+  description: 'SudoX Daily copyright policy and intellectual property notice.',
 };
 
 export default function CopyrightPage() {
@@ -47,9 +47,9 @@ export default function CopyrightPage() {
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Ownership of Content</h2>
         <p>
-          All content on the SudoX platform, including but not limited to the underlying code,
+          All content on the SudoX Daily platform, including but not limited to the underlying code,
           proprietary C++ puzzle generation algorithms, visual design, graphics, layouts,
-          and trademarks, are the exclusive property of SudoX and its creator, Nikhil Rathod{' '}
+          and trademarks, are the exclusive property of SudoX Daily and its creator, Nikhil Rathod{' '}
           <a href="https://www.linkedin.com/in/rathodnk" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
             (rathodnk)
           </a>.
@@ -60,7 +60,7 @@ export default function CopyrightPage() {
           The daily puzzles presented on this site (including Jigsaw, Windoku, Twodoku, and all X-variants)
           are procedurally generated daily by our proprietary engine. While the concept of Sudoku
           is in the public domain, the specific arrangements, source code, and daily puzzle
-          files hosted on SudoX are copyrighted material.
+          files hosted on SudoX Daily are copyrighted material.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Prohibited Actions</h2>

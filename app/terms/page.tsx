@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════
-// SudoX — Terms of Service
+// SudoX Daily — Terms of Service
 // ═══════════════════════════════════════════
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — SudoX',
-  description: 'SudoX terms of service — rules for using SudoX.',
+  title: 'Terms of Service — SudoX Daily',
+  description: 'SudoX Daily terms of service — rules for using SudoX Daily.',
 };
 
 export default function TermsPage() {
@@ -47,12 +47,12 @@ export default function TermsPage() {
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Acceptance</h2>
         <p>
-          By using SudoX, you agree to these terms. If you do not agree, please do not use the website.
+          By using SudoX Daily, you agree to these terms. If you do not agree, please do not use the website.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Service Description</h2>
         <p>
-          SudoX is a free, web-based puzzle game that provides 16 unique Sudoku variants daily.
+          SudoX Daily is a free, web-based puzzle game that provides 16 unique Sudoku variants daily.
           The service is provided &quot;as is&quot; without warranties of any kind.
         </p>
 
@@ -66,19 +66,19 @@ export default function TermsPage() {
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Intellectual Property</h2>
         <p>
           All puzzle generation algorithms, game designs, and website content are the property
-          of SudoX and its creator. The daily puzzles themselves are generated procedurally and
+          of SudoX Daily and its creator. The daily puzzles themselves are generated procedurally and
           are free to play.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Limitation of Liability</h2>
         <p>
-          SudoX is provided for entertainment purposes. We are not liable for any loss of data,
+          SudoX Daily is provided for entertainment purposes. We are not liable for any loss of data,
           progress, or any indirect damages arising from use of the service.
         </p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Availability</h2>
         <p>
-          We strive to keep SudoX available 24/7, but we do not guarantee uninterrupted service.
+          We strive to keep SudoX Daily available 24/7, but we do not guarantee uninterrupted service.
           Puzzles are generated daily, and occasional outages may occur during maintenance.
         </p>
 

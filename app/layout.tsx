@@ -127,7 +127,7 @@ export default function RootLayout({
             {' · '}
             <Link href="/terms" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Terms</Link>
             {' · '}
-            <Link href="/copyright" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Copyright</Link>
+            <Link href="/copyright" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>© 2026 SudoX Daily</Link>
           </p>
         </footer>
         <Analytics />

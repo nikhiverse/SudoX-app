@@ -1,35 +1,53 @@
 // ═══════════════════════════════════════════
-// SudoX — Privacy Policy
+// SudoX Daily — Privacy Policy
 // ═══════════════════════════════════════════
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — SudoX',
-  description: 'SudoX privacy policy — how we handle your data.',
+  title: 'Privacy Policy — SudoX Daily',
+  description: 'SudoX Daily privacy policy — how we handle your data.',
 };
 
 export default function PrivacyPage() {
   return (
     <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <h1
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: '28px',
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          marginBottom: '24px',
-        }}
-      >
-        Privacy Policy
-      </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h1
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: '28px',
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+            margin: 0,
+          }}
+        >
+          Privacy Policy
+        </h1>
+        <Link href="/" className="nav-back" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ width: '12px', height: '12px' }}
+          >
+            <line x1="4" y1="4" x2="12" y2="12" />
+            <line x1="12" y1="4" x2="4" y2="12" />
+          </svg>
+          Close
+        </Link>
+      </div>
 
       <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <p><strong>Last updated:</strong> June 2026</p>
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>What We Collect</h2>
         <p>
-          SudoX is a free puzzle game that requires <strong>no account</strong> and <strong>no login</strong>.
+          SudoX Daily is a free puzzle game that requires <strong>no account</strong> and <strong>no login</strong>.
           We do not collect personal information such as names, email addresses, or payment details.
         </p>
 
@@ -55,7 +73,7 @@ export default function PrivacyPage() {
 
         <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Cookies</h2>
         <p>
-          SudoX does not set any first-party cookies. Vercel Analytics may use minimal,
+          SudoX Daily does not set any first-party cookies. Vercel Analytics may use minimal,
           privacy-respecting techniques to measure traffic, but no tracking cookies are placed.
         </p>
 
