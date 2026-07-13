@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Copyright Policy — SudoX Daily',
+  title: 'Copyright Policy - SudoX Daily',
   description: 'SudoX Daily copyright policy and intellectual property notice.',
 };
 

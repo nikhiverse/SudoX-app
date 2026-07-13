@@ -17,7 +17,7 @@ export async function generateMetadata({
 
   if (!VALID_GAMES.includes(variant as GameVariant)) {
     return {
-      title: 'Unknown Variant — SudoX',
+      title: 'Unknown Variant - SudoX Daily',
       description: 'This puzzle variant does not exist.',
     };
   }
@@ -25,10 +25,10 @@ export async function generateMetadata({
   const name = GAME_NAMES[variant as GameVariant] || variant;
 
   return {
-    title: `${name} — SudoX Daily Puzzle`,
+    title: `${name} - SudoX Daily`,
     description: `Play today's ${name} puzzle on SudoX. A free daily ${name} challenge — no login required.`,
     openGraph: {
-      title: `${name} — SudoX`,
+      title: `${name} - SudoX Daily`,
       description: `Play today's ${name} puzzle. Free daily Sudoku variant.`,
       type: 'website',
     },

@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — SudoX Daily',
+  title: 'Privacy Policy - SudoX Daily',
   description: 'SudoX Daily privacy policy — how we handle your data.',
 };
 

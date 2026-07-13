@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { SignupForm } from './SignupForm';
 
 export const metadata: Metadata = {
-  title: 'Sign Up — SudoX',
+  title: 'Sign Up - SudoX Daily',
   description: 'Create a free SudoX account to save your daily puzzle streak, track statistics, and play variants.',
 };
 

@@ -43,7 +43,6 @@ const PDF_LAYOUT = {
   sectionGap:  10,
 };
 
-const PDF_FOOTER_TEXT = "© SudoX Sudoku Variants";
 
 const PDF_BORDER = {
   thin:  0.3,
@@ -99,11 +98,14 @@ function _drawHeader(
     doc.text("SX", margin + 6, 16.5, { align: "center" });
   }
 
+  // Make the logo/badge clickable
+  doc.link(margin, 8, 12, 12, { url: 'https://sudox-app.vercel.app/' });
+
   // Brand name
   doc.setFont("Times", "bold");
   doc.setFontSize(15);
   doc.setTextColor(...textMain);
-  doc.text("SudoX", margin + 16, 17);
+  doc.text("SudoX Daily", margin + 16, 17);
 
   // Puzzle ID
   doc.setFont("Courier", "normal");
@@ -144,8 +146,7 @@ function _drawGrid(
   const contentW = pageW - margin * 2;
 
   const {
-    gridDark, clueText, altCell, diagCell, winCell,
-    whitish,
+    gridDark, clueText, altCell, diagCell, winCell, whitish,
   } = PDF_PALETTE;
 
   const border = PDF_BORDER;
@@ -171,7 +172,6 @@ function _drawGrid(
   const gridX = margin + (contentW - gridW) / 2;
 
   // Font size: cellMM is in mm, jsPDF fontSize is in pt (1 mm ≈ 2.835 pt)
-  // Slightly reduced multiplier to prevent congested numbers
   const fontSize = Math.max(9, cellMM * 2.835 * 0.55);
 
   // ── Pass 1: backgrounds ──
@@ -181,11 +181,9 @@ function _drawGrid(
       const x = gridX + c * cellMM;
       const y = yPos + r * cellMM;
 
-      if (!el || el.classList.contains("inactive-cell")) {
-        continue;
-      }
+      if (!el || el.classList.contains("inactive-cell")) continue;
 
-      // Background colour (ignore correct/wrong state to print clean puzzle)
+      // Background colour mapping
       let bg: readonly [number, number, number] = whitish;
       if      (el.classList.contains("both-cell"))      bg = diagCell;
       else if (el.classList.contains("diagonal-cell"))  bg = diagCell;
@@ -194,36 +192,73 @@ function _drawGrid(
 
       doc.setFillColor(...bg);
       doc.rect(x, y, cellMM, cellMM, "F");
+    }
+  }
 
-      // Number (only print clues, ignore player progress)
+  // ── WATERMARKS (Updated for Premium Transparency) ──
+  // Drawn after backgrounds but before text/borders
+  const cx = pageW / 2;
+  const cy1 = pageH * 0.38;
+  const cy2 = pageH * 0.70;
+  
+  // Use jsPDF GState to apply actual opacity (transparency)
+  const transparentState = new (doc.GState as any)({ opacity: 0.12 });
+  doc.setGState(transparentState);
+  
+  // Use a dark color with low opacity so it acts as a subtle shadow on all backgrounds
+  doc.setTextColor(45, 42, 36); 
+  
+  // Watermark 1
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(45);
+  doc.text("SudoX Daily", cx, cy1, { align: "center", angle: 45 });
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(14);
+  doc.text("https://\u200Bsudox-app.vercel.app/", cx + 10, cy1 + 10, { align: "center", angle: 45 });
+
+  // Watermark 2
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(45);
+  doc.text("SudoX Daily", cx, cy2, { align: "center", angle: 45 });
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(14);
+  doc.text("https://\u200Bsudox-app.vercel.app/", cx + 10, cy2 + 10, { align: "center", angle: 45 });
+
+  // Reset opacity back to 1.0 (100%) so the grid numbers and lines draw normally
+  const solidState = new (doc.GState as any)({ opacity: 1.0 });
+  doc.setGState(solidState);
+
+  // ── Pass 2: text ──
+  for (let r = 0; r < totalRows; r++) {
+    for (let c = 0; c < totalCols; c++) {
+      const el = cellAt(r, c);
+      const x = gridX + c * cellMM;
+      const y = yPos + r * cellMM;
+
+      if (!el || el.classList.contains("inactive-cell")) continue;
+
       if (el.classList.contains("clue")) {
         const val = el.textContent?.trim() ?? '';
         if (val) {
-          let tx: readonly [number, number, number] = clueText;
-          if (
-            el.classList.contains("diagonal-cell") ||
-            el.classList.contains("window-cell") ||
-            el.classList.contains("both-cell")
-          ) {
-            tx = [255, 253, 248];
-          }
-          
           doc.setFont("Courier", "bold");
           doc.setFontSize(fontSize);
-          doc.setTextColor(...tx);
+          doc.setTextColor(...clueText);
           doc.text(val, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
         }
       }
     }
   }
 
-  // ── Pass 2: borders ──
+  // ── Pass 3: borders ──
   const parseBorder = (bStr: string): number | null => {
-    if (!bStr) return null;
-    return (bStr.includes("2.5px") || bStr.includes("2px"))
+    if (!bStr || bStr === "none" || bStr === "0px") return null;
+    return (bStr.includes("2.5px") || bStr.includes("2px") || bStr.includes("3px") || bStr.includes("thick"))
       ? border.thick
       : border.thin;
   };
+
+  // Deduplicate lines by geometry to prevent jagged anti-aliasing artifacts when lines overlap.
+  const linesToDraw = new Map<string, { x1: number, y1: number, x2: number, y2: number, w: number }>();
 
   for (let r = 0; r < totalRows; r++) {
     for (let c = 0; c < totalCols; c++) {
@@ -234,28 +269,39 @@ function _drawGrid(
       const y = yPos + r * cellMM;
       const st = el.style;
 
-      doc.setDrawColor(...gridDark);
-
       const sides = [
         { w: parseBorder(st.borderTop),    x1: x,          y1: y,          x2: x + cellMM, y2: y          },
         { w: parseBorder(st.borderBottom), x1: x,          y1: y + cellMM, x2: x + cellMM, y2: y + cellMM },
-        { w: parseBorder(st.borderLeft),   x1: x,          y1: y,          x2: x,           y2: y + cellMM },
-        { w: parseBorder(st.borderRight),  x1: x + cellMM, y1: y,          x2: x + cellMM,  y2: y + cellMM },
+        { w: parseBorder(st.borderLeft),   x1: x,          y1: y,          x2: x,          y2: y + cellMM },
+        { w: parseBorder(st.borderRight),  x1: x + cellMM, y1: y,          x2: x + cellMM, y2: y + cellMM },
       ];
 
       for (const s of sides) {
         if (s.w !== null) {
-          if (s.w === border.thick) {
-            doc.setDrawColor(...gridDark);
-            doc.setLineWidth(border.thick);
-          } else {
-            doc.setDrawColor(...PDF_PALETTE.borderSoft);
-            doc.setLineWidth(border.thin);
+          const kX1 = Math.min(s.x1, s.x2).toFixed(2);
+          const kY1 = Math.min(s.y1, s.y2).toFixed(2);
+          const kX2 = Math.max(s.x1, s.x2).toFixed(2);
+          const kY2 = Math.max(s.y1, s.y2).toFixed(2);
+          const key = `${kX1},${kY1}-${kX2},${kY2}`;
+
+          const existing = linesToDraw.get(key);
+          if (!existing || s.w > existing.w) {
+            linesToDraw.set(key, { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2, w: s.w });
           }
-          doc.line(s.x1, s.y1, s.x2, s.y2);
         }
       }
     }
+  }
+
+  // Draw all deduplicated lines.
+  // We sort them so thin lines are drawn first, and thick lines are drawn on top.
+  // This ensures perfect overlap and clean corners without jagged sub-pixel rendering.
+  const sortedLines = Array.from(linesToDraw.values()).sort((a, b) => a.w - b.w);
+  
+  doc.setDrawColor(...gridDark);
+  for (const s of sortedLines) {
+    doc.setLineWidth(s.w);
+    doc.line(s.x1, s.y1, s.x2, s.y2);
   }
 
   return yPos + gridH;
@@ -274,7 +320,15 @@ function _drawFooter(doc: JsPDFDoc) {
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...textMuted);
-  doc.text(PDF_FOOTER_TEXT, pageW / 2, footerY, { align: "center" });
+  
+  const text1 = "rathodnk";
+  const text2 = " · © 2026 SudoX Daily";
+  const w1 = doc.getTextWidth(text1);
+  const w2 = doc.getTextWidth(text2);
+  const startX = (pageW - (w1 + w2)) / 2;
+
+  doc.textWithLink(text1, startX, footerY, { url: "https://www.linkedin.com/in/rathodnk" });
+  doc.text(text2, startX + w1, footerY);
 }
 
 // ─────────────────────────────────────────────────────────────

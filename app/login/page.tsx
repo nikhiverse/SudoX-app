@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { LoginForm } from './LoginForm';
 
 export const metadata: Metadata = {
-  title: 'Login — SudoX',
+  title: 'Login - SudoX Daily',
   description: 'Log in to your SudoX account to track progress and stats.',
 };
 

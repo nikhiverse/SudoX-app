@@ -70,7 +70,7 @@ export default function HomePage() {
       <Modal
         isOpen={showExitModal}
         onClose={() => setShowExitModal(false)}
-        title="Exit SudoX?"
+        title="Exit SudoX Daily?"
         variant="warning"
         footer={
           <>
@@ -79,7 +79,7 @@ export default function HomePage() {
           </>
         }
       >
-        <p>Are you sure you want to leave SudoX?<br />You will be returned to your previous page.</p>
+        <p>Are you sure you want to leave SudoX Daily?<br />You will be returned to your previous page.</p>
       </Modal>
     </div>
   );
