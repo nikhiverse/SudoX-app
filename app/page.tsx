@@ -75,7 +75,7 @@ export default function HomePage() {
         footer={
           <>
             <button className="action-btn ghost" onClick={() => setShowExitModal(false)}>Cancel</button>
-            <button className="action-btn primary" onClick={exitApp} style={{ backgroundColor: 'var(--wrong-text)', borderColor: 'var(--wrong-text)' }}>Yes, exit</button>
+            <button className="action-btn primary" onClick={() => { setShowExitModal(false); exitApp(); }} style={{ backgroundColor: 'var(--wrong-text)', borderColor: 'var(--wrong-text)' }}>Yes, exit</button>
           </>
         }
       >

@@ -44,8 +44,16 @@ export function useBackNavigationTrap({ active, onTrapTriggered }: UseBackNaviga
 
   const exitApp = () => {
     isExitingRef.current = true;
-    // Go back two steps: once to get past the trapped state, once to get past the home page entry itself
-    window.history.go(-2);
+    
+    try {
+      window.close(); // Attempt to close PWA/WebAPK natively
+    } catch (e) {}
+
+    if (window.history.length > 2) {
+      window.history.go(-2); // Go past trap and initial state
+    } else {
+      window.history.back(); // Clear trap so next hardware back natively closes app
+    }
   };
 
   return { exitApp };
