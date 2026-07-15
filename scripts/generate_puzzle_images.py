@@ -362,31 +362,22 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
     """Render a premium social-media JPEG image for the puzzle."""
     colors = THEMES[theme]
     
-    # 1. Create base canvas
-    img = Image.new("RGB", (1200, 1200), color=colors["background"])
+    # 1. Create base canvas (Changed to RGBA to support the transparent watermark)
+    img = Image.new("RGBA", (1200, 1200), color=colors["background"])
     draw = ImageDraw.Draw(img)
     
-    # 2. Draw SudoX Logo
-    draw_logo_mark(draw, 80, 80, 36, colors)
-    font_brand = get_font("title_serif", 38)
-    draw.text((130, 72), "SudoX", fill=colors["brand_color"], font=font_brand)
-    
-    # 3. Draw Header Title and metadata
     game_display_name = GAME_NAMES.get(game, game.replace("_", " ").title())
     if solved:
         game_display_name += " (Solution)"
         
-    font_title = get_font("title_serif", 46)
-    draw.text((80, 140), game_display_name, fill=colors["text_regular"], font=font_title)
-    
-    # Date & Details
-    date_display = format_display_date(date_str or get_ist_date_string())
     puzz_id = build_unique_id(game, date_str or get_ist_date_string())
-    metadata_text = f"Daily Challenge  •  {date_display}  •  ID: #{puzz_id}"
-    font_meta = get_font("text_sans", 20)
-    draw.text((80, 205), metadata_text, fill=colors["text_secondary"], font=font_meta)
     
-    # 4. Calculate grid dimensions and center it
+    # 2. Draw Header Title (Left-aligned, matching PDF style)
+    header_text = f"{game_display_name} · {puzz_id}"
+    font_title = get_font("title_serif", 46)
+    draw.text((80, 80), header_text, fill=colors["text_regular"], font=font_title)
+    
+    # 3. Calculate grid dimensions
     ptype = puzzle_data.get("type", "standard")
     
     if ptype == "twodoku":
@@ -396,7 +387,7 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         total_rows = puzzle_data["size"]
         total_cols = puzzle_data["size"]
         
-    # Grid area: 720x720px centered at X=600, Y=695
+    # Grid area: 720x720px centered on the canvas
     grid_size = 720
     if total_cols > 9:
         grid_size = 750
@@ -404,7 +395,7 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
     grid_w = grid_size
     grid_h = grid_size
     grid_left = 600 - grid_w // 2
-    grid_top = 680 - grid_h // 2
+    grid_top = 560 - grid_h // 2 # Shifted slightly up to account for the footer
     
     cell_w = grid_w / total_cols
     cell_h = grid_h / total_rows
@@ -444,14 +435,10 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                         
             is_diagonal = False
             if puzzle_data.get("diagonals"):
-                if ptype == "standard":
-                    size = puzzle_data["size"]
-                    is_diagonal = (r == c) or (r + c == size - 1)
-                elif ptype == "jigsaw":
+                if ptype == "standard" or ptype == "jigsaw":
                     size = puzzle_data["size"]
                     is_diagonal = (r == c) or (r + c == size - 1)
             elif "X" in game or "x" in game:
-                # Fallback check for engine names
                 if ptype in ("standard", "jigsaw"):
                     size = puzzle_data["size"]
                     is_diagonal = (r == c) or (r + c == size - 1)
@@ -492,8 +479,6 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                 bg_color = colors["cell_bg"]
                 
             borders = get_cell_borders(puzzle_data, r, c, game)
-            
-            # Retrieve value
             clue_val = puzzle_data["grid"][r][c]
             sol_val = puzzle_data.get("solution", [[]])[r][c] if "solution" in puzzle_data else 0
             
@@ -507,14 +492,35 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                 "is_highlighted": is_both or is_diagonal or is_window or (is_alt_block and style == "website")
             })
             
-    # 5. Step 1: Draw cell backgrounds
+    # 4. Step 1: Draw cell backgrounds
     for cell in cells:
         draw.rectangle([cell["x1"], cell["y1"], cell["x2"], cell["y2"]], fill=cell["bg_color"])
         
+    # 5. Draw Centered Watermark (Drawn after backgrounds, before text/borders)
+    font_wm = get_font("title_sans", 80)
+    # Create a temporary transparent image for the rotated text
+    txt_img = Image.new("RGBA", (800, 200), (255, 255, 255, 0))
+    txt_draw = ImageDraw.Draw(txt_img)
+    # Use dark grey with ~12% opacity (30/255)
+    txt_draw.text((400, 100), "SudoX Daily", fill=(45, 42, 36, 30), font=font_wm, anchor="mm")
+    txt_img_rotated = txt_img.rotate(45, expand=True, resample=Image.BICUBIC)
+    
+    # Calculate perfect center of the grid for the watermark
+    grid_center_x = grid_left + (grid_w // 2)
+    grid_center_y = grid_top + (grid_h // 2)
+    paste_x = int(grid_center_x - txt_img_rotated.width // 2)
+    paste_y = int(grid_center_y - txt_img_rotated.height // 2)
+    
+    # Composite the watermark onto the main image
+    img.alpha_composite(txt_img_rotated, (paste_x, paste_y))
+
+    # Re-establish draw object after alpha composite just to be safe
+    draw = ImageDraw.Draw(img)
+
     # 6. Step 2: Draw borders in layers (thin -> thick -> outer)
-    # We define coordinate offsets slightly to align lines perfectly
-    for border_weight, width, color_key in [("thin", 2, "grid_line_thin"), ("thick", 4, "grid_line_thick"), ("outer", 6, "grid_line_outer")]:
-        border_color = colors[color_key]
+    # Changed to force all borders to use the dark grid line color to match the website/PDF layout.
+    for border_weight, width in [("thin", 2), ("thick", 4), ("outer", 6)]:
+        border_color = colors["grid_line_thick"] 
         for cell in cells:
             borders = cell["borders"]
             x1, y1, x2, y2 = cell["x1"], cell["y1"], cell["x2"], cell["y2"]
@@ -545,38 +551,32 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         is_clue = cell["clue_val"] > 0
         
         if solved:
-            # Render both clues and solved values
             val_to_render = cell["sol_val"] if cell["sol_val"] > 0 else cell["clue_val"]
             val_str = display_val(val_to_render)
         else:
-            # Render clues only
             if is_clue:
                 val_str = display_val(cell["clue_val"])
                 
         if val_str:
-            # Decide text color
             if is_clue:
                 text_color = colors["text_highlight"] if cell["is_highlighted"] else colors["text_regular"]
                 font = font_mono_bold
             else:
-                # Solved value
                 if cell["is_highlighted"]:
                     text_color = "#93c5fd" if theme == "light" else "#60a5fa"
                 else:
                     text_color = colors["correct_text"]
                 font = font_serif_italic
                 
-            # Draw centered text
-            # Pillow 9+ anchors: "mm" places the text centered horizontally and vertically
             draw.text((cx, cy), val_str, fill=text_color, font=font, anchor="mm")
 
-    # 8. Draw bottom brand footer
-    watermark_text = "Play online at:  sudox.xyz"
+    # 8. Draw bottom brand footer (Centered at the bottom of the canvas)
+    watermark_text = "Play at https://sudox-app.vercel.app/"
     font_watermark = get_font("text_sans", 22)
-    draw.text((600, 1115), watermark_text, fill=colors["text_secondary"], font=font_watermark, anchor="mm")
+    draw.text((600, 1100), watermark_text, fill=colors["text_secondary"], font=font_watermark, anchor="mm")
     
-    # 9. Save image
-    img.save(output_path, "JPEG", quality=95)
+    # 9. Save image as PNG
+    img.save(output_path, "PNG")
     print(f"📸 Image generated successfully: {output_path}")
 
 def main():
@@ -586,7 +586,7 @@ def main():
     parser.add_argument("--style", choices=["soft", "website"], default="soft", help="Rendering style (soft pastel or website raw accent)")
     parser.add_argument("--solved", action="store_true", help="Generate solved puzzle images (solutions)")
     parser.add_argument("--date", help="Target date YYYY-MM-DD (defaults to today IST)")
-    parser.add_argument("--out-dir", default="public/social", help="Output directory for generated JPEGs")
+    parser.add_argument("--out-dir", default="public/social", help="Output directory for generated PNGs")
     parser.add_argument("--daily", action="store_true", help="Fetch daily puzzles from DB instead of local engine generator")
     
     args = parser.parse_args()
@@ -636,8 +636,9 @@ def main():
                 
         # 3. Render image
         try:
-            solved_suffix = "_solved" if args.solved else ""
-            filename = f"{game}_{date_str}{solved_suffix}.jpg"
+            puzz_id = build_unique_id(game, date_str)
+            solved_suffix = "_sol" if args.solved else ""
+            filename = f"{puzz_id}{solved_suffix}.png"
             output_filepath = os.path.join(out_dir_path, filename)
             
             render_puzzle_image(

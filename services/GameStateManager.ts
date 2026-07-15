@@ -220,6 +220,16 @@ export class GameStateManager {
       }
       if (this.puzzleData.type === 'twodoku') {
         const d = this.puzzleData as import('@/lib/types').TwodokuPuzzle;
+        if (d.blocks && d.blocks.length > 0) {
+          if (d.blocks[r] && d.blocks[cr]) {
+            const b1 = d.blocks[r][c];
+            const b2 = d.blocks[cr][cc];
+            if (b1 !== undefined && b2 !== undefined && b1 >= 0 && b2 >= 0) {
+              return b1 === b2;
+            }
+          }
+          return false;
+        }
         if (d.grids) {
           return d.grids.some(g => {
             const cursorInGrid = cr >= g.r && cr < g.r + g.size && cc >= g.c && cc < g.c + g.size;
