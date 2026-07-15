@@ -61,27 +61,25 @@ GAME_CODES = {
     'sudoku12': '12'
 }
 
-# Aliases: games that use another game's binary (must match constants.ts)
-GAME_ALIASES = {
-    # Currently none - add here if a variant reuses another's binary
-}
+GAME_ALIASES = {}
 
-# Theme definitions
+# Theme definitions synchronized with PdfExportService.ts CSS Palette
 THEMES = {
     "light": {
-        "background": "#fef9f0",
-        "grid_line_thin": "#d0c9bd",
-        "grid_line_thick": "#2d2a24",
-        "grid_line_outer": "#000000",
-        "cell_bg": "#fffdf8",
-        "cell_alt": "#f5e6cc",      # Soft sand for checkerboard
-        "cell_accent": "#b45309",   # Rich amber for diagonals/windows
-        "cell_accent_2": "#92400e", # Slightly darker amber for overlaps
-        "text_regular": "#2d2a24",
-        "text_highlight": "#fffdf8",
-        "correct_text": "#1d4ed8",  # Steel blue for solutions
-        "brand_color": "#b45309",
-        "text_secondary": "#6b6456",
+        "background": "#fef9f0",      # warmBg
+        "grid_line_thin": "#2d2a24",  # gridDark
+        "grid_line_thick": "#2d2a24", # gridDark
+        "grid_line_outer": "#2d2a24", # gridDark
+        "cell_bg": "#ffffff",         # whitish
+        "cell_alt": "#fef3c7",        # altCell
+        "cell_accent": "#b45309",     # diagCell / winCell
+        "cell_accent_2": "#b45309",   # Overlaps treated as same accent
+        "text_regular": "#2d2a24",    # clueText
+        "text_highlight": "#ffffff",  # white on top of amber background
+        "correct_text": "#1d4ed8",    # correctTx
+        "wrong_text": "#be123c",      # wrongTx
+        "brand_color": "#b45309",     # primary
+        "text_secondary": "#9c9084",  # textMuted
         "text_muted": "#9c9084"
     },
     "dark": {
@@ -90,12 +88,13 @@ THEMES = {
         "grid_line_thick": "#cccccc",
         "grid_line_outer": "#cccccc",
         "cell_bg": "#050505",
-        "cell_alt": "#22190f",      # Deep dark amber
-        "cell_accent": "#f97316",   # Vibrant orange for diagonals/windows
-        "cell_accent_2": "#ea580c", # Overlap orange
+        "cell_alt": "#22190f",
+        "cell_accent": "#f97316",
+        "cell_accent_2": "#ea580c",
         "text_regular": "#ededed",
         "text_highlight": "#000000",
-        "correct_text": "#3b82f6",  # Vibrant blue for solutions
+        "correct_text": "#3b82f6",
+        "wrong_text": "#fb7185",
         "brand_color": "#fb923c",
         "text_secondary": "#a1a1aa",
         "text_muted": "#52525b"
@@ -122,7 +121,6 @@ def get_font(font_key, size):
     return ImageFont.load_default()
 
 def load_env_local(workspace_path):
-    """Load MongoDB environment variable from .env.local if present."""
     env_path = os.path.join(workspace_path, ".env.local")
     if os.path.exists(env_path):
         with open(env_path, "r") as f:
@@ -136,21 +134,11 @@ def load_env_local(workspace_path):
                         os.environ[key] = val
 
 def get_ist_date_string(offset_days=0):
-    """Returns date string in India Standard Time (IST) YYYY-MM-DD."""
     ist = timezone(timedelta(hours=5, minutes=30))
     now = datetime.now(ist) + timedelta(days=offset_days)
     return now.strftime("%Y-%m-%d")
 
-def format_display_date(date_str):
-    """Format 'YYYY-MM-DD' into a friendly display format like 'July 7, 2026'."""
-    try:
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
-        return dt.strftime("%B %d, %Y")
-    except Exception:
-        return date_str
-
 def build_unique_id(game, date_str):
-    """Build the 8-digit unique ID: yymmddcc."""
     try:
         parts = date_str.split("-")
         yy = parts[0][-2:]
@@ -162,15 +150,13 @@ def build_unique_id(game, date_str):
         return "00000000"
 
 def display_val(v):
-    """Convert grid cell value to character."""
     if v == 0:
         return ''
     if v <= 9:
         return str(v)
-    return chr(65 + v - 10)  # 10->A, 11->B, etc.
+    return chr(65 + v - 10)
 
 def compile_and_run_cpp(game, workspace_path):
-    """Compile C++ source if missing and run it to get puzzle data."""
     actual_game = GAME_ALIASES.get(game, game)
     bin_dir = os.path.join(workspace_path, "engine", "bin")
     os.makedirs(bin_dir, exist_ok=True)
@@ -195,7 +181,6 @@ def compile_and_run_cpp(game, workspace_path):
     print(f"🎲 Running generator engine: {actual_game}...")
     output = subprocess.run([bin_path], capture_output=True, text=True, check=True).stdout
     
-    # Strip ANSI colors if any
     import re
     clean_output = re.sub(r'\x1b\[[0-9;]*m', '', output)
     json_start = clean_output.find('{')
@@ -205,14 +190,10 @@ def compile_and_run_cpp(game, workspace_path):
     return json.loads(clean_output[json_start:])
 
 def query_database_puzzle(game, date_str):
-    """Query puzzle from MongoDB daily_puzzles collection."""
     if not HAS_PYMONGO:
-        print("⚠️ pymongo is not installed. Database query skipped.")
         return None
-        
     uri = os.environ.get("MONGODB_URI")
     if not uri:
-        print("⚠️ MONGODB_URI is not set in environment. Database query skipped.")
         return None
         
     try:
@@ -220,14 +201,11 @@ def query_database_puzzle(game, date_str):
         db = client["sudox"]
         collection = db["daily_puzzles"]
         
-        # Pull puzzle doc
         puzzle_doc = collection.find_one({"game": game, "date": date_str, "type": "puzzle"})
         if not puzzle_doc:
             return None
             
         puzzle_data = puzzle_doc["puzzleData"]
-        
-        # Pull solution doc if it exists separately
         solved_doc = collection.find_one({"game": game, "date": date_str, "type": "solution"})
         if solved_doc:
             puzzle_data["solution"] = solved_doc["solution"]
@@ -238,7 +216,6 @@ def query_database_puzzle(game, date_str):
         return None
 
 def get_cell_borders(puzzle_data, r, c, game):
-    """Compute cell borders based on puzzle type and coordinates."""
     ptype = puzzle_data.get("type", "standard")
     borders = {"top": "thin", "bottom": "thin", "left": "thin", "right": "thin"}
     
@@ -266,25 +243,21 @@ def get_cell_borders(puzzle_data, r, c, game):
                 return True
             return groups[nr][nc] != gid
 
-        # Top border: wraps vertically if top row shares group with bottom row
         if r == 0:
             borders["top"] = "thin" if (groups[size - 1][c] == gid) else "outer"
         else:
             borders["top"] = "thick" if is_diff_group(r - 1, c) else "thin"
 
-        # Bottom border: wraps vertically if bottom row shares group with top row
         if r == size - 1:
             borders["bottom"] = "thin" if (groups[0][c] == gid) else "outer"
         else:
             borders["bottom"] = "thick" if is_diff_group(r + 1, c) else "thin"
 
-        # Left border: wraps horizontally if leftmost column shares group with rightmost column
         if c == 0:
             borders["left"] = "thin" if (groups[r][size - 1] == gid) else "outer"
         else:
             borders["left"] = "thick" if is_diff_group(r, c - 1) else "thin"
 
-        # Right border: wraps horizontally if rightmost column shares group with leftmost column
         if c == size - 1:
             borders["right"] = "thin" if (groups[r][0] == gid) else "outer"
         else:
@@ -345,24 +318,8 @@ def get_cell_borders(puzzle_data, r, c, game):
                     
     return borders
 
-def draw_logo_mark(draw, x, y, size, colors):
-    """Draw a cute 3x3 grid logo mark next to the brand name."""
-    cell_s = size / 3
-    for r in range(3):
-        for c in range(3):
-            cx1 = x + c * cell_s
-            cy1 = y + r * cell_s
-            cx2 = cx1 + cell_s
-            cy2 = cy1 + cell_s
-            
-            fill = colors["cell_accent"] if (r + c) % 2 == 1 else colors["cell_bg"]
-            draw.rectangle([cx1, cy1, cx2, cy2], fill=fill, outline=colors["grid_line_thick"], width=1)
-
 def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="soft", solved=False, date_str=None):
-    """Render a premium social-media JPEG image for the puzzle."""
     colors = THEMES[theme]
-    
-    # 1. Create base canvas (Changed to RGBA to support the transparent watermark)
     img = Image.new("RGBA", (1200, 1200), color=colors["background"])
     draw = ImageDraw.Draw(img)
     
@@ -372,12 +329,13 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         
     puzz_id = build_unique_id(game, date_str or get_ist_date_string())
     
-    # 2. Draw Header Title (Left-aligned, matching PDF style)
+    # ── HEADER TITLE ──
+    # Swapped from a massive bold serif to a standard regular serif at a reasonable size
     header_text = f"{game_display_name} · {puzz_id}"
-    font_title = get_font("title_serif", 46)
-    draw.text((80, 80), header_text, fill=colors["text_regular"], font=font_title)
+    font_title = get_font("text_serif", 36) 
+    draw.text((80, 60), header_text, fill=colors["text_regular"], font=font_title)
     
-    # 3. Calculate grid dimensions
+    # ── GRID SIZING WITH EMPATHY SPACES ──
     ptype = puzzle_data.get("type", "standard")
     
     if ptype == "twodoku":
@@ -387,25 +345,25 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         total_rows = puzzle_data["size"]
         total_cols = puzzle_data["size"]
         
-    # Grid area: 720x720px centered on the canvas
-    grid_size = 720
-    if total_cols > 9:
-        grid_size = 750
-        
+    # Scale dynamically to use empty canvas sizes wisely for 9x9 and above
+    if total_cols <= 6:
+        grid_size = 720  # Keeps mini grids small and cute
+    elif total_cols <= 9:
+        grid_size = 960  # Pushes 9x9 out to occupy whitespace
+    else:
+        grid_size = 1040 # Maximizes 12x12 or twodokus
+
     grid_w = grid_size
     grid_h = grid_size
-    grid_left = 600 - grid_w // 2
-    grid_top = 560 - grid_h // 2 # Shifted slightly up to account for the footer
+    grid_left = (1200 - grid_w) // 2
+    grid_top = (1200 - grid_h) // 2 - 20 # slight up-shift to accommodate footer
     
     cell_w = grid_w / total_cols
     cell_h = grid_h / total_rows
     
-    # Pre-calculate cell details
     cells = []
-    
     for r in range(total_rows):
         for c in range(total_cols):
-            # Check if active
             is_cell_active = True
             if ptype == "twodoku":
                 is_cell_active = bool(puzzle_data["active"][r][c])
@@ -418,15 +376,12 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
             x2 = x1 + cell_w
             y2 = y1 + cell_h
             
-            # Compute cell flags
             is_window = False
             if "windows" in puzzle_data:
                 for wr, wc in puzzle_data["windows"]:
                     if wr <= r < wr + 3 and wc <= c < wc + 3:
                         is_window = True
                         break
-            
-            # Jigsaw windows
             if ptype == "jigsaw" and "windows" in puzzle_data:
                 for wr, wc in puzzle_data["windows"]:
                     if wr <= r < wr + 3 and wc <= c < wc + 3:
@@ -445,7 +400,6 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                     
             is_both = is_window and is_diagonal
             
-            # Checkerboard blocks
             is_alt_block = False
             if ptype == "standard":
                 if "altSubRows" in puzzle_data and "altSubCols" in puzzle_data:
@@ -468,7 +422,6 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                         is_alt_block = ((bR + bC) % 2 == parity)
                         break
             
-            # Select background color
             if is_both:
                 bg_color = colors["cell_accent_2"]
             elif is_diagonal or is_window:
@@ -492,55 +445,44 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                 "is_highlighted": is_both or is_diagonal or is_window or (is_alt_block and style == "website")
             })
             
-    # 4. Step 1: Draw cell backgrounds
+    # Draw Backgrounds
     for cell in cells:
         draw.rectangle([cell["x1"], cell["y1"], cell["x2"], cell["y2"]], fill=cell["bg_color"])
         
-    # 5. Draw Centered Watermark (Drawn after backgrounds, before text/borders)
+    # Draw Background Watermark
     font_wm = get_font("title_sans", 80)
-    # Create a temporary transparent image for the rotated text
     txt_img = Image.new("RGBA", (800, 200), (255, 255, 255, 0))
     txt_draw = ImageDraw.Draw(txt_img)
-    # Use dark grey with ~12% opacity (30/255)
     txt_draw.text((400, 100), "SudoX Daily", fill=(45, 42, 36, 30), font=font_wm, anchor="mm")
     txt_img_rotated = txt_img.rotate(45, expand=True, resample=Image.BICUBIC)
     
-    # Calculate perfect center of the grid for the watermark
     grid_center_x = grid_left + (grid_w // 2)
     grid_center_y = grid_top + (grid_h // 2)
     paste_x = int(grid_center_x - txt_img_rotated.width // 2)
     paste_y = int(grid_center_y - txt_img_rotated.height // 2)
     
-    # Composite the watermark onto the main image
     img.alpha_composite(txt_img_rotated, (paste_x, paste_y))
-
-    # Re-establish draw object after alpha composite just to be safe
     draw = ImageDraw.Draw(img)
 
-    # 6. Step 2: Draw borders in layers (thin -> thick -> outer)
-    # Changed to force all borders to use the dark grid line color to match the website/PDF layout.
-    for border_weight, width in [("thin", 2), ("thick", 4), ("outer", 6)]:
+    # Draw Borders 
+    for border_weight, width in [("thin", 2), ("thick", 5), ("outer", 8)]:
         border_color = colors["grid_line_thick"] 
         for cell in cells:
             borders = cell["borders"]
             x1, y1, x2, y2 = cell["x1"], cell["y1"], cell["x2"], cell["y2"]
             
-            # Top
             if borders["top"] == border_weight:
                 draw.line([(x1, y1), (x2, y1)], fill=border_color, width=width)
-            # Bottom
             if borders["bottom"] == border_weight:
                 draw.line([(x1, y2), (x2, y2)], fill=border_color, width=width)
-            # Left
             if borders["left"] == border_weight:
                 draw.line([(x1, y1), (x1, y2)], fill=border_color, width=width)
-            # Right
             if borders["right"] == border_weight:
                 draw.line([(x2, y1), (x2, y2)], fill=border_color, width=width)
 
-    # 7. Step 3: Draw values (Clues and Solutions)
-    font_mono_bold = get_font("text_mono", int(cell_h * 0.55))
-    font_serif_italic = get_font("solution_serif_italic", int(cell_h * 0.52))
+    # Draw Typography Values 
+    font_mono_bold = get_font("text_mono", int(cell_h * 0.55)) # Matches Courier Bold for Clues
+    font_sans_normal = get_font("text_sans", int(cell_h * 0.52)) # Matches Helvetica Normal for solutions
     
     for cell in cells:
         x1, y1, x2, y2 = cell["x1"], cell["y1"], cell["x2"], cell["y2"]
@@ -566,16 +508,15 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                     text_color = "#93c5fd" if theme == "light" else "#60a5fa"
                 else:
                     text_color = colors["correct_text"]
-                font = font_serif_italic
+                font = font_sans_normal
                 
             draw.text((cx, cy), val_str, fill=text_color, font=font, anchor="mm")
 
-    # 8. Draw bottom brand footer (Centered at the bottom of the canvas)
+    # Draw Footer
     watermark_text = "Play at https://sudox-app.vercel.app/"
     font_watermark = get_font("text_sans", 22)
-    draw.text((600, 1100), watermark_text, fill=colors["text_secondary"], font=font_watermark, anchor="mm")
+    draw.text((600, 1140), watermark_text, fill=colors["text_secondary"], font=font_watermark, anchor="mm")
     
-    # 9. Save image as PNG
     img.save(output_path, "PNG")
     print(f"📸 Image generated successfully: {output_path}")
 
@@ -591,16 +532,12 @@ def main():
     
     args = parser.parse_args()
     
-    # Resolve workspace paths
     script_dir = os.path.dirname(os.path.abspath(__file__))
     workspace_path = os.path.dirname(script_dir)
     
     load_env_local(workspace_path)
-    
-    # Determine date
     date_str = args.date or get_ist_date_string()
     
-    # Determine output folder
     out_dir_path = os.path.join(workspace_path, args.out_dir)
     os.makedirs(out_dir_path, exist_ok=True)
     
@@ -618,14 +555,12 @@ def main():
         print(f"\n👉 Processing variant: {game}")
         puzzle_data = None
         
-        # 1. Try DB first if requested
         if args.daily:
             print(f"🔌 Querying database for {game} on {date_str}...")
             puzzle_data = query_database_puzzle(game, date_str)
             if not puzzle_data:
                 print("❌ Puzzle not found in database daily collection.")
                 
-        # 2. Fallback to C++ generator
         if not puzzle_data:
             try:
                 puzzle_data = compile_and_run_cpp(game, workspace_path)
@@ -634,7 +569,6 @@ def main():
                 fail_count += 1
                 continue
                 
-        # 3. Render image
         try:
             puzz_id = build_unique_id(game, date_str)
             solved_suffix = "_sol" if args.solved else ""

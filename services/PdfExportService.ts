@@ -228,7 +228,8 @@ function _drawGrid(
   const solidState = new (doc.GState as any)({ opacity: 1.0 });
   doc.setGState(solidState);
 
-  // ── Pass 2: text ──
+  // ── Pass 2: text — render ALL visible numbers (clues + user entries) ──
+  const { correctTx, wrongTx } = PDF_PALETTE;
   for (let r = 0; r < totalRows; r++) {
     for (let c = 0; c < totalCols; c++) {
       const el = cellAt(r, c);
@@ -237,15 +238,32 @@ function _drawGrid(
 
       if (!el || el.classList.contains("inactive-cell")) continue;
 
+      const val = el.textContent?.trim() ?? '';
+      if (!val) continue;
+
       if (el.classList.contains("clue")) {
-        const val = el.textContent?.trim() ?? '';
-        if (val) {
-          doc.setFont("Courier", "bold");
-          doc.setFontSize(fontSize);
-          doc.setTextColor(...clueText);
-          doc.text(val, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
-        }
+        // Original clue — bold dark
+        doc.setFont("Courier", "bold");
+        doc.setFontSize(fontSize);
+        doc.setTextColor(...clueText);
+      } else if (el.classList.contains("correct")) {
+        // User-entered correct number — blue
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(fontSize * 0.9);
+        doc.setTextColor(...correctTx);
+      } else if (el.classList.contains("wrong")) {
+        // Current wrong entry — red
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(fontSize * 0.9);
+        doc.setTextColor(...wrongTx);
+      } else {
+        // Pending user entry (no solution to validate against) — muted dark
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(fontSize * 0.9);
+        doc.setTextColor(...clueText);
       }
+
+      doc.text(val, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
     }
   }
 

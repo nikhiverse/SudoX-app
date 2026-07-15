@@ -13,6 +13,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useKeyboard } from '@/hooks/useKeyboard';
 import { useLives } from '@/hooks/useLives';
 import { useWebviewDetect } from '@/hooks/useWebviewDetect';
+import { useScreenshotPrevention } from '@/hooks/useScreenshotPrevention';
 import { PuzzleHeader } from '@/components/game/PuzzleHeader';
 import { PuzzleGrid } from '@/components/game/PuzzleGrid';
 import { NumberPanel } from '@/components/game/NumberPanel';
@@ -88,6 +89,7 @@ function GameLoader({ game, gameName }: { game: GameVariant; gameName: string })
 
   return (
     <GameActive
+      key={data.uniqueId}
       game={game}
       gameName={gameName}
       puzzleData={data.puzzleData}
@@ -137,6 +139,17 @@ function GameActive({
   const isWebview = useWebviewDetect();
   const webviewInputCountRef = useRef(0);
   const [showWebviewModal, setShowWebviewModal] = useState(false);
+
+  // Screenshot prevention — disabled on localhost/test automatically
+  useScreenshotPrevention({
+    onAttempt: () => {
+      setAutoDismissModal({
+        title: '📄 Use PDF Download',
+        message: 'Screenshots are disabled. Use the Download PDF option in the menu to save this puzzle.',
+        type: 'warning',
+      });
+    },
+  });
 
   // Read saved timestamps for display on revisit
   const [finishedAt, setFinishedAt] = useState<string | undefined>();
