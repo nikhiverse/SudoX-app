@@ -20,7 +20,7 @@ import { NumberPanel } from '@/components/game/NumberPanel';
 import { PuzzleSkeleton } from '@/components/game/PuzzleSkeleton';
 import { Modal } from '@/components/ui/Modal';
 import { GAME_NAMES, VALID_GAMES, getVariantFromUrl } from '@/lib/constants';
-import { onPdfDownloadRequest, exportPuzzleToPdf } from '@/services/PdfExportService';
+import { onPdfDownloadRequest, exportPuzzleToPdf, requestPdfDownload } from '@/services/PdfExportService';
 import { StorageService } from '@/services/StorageService';
 import { getTodayDateString } from '@/lib/date-utils';
 import type { GameVariant } from '@/lib/types';
@@ -271,8 +271,8 @@ function GameActive({
 
   // Listen for PDF download requests from MenuDrawer
   useEffect(() => {
-    return onPdfDownloadRequest(() => {
-      exportPuzzleToPdf(gameName, uniqueId);
+    return onPdfDownloadRequest((type) => {
+      exportPuzzleToPdf(gameName, uniqueId, type);
     });
   }, [gameName, uniqueId]);
 
@@ -362,12 +362,22 @@ function GameActive({
       />
 
       {isCompleted ? (
-        <div className="status-panel">
-          Solved@{finishedAt ? formatTimestamp(finishedAt) : '00:00'}
+        <div className="status-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+          <div className="status-panel" style={{ marginTop: 0 }}>
+            Solved@{finishedAt ? formatTimestamp(finishedAt) : '00:00'}
+          </div>
+          <button className="action-btn ghost" onClick={() => requestPdfDownload('response')}>
+            Your Response
+          </button>
         </div>
       ) : gameIsLocked ? (
-        <div className="status-panel">
-          Locked@{lockedAt ? formatTimestamp(lockedAt) : '00:00'}
+        <div className="status-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+          <div className="status-panel" style={{ marginTop: 0 }}>
+            Locked@{lockedAt ? formatTimestamp(lockedAt) : '00:00'}
+          </div>
+          <button className="action-btn ghost" onClick={() => requestPdfDownload('response')}>
+            Your Response
+          </button>
         </div>
       ) : (
         <NumberPanel

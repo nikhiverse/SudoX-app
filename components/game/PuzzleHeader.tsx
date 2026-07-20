@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Timer } from './Timer';
 import { Modal } from '@/components/ui/Modal';
 
@@ -24,13 +25,22 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
 
   const confirmLeave = () => {
     setShowLeaveModal(false);
-    router.back();
+    router.push('/');
   };
 
   return (
     <div className="puzzle-header">
       <div className="puzzle-nav-row">
-        <button onClick={() => canLeaveDirectly ? router.back() : setShowLeaveModal(true)} className="nav-back">
+        <Link 
+          href="/"
+          className="nav-back"
+          onClick={(e) => {
+            if (!canLeaveDirectly) {
+              e.preventDefault();
+              setShowLeaveModal(true);
+            }
+          }}
+        >
           <svg
             viewBox="0 0 16 16"
             fill="none"
@@ -42,7 +52,7 @@ export function PuzzleHeader({ title, puzzleId, timerDisplay, timerEmoji, lives,
             <path d="M10 12L6 8l4-4" />
           </svg>
           All Variants
-        </button>
+        </Link>
         <Timer display={timerDisplay} emoji={timerEmoji} />
       </div>
       <div className="puzzle-title-row">

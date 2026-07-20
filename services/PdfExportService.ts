@@ -54,14 +54,18 @@ const PDF_BORDER = {
 // ─────────────────────────────────────────────────────────────
 
 /** Dispatch a custom event requesting PDF download. */
-export function requestPdfDownload(): void {
-  window.dispatchEvent(new CustomEvent('sudox:download-pdf'));
+export function requestPdfDownload(type: 'original' | 'response' = 'original'): void {
+  window.dispatchEvent(new CustomEvent('sudox:download-pdf', { detail: { type } }));
 }
 
 /** Listen for PDF download requests. Returns unsubscribe fn. */
-export function onPdfDownloadRequest(handler: () => void): () => void {
-  window.addEventListener('sudox:download-pdf', handler);
-  return () => window.removeEventListener('sudox:download-pdf', handler);
+export function onPdfDownloadRequest(handler: (type: 'original' | 'response') => void): () => void {
+  const listener = (e: Event) => {
+    const customEvent = e as CustomEvent;
+    handler(customEvent.detail?.type || 'original');
+  };
+  window.addEventListener('sudox:download-pdf', listener);
+  return () => window.removeEventListener('sudox:download-pdf', listener);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -141,6 +145,7 @@ function _drawGrid(
   totalRows: number,
   totalCols: number,
   cellAt: (r: number, c: number) => HTMLElement | null,
+  exportType: 'original' | 'response' = 'original'
 ): number {
   const { pageW, pageH, margin, footerGap } = PDF_LAYOUT;
   const contentW = pageW - margin * 2;
@@ -246,21 +251,25 @@ function _drawGrid(
         doc.setFont("Courier", "bold");
         doc.setFontSize(fontSize);
         doc.setTextColor(...clueText);
-      } else if (el.classList.contains("correct")) {
-        // User-entered correct number — blue
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(fontSize * 0.9);
-        doc.setTextColor(...correctTx);
-      } else if (el.classList.contains("wrong")) {
-        // Current wrong entry — red
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(fontSize * 0.9);
-        doc.setTextColor(...wrongTx);
       } else {
-        // Pending user entry (no solution to validate against) — muted dark
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(fontSize * 0.9);
-        doc.setTextColor(...clueText);
+        if (exportType === 'original') continue; // Skip user entries for original puzzle
+
+        if (el.classList.contains("correct")) {
+          // User-entered correct number — blue
+          doc.setFont("Helvetica", "normal");
+          doc.setFontSize(fontSize * 0.9);
+          doc.setTextColor(...correctTx);
+        } else if (el.classList.contains("wrong")) {
+          // Current wrong entry — red
+          doc.setFont("Helvetica", "normal");
+          doc.setFontSize(fontSize * 0.9);
+          doc.setTextColor(...wrongTx);
+        } else {
+          // Pending user entry (no solution to validate against) — muted dark
+          doc.setFont("Helvetica", "normal");
+          doc.setFontSize(fontSize * 0.9);
+          doc.setTextColor(...clueText);
+        }
       }
 
       doc.text(val, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
@@ -378,6 +387,7 @@ function loadImageAsBase64(url: string): Promise<string> {
 export async function exportPuzzleToPdf(
   gameName: string,
   puzzleId: string,
+  exportType: 'original' | 'response' = 'original'
 ): Promise<void> {
   // Dynamically import jsPDF from the npm package (code-split)
   const jspdfModule = await import('jspdf');
@@ -427,12 +437,13 @@ export async function exportPuzzleToPdf(
   yPos = _drawSectionLabel(doc, yPos, gameName);
 
   // Grid
-  _drawGrid(doc, yPos, totalRows, totalCols, cellAt);
+  _drawGrid(doc, yPos, totalRows, totalCols, cellAt, exportType);
 
   // Footer
   _drawFooter(doc);
 
   // Save — filename uses puzzle ID or fallback
   const pid = puzzleId.replace(/[^a-zA-Z0-9_-]/g, "");
-  doc.save(`${pid || "sudox_puzzle"}.pdf`);
+  const suffix = exportType === 'response' ? '_response' : '';
+  doc.save(`${pid || "sudox_puzzle"}${suffix}.pdf`);
 }

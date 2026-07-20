@@ -83,7 +83,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
         setIsGuideOpen(true);
         break;
       case 'download':
-        requestPdfDownload();
+        requestPdfDownload('original');
         break;
       case 'login':
         setIsLoginOpen(true);
@@ -97,7 +97,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
   const gameItems = [
     { label: 'Guide to Play', icon: icons.guide, action: 'guide' },
     { label: 'Theme', icon: icons.theme, action: 'theme' },
-    { label: 'Download PDF', icon: icons.download, action: 'download' },
+    { label: 'Download Puzzle', icon: icons.download, action: 'download' },
     { divider: true },
     { label: 'Mail Me', icon: icons.reachout, href: 'mailto:nikhil.sudox@gmail.com' },
     { label: 'Follow Us', icon: icons.follow, action: 'follow' },
