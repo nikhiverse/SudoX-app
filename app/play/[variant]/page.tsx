@@ -306,7 +306,7 @@ function GameActive({
         setShowWebviewModal(true);
       }
     }
-  }, [gameIsLocked, manager, recordMistake, game, writeValue, isWebview]);
+  }, [gameIsLocked, manager, recordMistake, writeValue, isWebview]);
 
   const wrappedEraseValue = useCallback((r: number, c: number) => {
     if (gameIsLocked) {

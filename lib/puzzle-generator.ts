@@ -12,7 +12,7 @@ import { execSync, execFileSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
-export async function generatePuzzleDocs(game: string, date: string): Promise<any[]> {
+export async function generatePuzzleDocs(game: string, date: string): Promise<unknown[]> {
   const ENGINE_DIR = path.resolve(process.cwd(), 'engine');
   const SRC_DIR = path.join(ENGINE_DIR, 'src');
   const INCLUDE_DIR = path.join(ENGINE_DIR, 'include');
