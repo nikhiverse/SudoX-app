@@ -108,7 +108,7 @@ export async function generateAndStorePuzzle(game: string, date: string): Promis
     { unique: true, background: true }
   );
 
-  await collection.insertMany(docs);
+  await collection.insertMany(docs as DailyPuzzleDoc[]);
 
   return true;
 }
