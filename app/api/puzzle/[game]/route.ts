@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════
 
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { getDb } from '@/lib/mongodb';
 import { VALID_GAMES, PUZZLES_COLLECTION } from '@/lib/constants';
 import { getTodayDateString } from '@/lib/date-utils';
@@ -42,15 +43,29 @@ export async function GET(
   }
 
   try {
-    // 3. Query MongoDB for today's puzzle
-    const db = await getDb();
-    const collection = db.collection<DailyPuzzleDoc>(PUZZLES_COLLECTION);
+    // 3. Query MongoDB for puzzle
+    // Extract date from query string. Restrict to today or past dates to prevent cheating.
+    const dateQuery = request.nextUrl.searchParams.get('date');
     const today = getTodayDateString();
+    const targetDate = (dateQuery && dateQuery <= today) ? dateQuery : today;
 
-    const docs = await collection.find({ game, date: today }).toArray();
+    // Wrap the DB call in Next.js unstable_cache
+    const getCachedDocs = unstable_cache(
+      async (g: string, d: string) => {
+        const db = await getDb();
+        const collection = db.collection<DailyPuzzleDoc>(PUZZLES_COLLECTION);
+        // Force conversion to plain objects to ensure serializability out of cache
+        const rawDocs = await collection.find({ game: g, date: d }).toArray();
+        return JSON.parse(JSON.stringify(rawDocs)); 
+      },
+      [`puzzle-${game}-${targetDate}`],
+      { revalidate: 3600, tags: ['puzzles'] }
+    );
+
+    const docs = await getCachedDocs(game, targetDate);
 
     if (!docs || docs.length === 0) {
-      console.warn(`No puzzle docs found for game=${game}, date=${today}.`);
+      console.warn(`No puzzle docs found for game=${game}, date=${targetDate}.`);
       return NextResponse.json(
         { error: 'Puzzle not yet generated for today. Please try again in a few minutes.' },
         { status: 503 }
@@ -69,7 +84,7 @@ export async function GET(
     }
 
     if (!puzzleDoc || !solutionDoc) {
-      console.error(`Incomplete puzzle data for game=${game}, date=${today}. puzzleDoc=${!!puzzleDoc}, solutionDoc=${!!solutionDoc}`);
+      console.error(`Incomplete puzzle data for game=${game}, date=${targetDate}. puzzleDoc=${!!puzzleDoc}, solutionDoc=${!!solutionDoc}`);
       return NextResponse.json(
         { error: 'Incomplete puzzle data found in database.' },
         { status: 500 }
@@ -94,7 +109,7 @@ export async function GET(
       date: puzzleDoc.date,
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=60',
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=3600',
       },
     });
   } catch (err) {

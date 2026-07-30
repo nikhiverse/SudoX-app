@@ -51,10 +51,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fef9f0' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
-  ],
+  themeColor: '#fef9f0',
 };
 
 export default function RootLayout({
@@ -73,9 +70,8 @@ export default function RootLayout({
           __html: `
           (function() {
             try {
-              var t = localStorage.getItem('sudox:theme');
-              if (t === 'dark') document.documentElement.classList.add('force-dark');
-              else if (t === 'light') document.documentElement.classList.add('force-light');
+              document.documentElement.classList.add('force-light');
+              document.documentElement.classList.remove('force-dark');
             } catch(e) {}
           })();
         `}} />

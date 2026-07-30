@@ -21,6 +21,13 @@ if (!MONGODB_URI) {
 
 const DB_NAME = 'sudox';
 
+// ── Circuit Breaker Options ──
+const mongoOptions = {
+  serverSelectionTimeoutMS: 5000,
+  connectTimeoutMS: 5000,
+  socketTimeoutMS: 10000,
+};
+
 // ── Global cache for dev hot-reloads ──
 const globalForMongo = globalThis as typeof globalThis & {
   _mongoClient?: MongoClient;
@@ -32,14 +39,14 @@ let clientPromise: Promise<MongoClient>;
 if (process.env.NODE_ENV === 'development') {
   // In dev, preserve the client across hot-module reloads
   if (!globalForMongo._mongoClientPromise) {
-    const client = new MongoClient(MONGODB_URI);
+    const client = new MongoClient(MONGODB_URI, mongoOptions);
     globalForMongo._mongoClientPromise = client.connect();
     globalForMongo._mongoClient = client;
   }
   clientPromise = globalForMongo._mongoClientPromise;
 } else {
   // In production, create a fresh client
-  const client = new MongoClient(MONGODB_URI);
+  const client = new MongoClient(MONGODB_URI, mongoOptions);
   clientPromise = client.connect();
 }
 

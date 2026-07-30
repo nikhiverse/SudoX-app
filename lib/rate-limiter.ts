@@ -34,11 +34,18 @@ export async function checkRateLimit(ip: string): Promise<boolean> {
   }
 
   try {
-    const { success } = await ratelimit.limit(ip);
+    // Fail open if Redis hangs for more than 2 seconds (circuit breaker)
+    const timeoutPromise = new Promise<{ success: boolean }>((_, reject) =>
+      setTimeout(() => reject(new Error('Rate limiter timeout')), 2000)
+    );
+    const { success } = await Promise.race([
+      ratelimit.limit(ip),
+      timeoutPromise
+    ]);
     return success;
   } catch (error) {
-    console.error('Rate limiter error:', error);
-    // Fail open if Redis is down
+    console.error('Rate limiter error/timeout:', error);
+    // Fail open if Redis is down or slow
     return true;
   }
 }

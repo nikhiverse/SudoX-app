@@ -12,7 +12,7 @@ import { execSync, execFileSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
-export async function generateAndStorePuzzle(game: string, date: string): Promise<boolean> {
+export async function generatePuzzleDocs(game: string, date: string): Promise<any[]> {
   const ENGINE_DIR = path.resolve(process.cwd(), 'engine');
   const SRC_DIR = path.join(ENGINE_DIR, 'src');
   const INCLUDE_DIR = path.join(ENGINE_DIR, 'include');
@@ -94,6 +94,11 @@ export async function generateAndStorePuzzle(game: string, date: string): Promis
     generatedAt: new Date(),
   };
 
+  return [puzzDoc, solvedDoc];
+}
+
+export async function generateAndStorePuzzle(game: string, date: string): Promise<boolean> {
+  const docs = await generatePuzzleDocs(game, date);
   const db = await getDb();
   const collection = db.collection<DailyPuzzleDoc>(PUZZLES_COLLECTION);
 
@@ -103,8 +108,7 @@ export async function generateAndStorePuzzle(game: string, date: string): Promis
     { unique: true, background: true }
   );
 
-  // @ts-expect-error - allow custom string _id
-  await collection.insertMany([puzzDoc, solvedDoc]);
+  await collection.insertMany(docs);
 
   return true;
 }

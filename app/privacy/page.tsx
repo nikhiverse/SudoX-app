@@ -2,30 +2,41 @@
 // SudoX Daily — Privacy Policy
 // ═══════════════════════════════════════════
 
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - SudoX Daily',
-  description: 'SudoX Daily privacy policy — how we handle your data.',
+  title: "Privacy Policy - SudoX Daily",
+  description: "SudoX Daily privacy policy — how we handle your data.",
 };
 
 export default function PrivacyPage() {
   return (
-    <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+        }}
+      >
         <h1
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: '28px',
+            fontSize: "28px",
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: "var(--text-primary)",
             margin: 0,
           }}
         >
           Privacy Policy
         </h1>
-        <Link href="/" className="nav-back" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <Link
+          href="/"
+          className="nav-back"
+          style={{ display: "flex", alignItems: "center", gap: "6px" }}
+        >
           <svg
             viewBox="0 0 16 16"
             fill="none"
@@ -33,7 +44,7 @@ export default function PrivacyPage() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ width: '12px', height: '12px' }}
+            style={{ width: "12px", height: "12px" }}
           >
             <line x1="4" y1="4" x2="12" y2="12" />
             <line x1="12" y1="4" x2="4" y2="12" />
@@ -42,74 +53,184 @@ export default function PrivacyPage() {
         </Link>
       </div>
 
-      <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> July 2026</p>
-
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>What We Collect</h2>
+      <div
+        style={{
+          fontSize: "15px",
+          lineHeight: 1.8,
+          color: "var(--text-secondary)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+      >
         <p>
-          SudoX Daily is a free puzzle game that requires <strong>no account</strong> and <strong>no login</strong>.
-          We do not collect personal information such as names, email addresses, or payment details.
+          <strong>Last updated:</strong> July 2026
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Analytics</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          What We Collect
+        </h2>
         <p>
-          We use <strong>Vercel Analytics</strong> and <strong>Vercel Speed Insights</strong> to understand
-          how our website performs. These tools collect anonymous, aggregate data such as:
+          SudoX Daily is a free puzzle game that requires{" "}
+          <strong>no account</strong> and <strong>no login</strong>. We do not
+          collect personal information such as names, email addresses, or
+          payment details.
         </p>
-        <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Analytics
+        </h2>
+        <p>
+          We use <strong>Vercel Analytics</strong> and{" "}
+          <strong>Vercel Speed Insights</strong> to understand how our website
+          performs. These tools collect anonymous, aggregate data such as:
+        </p>
+        <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
           <li>Page views and visitor counts</li>
           <li>Page load times and web vitals</li>
           <li>Device type and browser (anonymized)</li>
           <li>Geographic region (country-level, no precise location)</li>
         </ul>
-        <p>No personally identifiable information is collected by these tools.</p>
-
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Local Storage</h2>
         <p>
-          Your puzzle progress, game state, and theme preference are stored locally in your browser
-          using <strong>localStorage</strong>. This data never leaves your device and is not sent to
-          our servers. Data older than 7 days is automatically cleaned up.
+          No personally identifiable information is collected by these tools.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Cookies</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Local Storage
+        </h2>
         <p>
-          SudoX Daily does not set any first-party cookies. Vercel Analytics may use minimal,
-          privacy-respecting techniques to measure traffic, but no tracking cookies are placed.
+          Your puzzle progress, game state, and theme preference are stored
+          locally in your browser using <strong>localStorage</strong>. This data
+          never leaves your device and is not sent to our servers. Data older
+          than 7 days is automatically cleaned up.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Third-Party Services</h2>
-        <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
-          <li><strong>Vercel</strong> — hosting, analytics, and speed insights</li>
-          <li><strong>Google Fonts</strong> — web fonts (Playfair Display, DM Sans, Courier Prime)</li>
-          <li><strong>MongoDB Atlas</strong> — puzzle data storage (no personal data stored)</li>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Cookies
+        </h2>
+        <p>
+          SudoX Daily does not set any first-party cookies. Vercel Analytics may
+          use minimal, privacy-respecting techniques to measure traffic, but no
+          tracking cookies are placed.
+        </p>
+
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Third-Party Services
+        </h2>
+        <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
+          <li>
+            <strong>Vercel</strong> — hosting, analytics, and speed insights
+          </li>
+          <li>
+            <strong>Google Fonts</strong> — web fonts (Playfair Display, DM
+            Sans, Courier Prime)
+          </li>
+          <li>
+            <strong>MongoDB Atlas</strong> — puzzle data storage (no personal
+            data stored)
+          </li>
         </ul>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Changes</h2>
-        <p>We may update this policy from time to time. Changes will be reflected on this page.</p>
-
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Reach Out</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Changes
+        </h2>
         <p>
-          Questions? Mail Me at{' '}
-          <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          We may update this policy from time to time. Changes will be reflected
+          on this page.
+        </p>
+
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Reach Out
+        </h2>
+        <p>
+          Questions? Mail Me at{" "}
+          <a
+            href="mailto:nikhil.sudox@gmail.com"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             nikhil.sudox@gmail.com
           </a>
         </p>
         <p>
-          X handle at{' '}
-          <a href="https://x.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          X handle at{" "}
+          <a
+            href="https://x.com/SudoXDaily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             SudoXDaily
           </a>
         </p>
         <p>
-          Facebook handle at{' '}
-          <a href="https://facebook.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          Facebook handle at{" "}
+          <a
+            href="https://facebook.com/SudoXDaily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             SudoXDaily
           </a>
         </p>
         <p>
-          Instagram handle at{' '}
-          <a href="https://instagram.com/sudox.ig" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-            sudox.ig
+          Instagram handle at{" "}
+          <a
+            href="https://instagram.com/sudox.daily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
+            sudox.daily
           </a>
         </p>
       </div>

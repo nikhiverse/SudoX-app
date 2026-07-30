@@ -2,30 +2,41 @@
 // SudoX Daily — Terms of Service
 // ═══════════════════════════════════════════
 
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - SudoX Daily',
-  description: 'SudoX Daily terms of service — rules for using SudoX Daily.',
+  title: "Terms of Service - SudoX Daily",
+  description: "SudoX Daily terms of service — rules for using SudoX Daily.",
 };
 
 export default function TermsPage() {
   return (
-    <div style={{ maxWidth: '640px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "24px",
+        }}
+      >
         <h1
           style={{
             fontFamily: "'Playfair Display', serif",
-            fontSize: '28px',
+            fontSize: "28px",
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: "var(--text-primary)",
             margin: 0,
           }}
         >
           Terms of Service
         </h1>
-        <Link href="/" className="nav-back" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <Link
+          href="/"
+          className="nav-back"
+          style={{ display: "flex", alignItems: "center", gap: "6px" }}
+        >
           <svg
             viewBox="0 0 16 16"
             fill="none"
@@ -33,7 +44,7 @@ export default function TermsPage() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ width: '12px', height: '12px' }}
+            style={{ width: "12px", height: "12px" }}
           >
             <line x1="4" y1="4" x2="12" y2="12" />
             <line x1="12" y1="4" x2="4" y2="12" />
@@ -42,72 +53,185 @@ export default function TermsPage() {
         </Link>
       </div>
 
-      <div style={{ fontSize: '15px', lineHeight: 1.8, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <p><strong>Last updated:</strong> July 2026</p>
-
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Acceptance</h2>
+      <div
+        style={{
+          fontSize: "15px",
+          lineHeight: 1.8,
+          color: "var(--text-secondary)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
+      >
         <p>
-          By using SudoX Daily, you agree to these terms. If you do not agree, please do not use the website.
+          <strong>Last updated:</strong> July 2026
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Service Description</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Acceptance
+        </h2>
         <p>
-          SudoX Daily is a free, web-based puzzle game that provides 16 unique Sudoku variants daily.
-          The service is provided &quot;as is&quot; without warranties of any kind.
+          By using SudoX Daily, you agree to these terms. If you do not agree,
+          please do not use the website.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Fair Use</h2>
-        <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Service Description
+        </h2>
+        <p>
+          SudoX Daily is a free, web-based puzzle game that provides 16 unique
+          Sudoku variants daily. The service is provided &quot;as is&quot;
+          without warranties of any kind.
+        </p>
+
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Fair Use
+        </h2>
+        <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
           <li>Do not attempt to overload, abuse, or disrupt the service</li>
-          <li>Do not scrape, crawl, or programmatically access the API beyond normal gameplay</li>
-          <li>Do not attempt to reverse-engineer or tamper with puzzle solutions</li>
+          <li>
+            Do not scrape, crawl, or programmatically access the API beyond
+            normal gameplay
+          </li>
+          <li>
+            Do not attempt to reverse-engineer or tamper with puzzle solutions
+          </li>
         </ul>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Intellectual Property</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Intellectual Property
+        </h2>
         <p>
-          All puzzle generation algorithms, game designs, and website content are the property
-          of SudoX Daily and its creator. The daily puzzles themselves are generated procedurally and
-          are free to play.
+          All puzzle generation algorithms, game designs, and website content
+          are the property of SudoX Daily and its creator. The daily puzzles
+          themselves are generated procedurally and are free to play.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Limitation of Liability</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Limitation of Liability
+        </h2>
         <p>
-          SudoX Daily is provided for entertainment purposes. We are not liable for any loss of data,
-          progress, or any indirect damages arising from use of the service.
+          SudoX Daily is provided for entertainment purposes. We are not liable
+          for any loss of data, progress, or any indirect damages arising from
+          use of the service.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Availability</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Availability
+        </h2>
         <p>
-          We strive to keep SudoX Daily available 24/7, but we do not guarantee uninterrupted service.
-          Puzzles are generated daily, and occasional outages may occur during maintenance.
+          We strive to keep SudoX Daily available 24/7, but we do not guarantee
+          uninterrupted service. Puzzles are generated daily, and occasional
+          outages may occur during maintenance.
         </p>
 
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Changes</h2>
-        <p>We may modify these terms at any time. Continued use constitutes acceptance of updated terms.</p>
-
-        <h2 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>Reach Out</h2>
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Changes
+        </h2>
         <p>
-          Questions? Mail Me at{' '}
-          <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          We may modify these terms at any time. Continued use constitutes
+          acceptance of updated terms.
+        </p>
+
+        <h2
+          style={{
+            fontSize: "18px",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: "8px",
+          }}
+        >
+          Reach Out
+        </h2>
+        <p>
+          Questions? Mail Me at{" "}
+          <a
+            href="mailto:nikhil.sudox@gmail.com"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             nikhil.sudox@gmail.com
           </a>
         </p>
         <p>
-          X handle at{' '}
-          <a href="https://x.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          X handle at{" "}
+          <a
+            href="https://x.com/SudoXDaily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             SudoXDaily
           </a>
         </p>
         <p>
-          Facebook handle at{' '}
-          <a href="https://facebook.com/SudoXDaily" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          Facebook handle at{" "}
+          <a
+            href="https://facebook.com/SudoXDaily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
             SudoXDaily
           </a>
         </p>
         <p>
-          Instagram handle at{' '}
-          <a href="https://instagram.com/sudox.ig" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-            sudox.ig
+          Instagram handle at{" "}
+          <a
+            href="https://instagram.com/sudox.daily"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "var(--primary)", textDecoration: "none" }}
+          >
+            sudox.daily
           </a>
         </p>
       </div>

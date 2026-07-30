@@ -282,6 +282,10 @@ function GameActive({
       return;
     }
 
+    if (val !== 0 && manager.isExhausted(val)) {
+      return;
+    }
+
     // Check if it's a mistake before writing
     if (val !== 0 && !manager.isCorrect(r, c) && !manager.isClue(r, c)) {
       if (manager.getState().solutionGrid) {
@@ -366,7 +370,7 @@ function GameActive({
           <div className="status-panel" style={{ marginTop: 0 }}>
             Solved@{finishedAt ? formatTimestamp(finishedAt) : '00:00'}
           </div>
-          <button className="action-btn ghost" onClick={() => requestPdfDownload('response')}>
+          <button className="status-panel" style={{ marginTop: 0, cursor: 'pointer' }} onClick={() => requestPdfDownload('response')}>
             Your Response
           </button>
         </div>
@@ -375,7 +379,7 @@ function GameActive({
           <div className="status-panel" style={{ marginTop: 0 }}>
             Locked@{lockedAt ? formatTimestamp(lockedAt) : '00:00'}
           </div>
-          <button className="action-btn ghost" onClick={() => requestPdfDownload('response')}>
+          <button className="status-panel" style={{ marginTop: 0, cursor: 'pointer' }} onClick={() => requestPdfDownload('response')}>
             Your Response
           </button>
         </div>

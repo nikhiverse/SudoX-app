@@ -11,7 +11,7 @@
 import { getDb } from '../lib/mongodb';
 import { VALID_GAMES, PUZZLES_COLLECTION } from '../lib/constants';
 import { getTodayDateString, getISTDate } from '../lib/date-utils';
-import { generateAndStorePuzzle } from '../lib/puzzle-generator';
+import { generatePuzzleDocs } from '../lib/puzzle-generator';
 import type { DailyPuzzleDoc } from '../lib/types';
 
 /**
@@ -60,19 +60,25 @@ async function main() {
     failed: [] as { game: string; error: string }[],
   };
 
+  // 1. Fetch existing games for the target date to avoid N findOne queries
+  const existingDocs = await collection.find({ date: targetDate, type: 'puzzle' }, { projection: { game: 1 } }).toArray();
+  const existingGames = new Set(existingDocs.map(d => d.game));
+
+  const docsToInsert: any[] = [];
+
   for (const game of VALID_GAMES) {
     try {
       // Skip if already generated for this date
-      const existing = await collection.findOne({ game, date: targetDate });
-      if (existing) {
+      if (existingGames.has(game)) {
         console.log(`⏭️  Skipped ${game} (Already exists for ${targetDate})`);
         results.skipped.push(game);
         continue;
       }
 
-      // Generate and store
+      // Generate
       process.stdout.write(`⚙️  Generating ${game}... `);
-      await generateAndStorePuzzle(game, targetDate);
+      const docs = await generatePuzzleDocs(game, targetDate);
+      docsToInsert.push(...docs);
       console.log('✅ Done');
       results.generated.push(game);
 
@@ -81,6 +87,17 @@ async function main() {
       console.log(`❌ Failed: ${message}`);
       results.failed.push({ game, error: message });
     }
+  }
+
+  // 2. Bulk Insert with Chunking to prevent oversized statements / long locks
+  if (docsToInsert.length > 0) {
+    console.log(`\n📦 Batch inserting ${docsToInsert.length} documents...`);
+    const CHUNK_SIZE = 20; // 10 puzzles (puzzle + solution docs) at a time
+    for (let i = 0; i < docsToInsert.length; i += CHUNK_SIZE) {
+      const chunk = docsToInsert.slice(i, i + CHUNK_SIZE);
+      await collection.insertMany(chunk, { ordered: false });
+    }
+    console.log(`✅ Batch insert complete.`);
   }
 
   console.log(`\n📊 Generation Summary (${label} — ${targetDate}):`);

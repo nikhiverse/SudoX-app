@@ -64,35 +64,36 @@ GAME_CODES = {
 GAME_ALIASES = {}
 
 # Theme definitions synchronized with PdfExportService.ts CSS Palette
+# Modified for premium UI: distinctly lighter inner borders, darker outer borders, black text.
 THEMES = {
     "light": {
-        "background": "#fef9f0",      # warmBg
-        "grid_line_thin": "#2d2a24",  # gridDark
-        "grid_line_thick": "#2d2a24", # gridDark
-        "grid_line_outer": "#2d2a24", # gridDark
-        "cell_bg": "#ffffff",         # whitish
-        "cell_alt": "#fef3c7",        # altCell
-        "cell_accent": "#b45309",     # diagCell / winCell
-        "cell_accent_2": "#b45309",   # Overlaps treated as same accent
-        "text_regular": "#2d2a24",    # clueText
-        "text_highlight": "#ffffff",  # white on top of amber background
-        "correct_text": "#1d4ed8",    # correctTx
-        "wrong_text": "#be123c",      # wrongTx
-        "brand_color": "#b45309",     # primary
-        "text_secondary": "#9c9084",  # textMuted
+        "background": "#fdfaf2",      
+        "grid_line_thin": "#d6d3d1",  # Lighter for subtle inner borders
+        "grid_line_thick": "#44403c", # Darker for clear subgrid separation
+        "grid_line_outer": "#1c1917", # Near black for strong outer frame
+        "cell_bg": "#ffffff",         
+        "cell_alt": "#fef3c7",        
+        "cell_accent": "#d97706",     
+        "cell_accent_2": "#b45309",   
+        "text_regular": "#000000",    # Enforced Black
+        "text_highlight": "#000000",  # Enforced Black
+        "correct_text": "#1d4ed8",    
+        "wrong_text": "#be123c",      
+        "brand_color": "#b45309",     
+        "text_secondary": "#9c9084",  
         "text_muted": "#9c9084"
     },
     "dark": {
         "background": "#000000",
         "grid_line_thin": "#3a3a3c",
-        "grid_line_thick": "#cccccc",
+        "grid_line_thick": "#8a8a8e",
         "grid_line_outer": "#cccccc",
         "cell_bg": "#050505",
         "cell_alt": "#22190f",
         "cell_accent": "#f97316",
         "cell_accent_2": "#ea580c",
-        "text_regular": "#ededed",
-        "text_highlight": "#000000",
+        "text_regular": "#ffffff",
+        "text_highlight": "#ffffff",
         "correct_text": "#3b82f6",
         "wrong_text": "#fb7185",
         "brand_color": "#fb923c",
@@ -179,7 +180,18 @@ def compile_and_run_cpp(game, workspace_path):
         subprocess.run(cmd, check=True)
         
     print(f"🎲 Running generator engine: {actual_game}...")
-    output = subprocess.run([bin_path], capture_output=True, text=True, check=True).stdout
+    try:
+        # We add timeout=10 here
+        output = subprocess.run(
+            [bin_path], 
+            capture_output=True, 
+            text=True, 
+            check=True, 
+            timeout=10
+        ).stdout
+    except subprocess.TimeoutExpired:
+        # If it takes more than 10 seconds, this catches the error and moves on
+        raise ValueError(f"No JSON output. C++ engine timed out for {actual_game}.")
     
     import re
     clean_output = re.sub(r'\x1b\[[0-9;]*m', '', output)
@@ -329,13 +341,7 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         
     puzz_id = build_unique_id(game, date_str or get_ist_date_string())
     
-    # ── HEADER TITLE ──
-    # Swapped from a massive bold serif to a standard regular serif at a reasonable size
-    header_text = f"{game_display_name} · {puzz_id}"
-    font_title = get_font("text_serif", 36) 
-    draw.text((80, 60), header_text, fill=colors["text_regular"], font=font_title)
-    
-    # ── GRID SIZING WITH EMPATHY SPACES ──
+    # ── DYNAMIC GRID SIZING ──
     ptype = puzzle_data.get("type", "standard")
     
     if ptype == "twodoku":
@@ -345,21 +351,28 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
         total_rows = puzzle_data["size"]
         total_cols = puzzle_data["size"]
         
-    # Scale dynamically to use empty canvas sizes wisely for 9x9 and above
     if total_cols <= 6:
-        grid_size = 720  # Keeps mini grids small and cute
+        grid_size = 720  
     elif total_cols <= 9:
-        grid_size = 960  # Pushes 9x9 out to occupy whitespace
+        grid_size = 960  
     else:
-        grid_size = 1040 # Maximizes 12x12 or twodokus
+        grid_size = 1000 
 
+    # ── BALANCED MARGINS & LAYOUT ──
     grid_w = grid_size
     grid_h = grid_size
     grid_left = (1200 - grid_w) // 2
-    grid_top = (1200 - grid_h) // 2 - 20 # slight up-shift to accommodate footer
+    grid_top = (1200 - grid_h) // 2
     
     cell_w = grid_w / total_cols
     cell_h = grid_h / total_rows
+    
+    # ── HEADER TITLE ──
+    header_text = f"{game_display_name} · {puzz_id}"
+    font_title = get_font("text_serif", 36) 
+    title_x = grid_left
+    title_y = grid_top - 60 # Clean breathing room above grid
+    draw.text((title_x, title_y), header_text, fill=colors["text_regular"], font=font_title)
     
     cells = []
     for r in range(total_rows):
@@ -423,7 +436,7 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                         break
             
             if is_both:
-                bg_color = colors["cell_accent_2"]
+                bg_color = colors["cell_accent"]
             elif is_diagonal or is_window:
                 bg_color = colors["cell_accent"]
             elif is_alt_block:
@@ -464,9 +477,18 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
     img.alpha_composite(txt_img_rotated, (paste_x, paste_y))
     draw = ImageDraw.Draw(img)
 
-    # Draw Borders 
-    for border_weight, width in [("thin", 2), ("thick", 5), ("outer", 8)]:
-        border_color = colors["grid_line_thick"] 
+    # ── DRAW BORDERS (DISTINCT HIERARCHY) ──
+    # Thin: 1px, Thick (Subgrid): 3px, Outer: 8px
+    for border_weight, width in [("thin", 1), ("thick", 6), ("outer", 6)]:
+        
+        # Apply specific colors to clearly distinguish border depths
+        if border_weight == "thin":
+            border_color = colors.get("grid_line_thin", "#FFFFF0")
+        elif border_weight == "thick":
+            border_color = colors.get("grid_line_thick", "#1c1917")
+        else:
+            border_color = colors.get("grid_line_outer", "#1c1917")
+            
         for cell in cells:
             borders = cell["borders"]
             x1, y1, x2, y2 = cell["x1"], cell["y1"], cell["x2"], cell["y2"]
@@ -480,9 +502,9 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
             if borders["right"] == border_weight:
                 draw.line([(x2, y1), (x2, y2)], fill=border_color, width=width)
 
-    # Draw Typography Values 
-    font_mono_bold = get_font("text_mono", int(cell_h * 0.55)) # Matches Courier Bold for Clues
-    font_sans_normal = get_font("text_sans", int(cell_h * 0.52)) # Matches Helvetica Normal for solutions
+    # ── DRAW TYPOGRAPHY VALUES (BLACK NUMBERS) ──
+    font_mono_bold = get_font("text_mono", int(cell_h * 0.55)) 
+    font_sans_normal = get_font("text_sans", int(cell_h * 0.52)) 
     
     for cell in cells:
         x1, y1, x2, y2 = cell["x1"], cell["y1"], cell["x2"], cell["y2"]
@@ -501,21 +523,49 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
                 
         if val_str:
             if is_clue:
-                text_color = colors["text_highlight"] if cell["is_highlighted"] else colors["text_regular"]
+                # Force black text for clues regardless of highlight
+                text_color = "#000000" if theme == "light" else colors["text_regular"]
                 font = font_mono_bold
             else:
                 if cell["is_highlighted"]:
-                    text_color = "#93c5fd" if theme == "light" else "#60a5fa"
+                    text_color = "#000000" if theme == "light" else "#60a5fa"
                 else:
                     text_color = colors["correct_text"]
                 font = font_sans_normal
                 
             draw.text((cx, cy), val_str, fill=text_color, font=font, anchor="mm")
 
-    # Draw Footer
-    watermark_text = "Play at https://sudox-app.vercel.app/"
-    font_watermark = get_font("text_sans", 22)
-    draw.text((600, 1140), watermark_text, fill=colors["text_secondary"], font=font_watermark, anchor="mm")
+    # ── FOOTER ──
+# ── FOOTER ──
+   # ── FOOTER ──
+    font_watermark = get_font("title_sans", 22)
+    footer_y1 = grid_top + grid_h + 40
+    
+    # 1. Split the text into two parts
+    text_prefix = "Play at "
+    text_url = "https://sudox-app.vercel.app/"
+    
+    # 2. Measure the widths of both parts
+    width_prefix = draw.textlength(text_prefix, font=font_watermark)
+    width_url = draw.textlength(text_url, font=font_watermark)
+    total_width = width_prefix + width_url
+    
+    # 3. Calculate the starting X coordinate so the combined text stays centered at 600
+    start_x = 600 - (total_width / 2)
+    
+    # 4. Draw "Play at " in the subtle secondary color
+    # We use anchor="lm" (left-middle) now because we are drawing left-to-right
+    draw.text((start_x, footer_y1), text_prefix, fill=colors["text_secondary"], font=font_watermark, anchor="lm")
+    
+    # 5. Draw the URL in the strong regular color right where the prefix ends
+    url_x = start_x + width_prefix
+    draw.text((url_x, footer_y1), text_url, fill=colors["text_regular"], font=font_watermark, anchor="lm")
+
+    # ── COPYRIGHT LINE ──
+    watermark_text2 = "© 2026 SudoX Daily"
+    font_watermark2 = get_font("text_sans", 18)
+    footer_y2 = footer_y1 + 30 
+    draw.text((600, footer_y2), watermark_text2, fill=colors["text_secondary"], font=font_watermark2, anchor="mm")
     
     img.save(output_path, "PNG")
     print(f"📸 Image generated successfully: {output_path}")

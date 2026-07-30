@@ -31,8 +31,22 @@ export const PuzzleService = {
 
     const url = `/api/puzzle/${game}?date=${today}`;
     console.log('PuzzleService: fetching from URL:', url);
-    // 2. Fetch from API (reads MongoDB, no C++)
-    const res = await fetch(url, { cache: 'no-store' });
+    // 2. Fetch from API (reads MongoDB, no C++) with circuit breaker timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    let res: Response;
+    try {
+      res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        throw new Error('Network timeout. The server took too long to respond.');
+      }
+      throw new Error('Network error. Please check your connection.');
+    } finally {
+      clearTimeout(timeoutId);
+    }
+    
     console.log('PuzzleService: fetch returned status =', res.status);
 
     if (!res.ok) {
