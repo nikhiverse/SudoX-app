@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDisplayDate, getISTDate } from '@/lib/date-utils';
+import { formatDisplayDate } from '@/lib/date-utils';
 import { useSyncExternalStore, useEffect, useState } from 'react';
 
 // Client-side date display — avoids useEffect+setState pattern
@@ -18,13 +18,21 @@ function getServerDate() {
   return '';
 }
 
-export function ClientDateDisplay() {
+export function ClientDateDisplay({ serverTimeNow }: { serverTimeNow: number }) {
   const date = useSyncExternalStore(subscribeNoop, getClientDate, getServerDate);
   const [countdown, setCountdown] = useState<string | null>(null);
+  
+  // Calculate offset between server and client clock ONCE
+  const [timeOffset] = useState(() => serverTimeNow - Date.now());
 
   useEffect(() => {
     const updateCountdown = () => {
-      const current = getISTDate();
+      // Adjust client clock using the server offset
+      const adjustedTime = new Date(Date.now() + timeOffset);
+      // Localize adjusted time to IST
+      const istString = adjustedTime.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+      const current = new Date(istString);
+      
       const nextMidnight = new Date(current);
       nextMidnight.setHours(24, 0, 0, 0);
       
@@ -48,7 +56,7 @@ export function ClientDateDisplay() {
     
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [timeOffset]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>

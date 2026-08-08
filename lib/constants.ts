@@ -122,6 +122,16 @@ export const STORAGE_KEEP_DAYS = 2;
 // ── MongoDB collection name ──
 export const PUZZLES_COLLECTION = 'daily_puzzles';
 
+// ── Puzzle domain boundary ──
+// The first date a puzzle was ever generated. Any ?date= value before this
+// is guaranteed to not exist in MongoDB. Rejecting pre-launch dates at the
+// routing layer means zero index lookups for the attacker's historical sweep.
+// This must be the date the database was FIRST SEEDED, not the public launch
+// date. The lower-bound check rejects any ?date= before this, so if you set
+// it to a future date you will 404 all legitimate requests until that day.
+// To find the real value: db.daily_puzzles.find().sort({date:1}).limit(1)
+export const PUZZLE_LAUNCH_DATE = '2026-08-08';
+
 // ── URL mapping overrides ──
 export function getVariantUrl(variant: string): string {
   if (variant === 'sudoku_easy') return 'sudoku_eazy';

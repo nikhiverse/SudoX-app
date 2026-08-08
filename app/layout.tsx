@@ -136,7 +136,8 @@ export default function RootLayout({
 // ── Client Components inlined for simplicity ──
 
 function DateDisplay() {
-  return <ClientDateDisplay />;
+  const serverTimeNow = Date.now();
+  return <ClientDateDisplay serverTimeNow={serverTimeNow} />;
 }
 
 function HamburgerButton() {

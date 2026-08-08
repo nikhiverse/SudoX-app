@@ -6,13 +6,22 @@ import { GAME_CODES } from './constants';
 import type { GameVariant } from './types';
 
 /**
- * Helper: Get current Date object localized to IST (Asia/Kolkata)
+ * Helper: Gets a precise YYYY-MM-DD string for a given date in IST.
+ * Uses Intl.DateTimeFormat to avoid creating corrupted Date objects with mixed offsets.
  */
-export function getISTDate(): Date {
-  // Create a date string in IST, then parse it back into a Date object
-  // so we can use standard getFullYear(), getMonth(), etc.
-  const istString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-  return new Date(istString);
+function getISTDateString(date: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  
+  const y = parts.find(p => p.type === 'year')?.value;
+  const m = parts.find(p => p.type === 'month')?.value;
+  const d = parts.find(p => p.type === 'day')?.value;
+  
+  return `${y}-${m}-${d}`;
 }
 
 /**
@@ -20,11 +29,16 @@ export function getISTDate(): Date {
  * Guarantees puzzles roll over exactly at IST Midnight globally.
  */
 export function getTodayDateString(): string {
-  const now = getISTDate();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  return getISTDateString();
+}
+
+/**
+ * Returns tomorrow's date as "YYYY-MM-DD" in IST (Asia/Kolkata).
+ */
+export function getTomorrowDateString(): string {
+  const tomorrow = new Date();
+  tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+  return getISTDateString(tomorrow);
 }
 
 /**
@@ -44,21 +58,14 @@ export function formatDisplayDate(): string {
  * If dateStr (YYYY-MM-DD) is provided, uses that date; otherwise uses current IST.
  */
 export function buildUniqueId(game: GameVariant, dateStr?: string): string {
-  let yy: string, mm: string, dd: string;
-
-  if (dateStr) {
-    const [year, month, day] = dateStr.split('-');
-    yy = year.slice(-2);
-    mm = month;
-    dd = day;
-  } else {
-    const now = getISTDate();
-    yy = String(now.getFullYear()).slice(-2);
-    mm = String(now.getMonth() + 1).padStart(2, '0');
-    dd = String(now.getDate()).padStart(2, '0');
-  }
-
+  const targetDate = dateStr || getTodayDateString();
+  const [year, month, day] = targetDate.split('-');
+  
+  const yy = year.slice(-2);
+  const mm = month;
+  const dd = day;
   const cc = GAME_CODES[game] || '00';
+  
   return `${yy}${mm}${dd}${cc}`;
 }
 
@@ -67,16 +74,11 @@ export function buildUniqueId(game: GameVariant, dateStr?: string): string {
  * If dateStr (YYYY-MM-DD) is provided, uses that day; otherwise uses current IST.
  */
 export function buildGenerationId(game: GameVariant, dateStr?: string): string {
-  let dd: string;
-
-  if (dateStr) {
-    dd = dateStr.split('-')[2];
-  } else {
-    const now = getISTDate();
-    dd = String(now.getDate()).padStart(2, '0');
-  }
-
+  const targetDate = dateStr || getTodayDateString();
+  const dd = targetDate.split('-')[2];
+  
   const cc = GAME_CODES[game] || '00';
   const rr = String(Math.floor(Math.random() * 99) + 1).padStart(2, '0');
+  
   return `${dd}${cc}${rr}`;
 }
