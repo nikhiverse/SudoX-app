@@ -6,6 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ClientDateDisplay } from '@/components/layout/ClientDateDisplay';
+import { ClientHamburgerButton } from '@/components/layout/ClientHamburgerButton';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -107,8 +109,8 @@ export default function RootLayout({
             <span className="topbar-name">SudoX Daily</span>
           </div>
           <div className="topbar-right">
-            <DateDisplay />
-            <HamburgerButton />
+            <ClientDateDisplay />
+            <ClientHamburgerButton />
           </div>
         </header>
 
@@ -132,18 +134,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// ── Client Components inlined for simplicity ──
-
-function DateDisplay() {
-  const serverTimeNow = Date.now();
-  return <ClientDateDisplay serverTimeNow={serverTimeNow} />;
-}
-
-function HamburgerButton() {
-  return <ClientHamburgerButton />;
-}
-
-// These are separate client components imported below
-import { ClientDateDisplay } from '@/components/layout/ClientDateDisplay';
-import { ClientHamburgerButton } from '@/components/layout/ClientHamburgerButton';
