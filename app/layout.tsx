@@ -6,7 +6,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { ClientDateDisplay } from '@/components/layout/ClientDateDisplay';
+import dynamic from 'next/dynamic';
+const ClientDateDisplay = dynamic(
+  () => import('@/components/layout/ClientDateDisplay').then(m => m.ClientDateDisplay),
+  { ssr: false }
+);
 import { ClientHamburgerButton } from '@/components/layout/ClientHamburgerButton';
 import './globals.css';
 
