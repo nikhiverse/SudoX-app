@@ -17,6 +17,7 @@ interface UseGameStateResult {
   writeValue: (r: number, c: number, val: number) => void;
   eraseValue: (r: number, c: number) => void;
   syncTimer: (seconds: number) => void;
+  getTimerSeconds: () => number;
   initialTimerSeconds: number;
 }
 
@@ -77,6 +78,11 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
     timerRef.current = seconds;
   }, []);
 
+  // Stable getter — reads the current timer value without being a reactive dep.
+  // Use this in effects where you need the timer value but DON'T want the effect
+  // to re-run every second (which would cause infinite loops).
+  const getTimerSeconds = useCallback(() => timerRef.current, []);
+
   // Sync state automatically across different browser tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -129,6 +135,7 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
     writeValue, 
     eraseValue,
     syncTimer,
+    getTimerSeconds,
     initialTimerSeconds
   };
 }
