@@ -141,15 +141,14 @@ function GameActive({
   const [showWebviewModal, setShowWebviewModal] = useState(false);
 
   // Screenshot prevention — disabled on localhost/test automatically
-  useScreenshotPrevention({
-    onAttempt: () => {
-      setAutoDismissModal({
-        title: '📄 Use PDF Download',
-        message: 'Screenshots are disabled. Use the Download PDF option in the menu to save this puzzle.',
-        type: 'warning',
-      });
-    },
-  });
+  const handleScreenshotAttempt = useCallback(() => {
+    setAutoDismissModal({
+      title: '📄 Use PDF Download',
+      message: 'Screenshots are disabled. Use the Download PDF option in the menu to save this puzzle.',
+      type: 'warning',
+    });
+  }, []);
+  useScreenshotPrevention({ onAttempt: handleScreenshotAttempt });
 
   // Read saved timestamps for display on revisit
   const [finishedAt, setFinishedAt] = useState<string | undefined>();
