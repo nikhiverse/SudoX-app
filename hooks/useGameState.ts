@@ -69,10 +69,13 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
   }, [manager, game]);
 
   const syncTimer = useCallback((seconds: number) => {
+    // Only update the ref — do NOT call persist() here.
+    // persist() writes localStorage which fires the cross-tab storage event,
+    // which calls bump() → re-render → timer.seconds changes → this fires again
+    // → infinite loop (React error #185). The timer value is already in timerRef
+    // and will be included in the next persist() triggered by a user action.
     timerRef.current = seconds;
-    // Persist every 1 second so timer survives page refresh seamlessly
-    persist();
-  }, [persist]);
+  }, []);
 
   // Sync state automatically across different browser tabs
   useEffect(() => {
