@@ -9,7 +9,14 @@ function subscribeToTime(callback: () => void) {
 }
 
 function getClientTime() {
-  return Date.now();
+  // IMPORTANT: useSyncExternalStore requires getSnapshot to return the *same*
+  // value (Object.is-equal) when the external store hasn't changed.
+  // Date.now() returns a different number every millisecond, causing React to
+  // see a "changed store" after every single commit → schedules a synchronous
+  // re-render → repeat 50× → React error #185 (Maximum update depth exceeded).
+  // Rounding to the nearest second matches our 1-second setInterval and keeps
+  // the snapshot stable between ticks.
+  return Math.floor(Date.now() / 1000);
 }
 
 function getServerTime() {
@@ -18,8 +25,8 @@ function getServerTime() {
 
 function getCountdownString(clientTime: number | null): string | null {
   if (!clientTime) return null;
-  // Localize current client time to IST
-  const istString = new Date(clientTime).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+  // clientTime is Unix seconds (Math.floor(Date.now()/1000)) — convert to ms for Date
+  const istString = new Date(clientTime * 1000).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
   const current = new Date(istString);
 
   const nextMidnight = new Date(current);
