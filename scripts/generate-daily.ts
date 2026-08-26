@@ -10,7 +10,7 @@
 
 import { getDb } from '../lib/mongodb';
 import { VALID_GAMES, PUZZLES_COLLECTION } from '../lib/constants';
-import { getTodayDateString, getISTDate } from '../lib/date-utils';
+import { getTodayDateString, getTomorrowDateString } from '../lib/date-utils';
 import { generatePuzzleDocs } from '../lib/puzzle-generator';
 import type { DailyPuzzleDoc } from '../lib/types';
 
@@ -22,12 +22,7 @@ function getTargetDate(): string {
   const isTomorrow = process.argv.includes('--tomorrow');
 
   if (isTomorrow) {
-    const now = getISTDate();
-    now.setDate(now.getDate() + 1);
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return getTomorrowDateString();
   }
 
   return getTodayDateString();

@@ -26,15 +26,23 @@ export function useTimer(initialSeconds: number = 0): UseTimerResult {
   const startTimeRef = useRef<number>(0);
   const startSecondsRef = useRef<number>(initialSeconds);
 
-  // When initialSeconds change (e.g. from 0 to the actual saved value on mount),
-  // update the state if the timer hasn't started yet.
+  // Track whether we've already seeded the timer from initialSeconds.
+  const initializedRef = useRef(false);
+
+  // When initialSeconds arrive (e.g. restored from localStorage after mount),
+  // seed the timer once — but only if it hasn't started yet.
+  // NOTE: neither `seconds` nor `isRunning` belong in this dep array:
+  //  - `seconds`: setSeconds → seconds changes → effect re-fires → infinite loop
+  //  - `isRunning`: start()/stop() calls would re-trigger this effect unnecessarily;
+  //    the `initializedRef` flag is the sole guard and doesn't need it.
   useEffect(() => {
-    if (!isRunning && initialSeconds > 0 && seconds === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!initializedRef.current && initialSeconds > 0) {
+      initializedRef.current = true;
       setSeconds(initialSeconds);
       startSecondsRef.current = initialSeconds;
     }
-  }, [initialSeconds, isRunning, seconds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSeconds]);
 
   // Cleanup on unmount
   useEffect(() => {

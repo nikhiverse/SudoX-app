@@ -124,7 +124,7 @@ function GameActive({
   puzzleData: import('@/lib/types').PuzzleData;
   uniqueId: string;
 }) {
-  const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, initialTimerSeconds } = useGameState(puzzleData, game);
+  const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, getTimerSeconds, persistTimerSnapshot, initialTimerSeconds } = useGameState(puzzleData, game);
   const timer = useTimer(initialTimerSeconds);
   const { lives, recordMistake, isLocked, isInitialized } = useLives(game);
   const gameIsLocked = isLocked;
@@ -141,15 +141,14 @@ function GameActive({
   const [showWebviewModal, setShowWebviewModal] = useState(false);
 
   // Screenshot prevention — disabled on localhost/test automatically
-  useScreenshotPrevention({
-    onAttempt: () => {
-      setAutoDismissModal({
-        title: '📄 Use PDF Download',
-        message: 'Screenshots are disabled. Use the Download PDF option in the menu to save this puzzle.',
-        type: 'warning',
-      });
-    },
-  });
+  const handleScreenshotAttempt = useCallback(() => {
+    setAutoDismissModal({
+      title: '📄 Use PDF Download',
+      message: 'Screenshots are disabled. Use the Download PDF option in the menu to save this puzzle.',
+      type: 'warning',
+    });
+  }, []);
+  useScreenshotPrevention({ onAttempt: handleScreenshotAttempt });
 
   // Read saved timestamps for display on revisit
   const [finishedAt, setFinishedAt] = useState<string | undefined>();
@@ -202,6 +201,9 @@ function GameActive({
   const prevIsLocked = useRef(gameIsLocked);
 
   // Active game changes — save timestamp on transition
+  // NOTE: timer.seconds is intentionally NOT in deps — it changes every second
+  // which would re-fire this effect and cause an infinite re-render loop.
+  // We read the current value from timerRef (kept in sync by syncTimer) instead.
   useEffect(() => {
     if (!initHandledRef.current) return;
 
@@ -217,7 +219,7 @@ function GameActive({
         cellValues: serialized.cellValues,
         cellCorrect: serialized.cellCorrect,
         cellWasWrong: serialized.cellWasWrong,
-        timerSeconds: timer.seconds,
+        timerSeconds: getTimerSeconds(),
         completed: true,
         finishedAt: now,
       });
@@ -238,7 +240,7 @@ function GameActive({
         cellValues: serialized.cellValues,
         cellCorrect: serialized.cellCorrect,
         cellWasWrong: serialized.cellWasWrong,
-        timerSeconds: timer.seconds,
+        timerSeconds: getTimerSeconds(),
         completed: false,
         finishedAt: existing?.finishedAt,
         lockedAt: now,
@@ -246,7 +248,8 @@ function GameActive({
       setAutoDismissModal({ title: 'Game Locked', message: 'Better try tomorrow', type: 'warning' });
     }
     prevIsLocked.current = gameIsLocked;
-  }, [isCompleted, gameIsLocked, stateVersion, game, manager, timer.seconds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCompleted, gameIsLocked, stateVersion, game, manager]);
 
   // Start timer immediately when puzzle loads (only if not already finished/locked)
   useEffect(() => {
@@ -262,12 +265,16 @@ function GameActive({
     syncTimer(timer.seconds);
   }, [timer.seconds, syncTimer]);
 
-  // Stop timer if the game is successfully fully solved or locked
+  // Stop timer if the game is successfully fully solved or locked.
+  // NOTE: `timer` object is intentionally NOT in deps — it's a new object
+  // reference every render, which would make this effect fire on every render.
+  // stateVersion changes on every game action, which is the correct trigger.
   useEffect(() => {
     if (manager.isCompleted() || gameIsLocked) {
       timer.stop();
     }
-  }, [stateVersion, manager, timer, gameIsLocked]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateVersion, manager, gameIsLocked]);
 
   // Listen for PDF download requests from MenuDrawer
   useEffect(() => {
@@ -275,6 +282,25 @@ function GameActive({
       exportPuzzleToPdf(gameName, uniqueId, type);
     });
   }, [gameName, uniqueId]);
+
+  // Flush timer to localStorage when the user navigates away without making
+  // any input (visibilitychange covers tab-switch/home navigation; pagehide
+  // covers iOS Safari back-swipe and browser back button).
+  // This is a one-shot imperative write — it never calls bump() or syncTimer,
+  // so it cannot trigger the reactive sync loop.
+  useEffect(() => {
+    const flush = () => {
+      if (document.visibilityState === 'hidden') {
+        persistTimerSnapshot();
+      }
+    };
+    document.addEventListener('visibilitychange', flush);
+    window.addEventListener('pagehide', persistTimerSnapshot);
+    return () => {
+      document.removeEventListener('visibilitychange', flush);
+      window.removeEventListener('pagehide', persistTimerSnapshot);
+    };
+  }, [persistTimerSnapshot]);
 
   const wrappedWriteValue = useCallback((r: number, c: number, val: number) => {
     if (gameIsLocked) {

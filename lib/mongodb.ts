@@ -45,9 +45,14 @@ if (process.env.NODE_ENV === 'development') {
   }
   clientPromise = globalForMongo._mongoClientPromise;
 } else {
-  // In production, create a fresh client
-  const client = new MongoClient(MONGODB_URI, mongoOptions);
-  clientPromise = client.connect();
+  // In production, cache the promise in global scope to prevent connection drain
+  // across warm serverless functions and dynamic RSC renders.
+  if (!globalForMongo._mongoClientPromise) {
+    const client = new MongoClient(MONGODB_URI, mongoOptions);
+    globalForMongo._mongoClientPromise = client.connect();
+    globalForMongo._mongoClient = client;
+  }
+  clientPromise = globalForMongo._mongoClientPromise;
 }
 
 /**
