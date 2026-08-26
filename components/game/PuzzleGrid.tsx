@@ -40,7 +40,7 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
   }, []);
 
   const highlighted = useMemo(() => {
-    return manager.getHighlightedCells();
+    return manager.getHighlightedCells(game);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manager, stateVersion]);
 

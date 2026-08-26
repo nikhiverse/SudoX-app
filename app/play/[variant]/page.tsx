@@ -124,7 +124,7 @@ function GameActive({
   puzzleData: import('@/lib/types').PuzzleData;
   uniqueId: string;
 }) {
-  const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, getTimerSeconds, initialTimerSeconds } = useGameState(puzzleData, game);
+  const { manager, stateVersion, moveCursor, writeValue, eraseValue, syncTimer, getTimerSeconds, persistTimerSnapshot, initialTimerSeconds } = useGameState(puzzleData, game);
   const timer = useTimer(initialTimerSeconds);
   const { lives, recordMistake, isLocked, isInitialized } = useLives(game);
   const gameIsLocked = isLocked;
@@ -282,6 +282,25 @@ function GameActive({
       exportPuzzleToPdf(gameName, uniqueId, type);
     });
   }, [gameName, uniqueId]);
+
+  // Flush timer to localStorage when the user navigates away without making
+  // any input (visibilitychange covers tab-switch/home navigation; pagehide
+  // covers iOS Safari back-swipe and browser back button).
+  // This is a one-shot imperative write — it never calls bump() or syncTimer,
+  // so it cannot trigger the reactive sync loop.
+  useEffect(() => {
+    const flush = () => {
+      if (document.visibilityState === 'hidden') {
+        persistTimerSnapshot();
+      }
+    };
+    document.addEventListener('visibilitychange', flush);
+    window.addEventListener('pagehide', persistTimerSnapshot);
+    return () => {
+      document.removeEventListener('visibilitychange', flush);
+      window.removeEventListener('pagehide', persistTimerSnapshot);
+    };
+  }, [persistTimerSnapshot]);
 
   const wrappedWriteValue = useCallback((r: number, c: number, val: number) => {
     if (gameIsLocked) {

@@ -18,6 +18,7 @@ interface UseGameStateResult {
   eraseValue: (r: number, c: number) => void;
   syncTimer: (seconds: number) => void;
   getTimerSeconds: () => number;
+  persistTimerSnapshot: () => void;
   initialTimerSeconds: number;
 }
 
@@ -83,6 +84,20 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
   // to re-run every second (which would cause infinite loops).
   const getTimerSeconds = useCallback(() => timerRef.current, []);
 
+  // One-shot flush called from visibilitychange/pagehide to persist the timer
+  // even when the user navigates away without making any input.
+  // Does NOT call bump() — safe to call from event handlers without triggering
+  // a reactive re-render loop.
+  const persistTimerSnapshot = useCallback(() => {
+    const today = getTodayDateString();
+    const existing = StorageService.getProgress(game, today);
+    if (!existing) return; // no progress entry yet — timer was 0, nothing to save
+    StorageService.saveProgress(game, today, {
+      ...existing,
+      timerSeconds: timerRef.current,
+    });
+  }, [game]);
+
   // Sync state automatically across different browser tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
@@ -136,6 +151,7 @@ export function useGameState(puzzleData: PuzzleData, game: string): UseGameState
     eraseValue,
     syncTimer,
     getTimerSeconds,
+    persistTimerSnapshot,
     initialTimerSeconds
   };
 }

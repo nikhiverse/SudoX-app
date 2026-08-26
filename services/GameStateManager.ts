@@ -182,7 +182,10 @@ export class GameStateManager {
    * Returns a set of cells that should be highlighted (crosshair/matching)
    * based on the current cursor position.
    */
-  getHighlightedCells(): Set<string> {
+  // Variants where the sub-block cursor highlight should be suppressed.
+  private static readonly NO_BLOCK_HIGHLIGHT_GAMES = new Set(['windoku', 'windokuX', 'dozaku']);
+
+  getHighlightedCells(game?: string): Set<string> {
     const highlighted = new Set<string>();
     const { cursorR, cursorC, totalRows, totalCols, cellValues, activeMap } = this.state;
 
@@ -271,6 +274,9 @@ export class GameStateManager {
       return (isOnMainDiag && r === c) || (isOnAntiDiag && r + c === size - 1);
     };
 
+    // Whether to suppress the sub-block (group) highlight for this variant.
+    const suppressBlockHighlight = game !== undefined && GameStateManager.NO_BLOCK_HIGHLIGHT_GAMES.has(game);
+
     if (currentVal === 0) {
       // Empty cell: highlight same row + col + box/group + diagonals
       for (let r = 0; r < totalRows; r++) {
@@ -282,7 +288,7 @@ export class GameStateManager {
           if (
             r === cursorR || 
             c === cursorC || 
-            isSameGroup(r, c, cursorR, cursorC) ||
+            (!suppressBlockHighlight && isSameGroup(r, c, cursorR, cursorC)) ||
             isSameDiagonal(r, c)
           ) {
             highlighted.add(`${r},${c}`);
