@@ -157,4 +157,9 @@ export type GameVariant =
   | 'twodoku_mini'
   | 'twodoku8'
   | 'twodoku9'
-  | 'sudoku12';
+  | 'sudoku12'
+  | 'jigsaw_mini'
+  | 'sudox_king'
+  | 'sudox_queen'
+  | 'queendoku'
+  | 'snakedoku';

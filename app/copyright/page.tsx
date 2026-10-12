@@ -84,8 +84,8 @@ export default function CopyrightPage() {
           For copyright concerns or licensing inquiries, please contact:
         </p>
         <p>
-          <a href="mailto:nikhil.sudox@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-            nikhil.sudox@gmail.com
+          <a href="mailto:sudoxdaily@gmail.com" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+            sudoxdaily@gmail.com
           </a>
         </p>
       </div>

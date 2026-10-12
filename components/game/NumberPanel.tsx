@@ -13,9 +13,10 @@ interface NumberPanelProps {
   stateVersion: number;
   onNumberClick: (val: number) => void;
   onErase: () => void;
+  game?: string;
 }
 
-export function NumberPanel({ manager, stateVersion, onNumberClick, onErase }: NumberPanelProps) {
+export function NumberPanel({ manager, stateVersion, onNumberClick, onErase, game }: NumberPanelProps) {
   const max = manager.getMaxNum();
 
   const buttons = useMemo(() => {
@@ -23,25 +24,30 @@ export function NumberPanel({ manager, stateVersion, onNumberClick, onErase }: N
 
     for (let v = 1; v <= max; v++) {
       const exhausted = manager.isExhausted(v);
+      const isChessPiece =
+        (game === 'sudox_king' && v === 1) ||
+        (game === 'sudox_queen' && v === 9);
+      const labelVal = displayVal(v, game);
+
       btns.push(
         <button
           key={v}
-          className={`num-btn ${exhausted ? 'num-btn--exhausted' : ''}`}
+          className={`num-btn ${exhausted ? 'num-btn--exhausted' : ''} ${isChessPiece ? 'num-btn--chess' : ''}`}
           data-val={v}
-          aria-label={`Input number ${displayVal(v)}`}
+          aria-label={`Input number ${labelVal}`}
           onClick={() => {
             if (!exhausted) onNumberClick(v);
           }}
           disabled={exhausted}
         >
-          {displayVal(v)}
+          {labelVal}
         </button>
       );
     }
 
     return btns;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [max, manager, stateVersion, onNumberClick]);
+  }, [max, manager, stateVersion, onNumberClick, game]);
 
   return (
     <div className="num-panel">

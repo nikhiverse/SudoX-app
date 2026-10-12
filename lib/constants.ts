@@ -22,6 +22,11 @@ export const VALID_GAMES: GameVariant[] = [
   'twodoku8',
   'twodoku9',
   'sudoku12',
+  'jigsaw_mini',
+  'sudox_king',
+  'sudox_queen',
+  'queendoku',
+  'snakedoku',
 ];
 
 // ── Display names for each variant ──
@@ -42,6 +47,11 @@ export const GAME_NAMES: Record<GameVariant, string> = {
   twodoku8: 'Twodoku 8',
   twodoku9: 'Twodoku 9',
   sudoku12: 'Sudoku 12',
+  jigsaw_mini: 'Jigsaw Mini',
+  sudox_king: 'SudoX King',
+  sudox_queen: 'SudoX Queen',
+  queendoku: 'Queendoku',
+  snakedoku: 'Snakedoku',
 };
 
 // ── Variation codes for puzzle ID generation ──
@@ -62,6 +72,11 @@ export const GAME_CODES: Record<GameVariant, string> = {
   twodoku8: '14',
   twodoku9: '15',
   sudoku12: '12',
+  jigsaw_mini: '05',
+  sudox_king: '01',
+  sudox_queen: '02',
+  queendoku: '03',
+  snakedoku: '50',
 };
 
 // ── Aliases: games that use another game's binary ──
@@ -87,11 +102,17 @@ export const GAME_GRID_SIZE: Record<GameVariant, number> = {
   twodoku8: 8,
   twodoku9: 9,
   sudoku12: 12,
+  jigsaw_mini: 6,
+  sudox_king: 9,
+  sudox_queen: 9,
+  queendoku: 10,
+  snakedoku: 10,
 };
 
 // ── Home page variant grid — display order ──
 export const HOME_VARIANTS: GameVariant[] = [
   'sudoku_mini',
+  'jigsaw_mini',
   'sudoku_easy',
   'sudoku9',
   'sudoku_a',
@@ -107,6 +128,10 @@ export const HOME_VARIANTS: GameVariant[] = [
   'twodoku_mini',
   'twodoku8',
   'twodoku9',
+  'sudox_king',
+  'sudox_queen',
+  'queendoku',
+  'snakedoku',
 ];
 
 // ── Rate limiting ──

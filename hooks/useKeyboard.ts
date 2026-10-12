@@ -13,6 +13,7 @@ interface UseKeyboardProps {
   writeValue: (r: number, c: number, val: number) => void;
   eraseValue: (r: number, c: number) => void;
   enabled: boolean;
+  game?: string;
 }
 
 export function useKeyboard({
@@ -21,6 +22,7 @@ export function useKeyboard({
   writeValue,
   eraseValue,
   enabled,
+  game,
 }: UseKeyboardProps): void {
   useEffect(() => {
     if (!enabled) return;
@@ -56,6 +58,20 @@ export function useKeyboard({
         return;
       }
 
+      // Chess piece shortcuts
+      if (game === 'sudox_king' && (e.key === 'k' || e.key === 'K')) {
+        if (cursorR >= 0 && cursorC >= 0) {
+          writeValue(cursorR, cursorC, 1);
+        }
+        return;
+      }
+      if (game === 'sudox_queen' && (e.key === 'q' || e.key === 'Q')) {
+        if (cursorR >= 0 && cursorC >= 0) {
+          writeValue(cursorR, cursorC, 9);
+        }
+        return;
+      }
+
       // Number keys
       const max = manager.getMaxNum();
       if (/^[1-9]$/.test(e.key)) {
@@ -85,5 +101,5 @@ export function useKeyboard({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [manager, moveCursor, writeValue, eraseValue, enabled]);
+  }, [manager, moveCursor, writeValue, eraseValue, enabled, game]);
 }

@@ -64,7 +64,7 @@ export default function PrivacyPage() {
         }}
       >
         <p>
-          <strong>Last updated:</strong> July 2026
+          <strong>Last updated:</strong> September 2026
         </p>
 
         <h2
@@ -79,7 +79,7 @@ export default function PrivacyPage() {
         </h2>
         <p>
           SudoX Daily is a free puzzle game that requires{" "}
-          <strong>no account</strong> and <strong>no login</strong>. We do not
+          <strong>no account</strong> and <strong>no login</strong> to play. We do not
           collect personal information such as names, email addresses, or
           payment details.
         </p>
@@ -120,10 +120,11 @@ export default function PrivacyPage() {
           Local Storage
         </h2>
         <p>
-          Your puzzle progress, game state, and theme preference are stored
-          locally in your browser using <strong>localStorage</strong>. This data
-          never leaves your device and is not sent to our servers. Data older
-          than 7 days is automatically cleaned up.
+          Your puzzle progress, in-progress game states, timer, and theme
+          preference are stored locally in your browser using{" "}
+          <strong>localStorage</strong>. This data never leaves your device and
+          is not sent to our servers. Solved puzzles and cached puzzle boards
+          older than 7 days are automatically cleaned up.
         </p>
 
         <h2
@@ -137,9 +138,9 @@ export default function PrivacyPage() {
           Cookies
         </h2>
         <p>
-          SudoX Daily does not set any first-party cookies. Vercel Analytics may
-          use minimal, privacy-respecting techniques to measure traffic, but no
-          tracking cookies are placed.
+          SudoX Daily does not set any first-party tracking cookies. Vercel
+          Analytics uses privacy-respecting aggregate telemetry without third-party
+          cross-site tracking cookies.
         </p>
 
         <h2
@@ -154,15 +155,21 @@ export default function PrivacyPage() {
         </h2>
         <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
           <li>
-            <strong>Vercel</strong> — hosting, analytics, and speed insights
+            <strong>Vercel</strong> — hosting infrastructure, edge network, and
+            performance insights
           </li>
           <li>
-            <strong>Google Fonts</strong> — web fonts (Playfair Display, DM
+            <strong>Google Fonts</strong> — typography (Playfair Display, DM
             Sans, Courier Prime)
           </li>
           <li>
-            <strong>MongoDB Atlas</strong> — puzzle data storage (no personal
-            data stored)
+            <strong>MongoDB Atlas</strong> — daily puzzle data storage (stores
+            game matrices; no personal data stored)
+          </li>
+          <li>
+            <strong>Upstash Redis</strong> — edge rate limiting and anti-DDoS
+            protection (processes incoming IP addresses to prevent abuse without
+            permanent retention)
           </li>
         </ul>
 
@@ -194,10 +201,10 @@ export default function PrivacyPage() {
         <p>
           Questions? Mail Me at{" "}
           <a
-            href="mailto:nikhil.sudox@gmail.com"
+            href="mailto:sudoxdaily@gmail.com"
             style={{ color: "var(--primary)", textDecoration: "none" }}
           >
-            nikhil.sudox@gmail.com
+            sudoxdaily@gmail.com
           </a>
         </p>
         <p>

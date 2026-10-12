@@ -28,6 +28,7 @@ interface GridCellProps {
   borderLeft: 'outer' | 'thick' | 'thin' | 'none';
   borderRight: 'outer' | 'thick' | 'thin' | 'none';
   onClick: (r: number, c: number) => void;
+  game?: string;
 }
 
 function borderStyle(type: 'outer' | 'thick' | 'thin' | 'none'): string {
@@ -42,7 +43,7 @@ function GridCellInner({
   isCursor, isCrosshair, isActive, isAltBlock,
   isDiagonal, isWindow, isBothCell, cellSize,
   borderTop: bt, borderBottom: bb, borderLeft: bl, borderRight: br,
-  onClick,
+  onClick, game,
 }: GridCellProps) {
   if (!isActive) {
     return (
@@ -57,6 +58,10 @@ function GridCellInner({
     );
   }
 
+  const isChessPiece =
+    (game === 'sudox_king' && value === 1) ||
+    (game === 'sudox_queen' && value === 9);
+
   const classes = ['grid-cell'];
   if (isClue) classes.push('clue');
   if (isAltBlock) classes.push('alt-block');
@@ -68,8 +73,10 @@ function GridCellInner({
   if (isCorrect) classes.push('correct');
   if (wasWrong) classes.push('was-wrong');
   if (isWrong) classes.push('wrong');
+  if (isChessPiece) classes.push('chess-piece');
 
-  const ariaLabel = `Row ${row + 1}, column ${col + 1}${value ? `, value ${displayVal(value)}` : ', empty'}${isClue ? ', clue' : ''}`;
+  const formattedVal = displayVal(value, game);
+  const ariaLabel = `Row ${row + 1}, column ${col + 1}${value ? `, value ${formattedVal}` : ', empty'}${isClue ? ', clue' : ''}`;
 
   return (
     <div
@@ -80,7 +87,7 @@ function GridCellInner({
       style={{
         width: cellSize,
         height: cellSize,
-        fontSize: cellSize * 0.48,
+        fontSize: isChessPiece ? cellSize * 0.58 : cellSize * 0.48,
         borderTop: borderStyle(bt),
         borderBottom: borderStyle(bb),
         borderLeft: borderStyle(bl),
@@ -88,7 +95,7 @@ function GridCellInner({
       }}
       onClick={() => onClick(row, col)}
     >
-      {displayVal(value)}
+      {formattedVal}
     </div>
   );
 }

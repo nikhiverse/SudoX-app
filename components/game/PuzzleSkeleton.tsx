@@ -200,10 +200,13 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
           br = (c + 1) % subCols === 0 || c === totalCols - 1 ? (c === totalCols - 1 ? 'outer' : 'thick') : 'thin';
         }
 
+        const isChessGame = game === 'sudox_king' || game === 'sudox_queen';
+        const isAltCell = isChessGame && (r + c) % 2 === 1;
+
         cellArray.push(
           <div
             key={`${r}-${c}`}
-            className="skeleton-grid-cell skeleton-pulse"
+            className={`skeleton-grid-cell skeleton-pulse ${isAltCell ? 'alt-block' : ''}`}
             style={{
               width: cellSize,
               height: cellSize,
@@ -234,6 +237,8 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
     return btns;
   }, [gridSize]);
 
+  const isChess = game === 'sudox_king' || game === 'sudox_queen';
+
   return (
     <>
       {/* Skeleton Header matching PuzzleHeader layout */}
@@ -254,7 +259,7 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
       {/* Grid skeleton */}
       <div className="puzzle-output" ref={containerRef}>
         <div
-          className={`sudoku-grid ${game.startsWith('twodoku') ? 'is-twodoku' : ''}`}
+          className={`sudoku-grid ${game.startsWith('twodoku') ? 'is-twodoku' : ''} ${isChess ? 'is-chess' : ''}`}
           style={{
             gridTemplateColumns: `repeat(${totalCols}, ${cellSize}px)`,
             gridTemplateRows: `repeat(${totalRows}, ${cellSize}px)`,

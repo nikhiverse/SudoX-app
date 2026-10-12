@@ -102,6 +102,7 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
             borderLeft={borders.left}
             borderRight={borders.right}
             onClick={onCellClick}
+            game={game}
           />
         );
       }
@@ -111,12 +112,14 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manager, stateVersion, containerWidth, puzzleData, game, highlighted, onCellClick]);
 
+  const isChess = game === 'sudox_king' || game === 'sudox_queen';
+
   return (
     <div className="puzzle-output" ref={containerRef}>
       <div
         role="grid"
         aria-label="Sudoku Puzzle"
-        className={`sudoku-grid ${puzzleData.type === 'twodoku' ? 'is-twodoku' : ''}`}
+        className={`sudoku-grid ${puzzleData.type === 'twodoku' ? 'is-twodoku' : ''} ${isChess ? 'is-chess' : ''}`}
         style={{
           gridTemplateColumns: `repeat(${state.totalCols}, ${cellSize}px)`,
           gridTemplateRows: `repeat(${state.totalRows}, ${cellSize}px)`,
@@ -140,6 +143,8 @@ function computeCellFlags(
   let isDiagonal = false;
   let isWindow = false;
   let isBothCell = false;
+
+  const isChess = game === 'sudox_king' || game === 'sudox_queen';
 
   if (data.type === 'standard') {
     const d = data as StandardPuzzle;
@@ -168,7 +173,9 @@ function computeCellFlags(
     }
 
     // Alt-block (checker pattern)
-    if (altSubRows && altSubCols) {
+    if (isChess) {
+      isAltBlock = (r + c) % 2 === 1;
+    } else if (altSubRows && altSubCols) {
       isAltBlock = (Math.floor(r / altSubRows) + Math.floor(c / altSubCols)) % 2 === 0;
     } else if (!diagonals && !windows) {
       isAltBlock = (Math.floor(r / subRows) + Math.floor(c / subCols)) % 2 === 1;

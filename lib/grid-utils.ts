@@ -5,19 +5,25 @@
 /**
  * Convert numeric value to display character.
  * 0 → "", 1-9 → "1"-"9", 10+ → "A", "B", "C" …
+ * In sudox_king, 1 is rendered as ♔ (King).
+ * In sudox_queen, 9 is rendered as ♕ (Queen).
  */
-export function displayVal(v: number): string {
+export function displayVal(v: number, game?: string): string {
   if (v === 0) return '';
+  if (game === 'sudox_king' && v === 1) return '♔';
+  if (game === 'sudox_queen' && v === 9) return '♕';
   if (v <= 9) return String(v);
   return String.fromCharCode(65 + v - 10); // 10→A, 11→B, 12→C …
 }
 
 /**
  * Parse a display character back to its numeric value.
- * "" or undefined → 0, "1"-"9" → 1-9, "A"/"a" → 10
+ * "" or undefined → 0, "1"-"9" → 1-9, "A"/"a" → 10, "♔" → 1, "♕" → 9
  */
 export function parseVal(ch: string | undefined): number {
   if (!ch) return 0;
+  if (ch === '♔') return 1;
+  if (ch === '♕') return 9;
   const n = parseInt(ch, 10);
   if (!isNaN(n)) return n;
   return ch.toUpperCase().charCodeAt(0) - 65 + 10; // A→10

@@ -288,7 +288,9 @@ function _drawGrid(
         }
       }
 
-      doc.text(val, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
+      // Map unicode chess piece glyphs to crisp ASCII letters for standard PDF font rendering
+      const printVal = val === '♔' ? 'K' : val === '♕' ? 'Q' : val;
+      doc.text(printVal, x + cellMM / 2, y + cellMM * 0.63, { align: "center" });
     }
   }
 

@@ -151,7 +151,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     {
       label: "Mail Me",
       icon: icons.reachout,
-      href: "mailto:nikhil.sudox@gmail.com",
+      href: "mailto:sudoxdaily@gmail.com",
     },
     { label: "Follow Us", icon: icons.follow, action: "follow" },
     { label: "Login", icon: icons.login, action: "login" },
@@ -164,7 +164,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     {
       label: "Mail Me",
       icon: icons.reachout,
-      href: "mailto:nikhil.sudox@gmail.com",
+      href: "mailto:sudoxdaily@gmail.com",
     },
     { label: "Follow Us", icon: icons.follow, action: "follow" },
     { label: "Login", icon: icons.login, action: "login" },

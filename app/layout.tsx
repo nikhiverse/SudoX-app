@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ClientDateDisplay } from '@/components/layout/ClientDateDisplay';
 import { ClientHamburgerButton } from '@/components/layout/ClientHamburgerButton';
+import { PrimaryNav } from '@/components/layout/PrimaryNav';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -108,11 +109,21 @@ export default function RootLayout({
             <Image src="/favicon.png" alt="SudoX Daily Logo" width={28} height={28} style={{ borderRadius: '6px' }} />
             <span className="topbar-name">SudoX Daily</span>
           </div>
+
+          {/* Desktop nav — centred absolutely so the countdown never shifts it */}
+          <PrimaryNav variant="desktop" />
+
           <div className="topbar-right">
-            <ClientDateDisplay />
+            {/* Date / countdown — visible on both computer and mobile topbar */}
+            <div className="topbar-date-wrap">
+              <ClientDateDisplay />
+            </div>
             <ClientHamburgerButton />
           </div>
         </header>
+
+        {/* Mobile tab row — shown only on small screens, stacks below the topbar */}
+        <PrimaryNav variant="mobile" />
 
         {/* ── MAIN CONTENT ── */}
         <main className="container">{children}</main>

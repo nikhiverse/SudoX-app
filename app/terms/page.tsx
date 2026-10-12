@@ -195,10 +195,10 @@ export default function TermsPage() {
         <p>
           Questions? Mail Me at{" "}
           <a
-            href="mailto:nikhil.sudox@gmail.com"
+            href="mailto:sudoxdaily@gmail.com"
             style={{ color: "var(--primary)", textDecoration: "none" }}
           >
-            nikhil.sudox@gmail.com
+            sudoxdaily@gmail.com
           </a>
         </p>
         <p>

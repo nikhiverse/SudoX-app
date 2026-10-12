@@ -28,6 +28,10 @@
   --grid-alt-cell: #b45309;
   /*#fef3c7*/
 
+  /* Chess-themed board tokens (SudoX King & Queen) */
+  --chess-cell-light: #fffdf8;
+  --chess-cell-dark: #ecd9ba;
+
   /* Playability */
   --cursor-bg: #81c784;
   --cursor-text: #2d2a24;
@@ -88,6 +92,10 @@
     /* Deep black for empty cells */
     --grid-alt-cell: #f97316;
     /* Slightly lighter for textured grid */
+
+    /* Chess-themed board tokens (Dark Mode) */
+    --chess-cell-light: #24221f;
+    --chess-cell-dark: #121110;
 
     --cursor-bg: #81c784;
     --cursor-text: #000000;
@@ -222,6 +230,10 @@
   --grid-bg: #2d2a24;
   --grid-cell-bg: #fffdf8;
   --grid-alt-cell: #b45309;
+
+  /* Chess-themed board tokens */
+  --chess-cell-light: #fffdf8;
+  --chess-cell-dark: #ecd9ba;
 
   /* Playability */
   --cursor-bg: #81c784;
@@ -749,6 +761,35 @@ img {
 
 .grid-cell.alt-block {
   background: var(--grid-alt-cell);
+}
+
+/* ─── CHESS-THEMED GRIDS (SudoX King & SudoX Queen) ─── */
+.sudoku-grid.is-chess .grid-cell {
+  background-color: var(--chess-cell-light);
+}
+
+.sudoku-grid.is-chess .grid-cell.alt-block {
+  background-color: var(--chess-cell-dark);
+}
+
+.sudoku-grid.is-chess .skeleton-grid-cell {
+  background-color: var(--chess-cell-light);
+}
+
+.sudoku-grid.is-chess .skeleton-grid-cell.alt-block {
+  background-color: var(--chess-cell-dark);
+}
+
+.grid-cell.chess-piece {
+  font-family: "Courier Prime", "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", monospace;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.num-btn--chess {
+  font-family: "Courier Prime", "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", monospace;
+  font-size: 21px !important;
+  line-height: 1;
 }
 
 .grid-cell.diagonal-cell {
@@ -1552,4 +1593,949 @@ footer a:hover {
   align-items: center;
   justify-content: center;
   margin: 0;
+}
+
+/* ═══════════════════════════════════════════
+   PRIMARY NAVIGATION — DESKTOP
+   Centred absolutely inside the sticky topbar
+   so the countdown width-change on the right
+   never shifts the nav geometrically.
+   ═══════════════════════════════════════════ */
+
+/* Give the topbar a positioning context for the absolutely-centred nav */
+.topbar {
+  position: sticky; /* already in base rule; restated for clarity */
+}
+
+.topbar-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: stretch;   /* tabs fill full topbar height for bigger click target */
+  gap: 2px;
+  height: 100%;           /* stretches to topbar height (60px) */
+  pointer-events: auto;
+}
+
+/* Individual tab link */
+.nav-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 6px;
+  transition:
+    color 0.15s var(--ease-out),
+    background-color 0.15s var(--ease-out);
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Orange underline — slides in when active */
+.nav-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 1px 1px 0 0;
+  opacity: 0;
+  transform: scaleX(0.5);
+  transform-origin: center;
+  transition:
+    opacity 0.15s var(--ease-out),
+    transform 0.2s var(--ease-out);
+}
+
+.nav-tab:hover {
+  color: var(--text-primary);
+  background-color: var(--surface-raised);
+}
+
+.nav-tab--active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nav-tab--active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.nav-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+/* ── Date/countdown wrapper — hidden on mobile ── */
+.topbar-date-wrap {
+  display: flex;
+  align-items: center;
+}
+
+/* ═══════════════════════════════════════════
+   PRIMARY NAVIGATION — MOBILE
+   Full-width tab row that stacks below the
+   sticky topbar on small screens.
+   ═══════════════════════════════════════════ */
+
+/* Hidden on desktop; shown via media query below */
+.mobile-nav-row {
+  display: none;
+  width: 100%;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-soft);
+  position: sticky;
+  top: 54px; /* matches mobile topbar height */
+  z-index: 19;
+}
+
+.mobile-nav-inner {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-nav-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-nav-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  min-height: 44px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s var(--ease-out),
+    border-color 0.15s var(--ease-out);
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mobile-nav-tab--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+.mobile-nav-tab:hover:not(.mobile-nav-tab--active) {
+  color: var(--text-primary);
+}
+
+.mobile-nav-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* ═══════════════════════════════════════════
+   TODAY PAGE — PLACEHOLDER SECTIONS
+   ═══════════════════════════════════════════ */
+
+.today-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.today-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Section label: small uppercase sans-serif, same as existing .menu-eyebrow style */
+.today-section-title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Dashed placeholder card */
+.today-section-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  background: var(--surface-card);
+  border: 1px dashed var(--border-mid);
+  border-radius: 10px;
+}
+
+.today-section-placeholder--link {
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.15s var(--ease-out),
+    box-shadow 0.15s var(--ease-out),
+    transform 0.15s var(--ease-out);
+}
+
+.today-section-placeholder--link:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.today-section-placeholder--link:hover .today-section-placeholder-label {
+  color: var(--primary);
+}
+
+.today-section-placeholder--link:active {
+  transform: translateY(0);
+}
+
+.today-section-placeholder--link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.today-section-placeholder-label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 0.15s var(--ease-out);
+}
+
+/* ═══════════════════════════════════════════
+   SEASON / GENERIC PLACEHOLDER PAGE
+   ═══════════════════════════════════════════ */
+
+.placeholder-page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.placeholder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  background: var(--surface-card);
+  border: 1px dashed var(--border-mid);
+  border-radius: 12px;
+  gap: 8px;
+}
+
+.placeholder-card-label {
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.placeholder-card-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE OVERRIDES — PRIMARY NAV
+   ═══════════════════════════════════════════ */
+
+/* Tablet and below: hide desktop centred nav, show mobile tab row */
+@media (max-width: 768px) {
+  .topbar-nav {
+    display: none;
+  }
+
+  .mobile-nav-row {
+    display: block;
+    top: 60px; /* tablet topbar stays at 60px */
+  }
+}
+
+/* Small phones: display date in topbar matching computer UI */
+@media (max-width: 520px) {
+  .topbar-date-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .topbar-brand {
+    gap: 8px;
+  }
+
+  .mobile-nav-row {
+    top: 54px; /* mobile topbar height */
+  }
+}
+
+@media (max-width: 360px) {
+  .topbar {
+    padding: 0 10px;
+  }
+
+  .topbar-name {
+    font-size: 15px;
+  }
+
+  .topbar-date {
+    font-size: 11px;
+  }
+}
+
+/* Reduced motion: disable nav-tab slide-in animation */
+@media (prefers-reduced-motion: reduce) {
+  .nav-tab::after {
+    transition: none;
+  }
+  .nav-tab,
+  .mobile-nav-tab {
+    transition: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TODAY PAGE — Dashboard Layout & Components
+   All tokens build on the existing :root design system.
+   Zero existing rules are modified below this line.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Today-specific palette tokens (light mode defaults) ── */
+:root {
+  /* Featured card — pale champagne gold */
+  --featured-bg:          #FFF8DF;
+  --featured-border:      #D3B44A;
+  --featured-shadow:      rgba(211, 180, 74, 0.15);
+  --featured-play-bg:     #D4B238;
+  --featured-play-hover:  #BFA030;
+  --featured-thumb-line:  rgba(211, 180, 74, 0.45);
+  --featured-thumb-cell:  #FFFAEA;
+
+  /* New Game CTA — pale blue */
+  --new-game-bg:      #E8F4FF;
+  --new-game-border:  #5AAAE6;
+  --new-game-hover:   #D6ECF9;
+  --new-game-shadow:  rgba(90, 170, 230, 0.15);
+}
+
+/* ── Dark mode (prefers-color-scheme) ── */
+@media (prefers-color-scheme: dark) {
+  :root:not(.force-light) {
+    --featured-bg:          #2A2415;
+    --featured-border:      #7A6424;
+    --featured-shadow:      rgba(122, 100, 36, 0.22);
+    --featured-play-bg:     #8A7020;
+    --featured-play-hover:  #6E5A18;
+    --featured-thumb-line:  rgba(122, 100, 36, 0.55);
+    --featured-thumb-cell:  #1E1B0E;
+
+    --new-game-bg:      #0E1F30;
+    --new-game-border:  #2A6FA8;
+    --new-game-hover:   #162B40;
+    --new-game-shadow:  rgba(42, 111, 168, 0.22);
+  }
+}
+
+/* ── Force dark mode ── */
+:root.force-dark {
+  --featured-bg:          #2A2415;
+  --featured-border:      #7A6424;
+  --featured-shadow:      rgba(122, 100, 36, 0.22);
+  --featured-play-bg:     #8A7020;
+  --featured-play-hover:  #6E5A18;
+  --featured-thumb-line:  rgba(122, 100, 36, 0.55);
+  --featured-thumb-cell:  #1E1B0E;
+
+  --new-game-bg:      #0E1F30;
+  --new-game-border:  #2A6FA8;
+  --new-game-hover:   #162B40;
+  --new-game-shadow:  rgba(42, 111, 168, 0.22);
+}
+
+/* ── Widen the container only for the Today dashboard ── */
+/* :has() is supported in Chrome 105+, Firefox 121+, Safari 15.4+ */
+.container:has(.today-page) {
+  max-width: 1140px;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* ── TODAY PAGE WRAPPER ── */
+.today-page {
+  width: 100%;
+}
+
+/* ════════════════════════════════════════
+   HERO HEADING
+   ════════════════════════════════════════ */
+.today-hero {
+  text-align: center;
+  padding-bottom: 36px;
+}
+
+.today-hero-eyebrow {
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.today-hero-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.today-hero-date {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.today-hero-rule {
+  width: 40px;
+  height: 1px;
+  background: var(--border-mid);
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════
+   FEATURED ROW
+   ════════════════════════════════════════ */
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 56px;
+}
+
+/* ── Featured Card ── */
+.featured-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 20px;
+  background: var(--featured-bg);
+  border: 1px solid var(--featured-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px var(--featured-shadow);
+}
+
+.featured-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.featured-card-category {
+  font-family: "DM Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--featured-border);
+  margin-bottom: 8px;
+}
+
+.featured-card-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(20px, 2.8vw, 28px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+.featured-card-description {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.featured-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: var(--featured-play-bg);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.15s var(--ease-out),
+    transform 0.15s var(--ease-out),
+    box-shadow 0.15s var(--ease-out);
+  min-height: 40px;
+}
+
+.featured-play:hover {
+  background: var(--featured-play-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px var(--featured-shadow);
+}
+
+.featured-play:active {
+  transform: translateY(0);
+}
+
+.featured-play:focus-visible {
+  outline: 2px solid var(--featured-border);
+  outline-offset: 2px;
+}
+
+.featured-card-preview {
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════
+   GRID THUMBNAIL
+   (CSS gap trick: gap between cells is the "grid line" color)
+   ════════════════════════════════════════ */
+.grid-thumb {
+  display: grid;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.grid-thumb--featured {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--featured-thumb-line);
+  border: 1px solid var(--featured-thumb-line);
+  width: 96px;
+  height: 96px;
+}
+
+.grid-thumb--card {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border-mid);
+  border: 1px solid var(--border-mid);
+  width: 56px;
+  height: 56px;
+}
+
+.grid-thumb-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-thumb--featured .grid-thumb-cell {
+  background: var(--featured-thumb-cell);
+}
+
+.grid-thumb--card .grid-thumb-cell {
+  background: var(--surface-card);
+}
+
+.grid-thumb-num {
+  font-family: "Courier Prime", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+  user-select: none;
+}
+
+/* ════════════════════════════════════════
+   PUZZLE SECTIONS (Minis / Classic / Royale)
+   ════════════════════════════════════════ */
+.puzzle-section {
+  margin-bottom: 52px;
+}
+
+.puzzle-section-header {
+  margin-bottom: 14px;
+}
+
+.puzzle-section-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(22px, 2.8vw, 28px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.puzzle-section-subtitle {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.puzzle-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+/* ── Puzzle Card ── */
+.puzzle-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  min-height: 76px;
+  transition:
+    border-color 0.15s var(--ease-out),
+    box-shadow 0.15s var(--ease-out),
+    transform 0.15s var(--ease-out);
+}
+
+.puzzle-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.puzzle-card:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.puzzle-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.puzzle-card-preview {
+  flex-shrink: 0;
+}
+
+.puzzle-card-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.puzzle-card-name {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.puzzle-card-size {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-card-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-mid);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition:
+    border-color 0.15s var(--ease-out),
+    color 0.15s var(--ease-out),
+    background-color 0.15s var(--ease-out);
+}
+
+.puzzle-card:hover .puzzle-card-action {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--surface-raised);
+}
+
+/* ════════════════════════════════════════
+   NEW GAME CTA
+   ════════════════════════════════════════ */
+.new-game-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  margin-bottom: 48px;
+}
+
+.new-game-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 22px 32px;
+  background: var(--new-game-bg);
+  border: 1px solid var(--new-game-border);
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 2px 10px var(--new-game-shadow);
+  transition:
+    background-color 0.15s var(--ease-out),
+    box-shadow 0.15s var(--ease-out),
+    transform 0.15s var(--ease-out);
+}
+
+.new-game-cta:hover {
+  background: var(--new-game-hover);
+  box-shadow: 0 4px 16px var(--new-game-shadow);
+  transform: translateY(-1px);
+}
+
+.new-game-cta:active {
+  transform: translateY(0);
+}
+
+.new-game-cta:focus-visible {
+  outline: 2px solid var(--new-game-border);
+  outline-offset: 2px;
+}
+
+.new-game-icon {
+  display: flex;
+  align-items: center;
+  color: var(--new-game-border);
+  flex-shrink: 0;
+}
+
+.new-game-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.new-game-title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.new-game-sub {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ════════════════════════════════════════
+   EDITORIAL CLOSING
+   ════════════════════════════════════════ */
+.today-closing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 4px 0 28px;
+}
+
+.today-closing-rule {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--border-mid);
+  flex-shrink: 0;
+}
+
+.today-closing-quote {
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TODAY PAGE — RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Widen the container padding for the Today dashboard */
+@media (max-width: 768px) {
+  .container:has(.today-page) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 430px) {
+  .container:has(.today-page) {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+/* ── Tablet (768px – 1023px) ── */
+@media (max-width: 1023px) {
+  .featured-grid {
+    gap: 14px;
+  }
+
+  .puzzle-card-grid {
+    gap: 10px;
+  }
+}
+
+/* ── Below 768px: stack featured, 2-col puzzle cards ── */
+@media (max-width: 767px) {
+  .featured-grid {
+    grid-template-columns: 1fr;
+    margin-bottom: 44px;
+  }
+
+  .featured-card {
+    padding: 18px 18px 16px;
+  }
+
+  .featured-card-title {
+    font-size: 22px;
+  }
+
+  .puzzle-card-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .puzzle-section {
+    margin-bottom: 40px;
+  }
+
+  .today-hero {
+    padding-bottom: 28px;
+  }
+
+  .new-game-wrap {
+    margin-top: 44px;
+    margin-bottom: 36px;
+  }
+
+  .new-game-cta {
+    max-width: 100%;
+  }
+}
+
+/* ── Below 520px: 1-col puzzle cards ── */
+@media (max-width: 519px) {
+  .puzzle-card-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .puzzle-section {
+    margin-bottom: 36px;
+  }
+
+  .featured-grid {
+    margin-bottom: 36px;
+  }
+
+  .grid-thumb--featured {
+    width: 76px;
+    height: 76px;
+  }
+
+  .new-game-cta {
+    padding: 18px 20px;
+  }
+
+  .new-game-title {
+    font-size: 16px;
+  }
+}
+
+/* ── Small phones (≤430px) ── */
+@media (max-width: 430px) {
+  .today-hero-title {
+    font-size: 28px;
+  }
+
+  .puzzle-card {
+    padding: 12px 14px;
+    min-height: 68px;
+  }
+
+  .grid-thumb--card {
+    width: 48px;
+    height: 48px;
+  }
+
+  .grid-thumb--featured {
+    width: 72px;
+    height: 72px;
+  }
+
+  .today-closing-quote {
+    font-size: 12px;
+    white-space: normal;
+  }
+
+  .today-closing-rule {
+    width: 24px;
+  }
+}
+
+/* ── prefers-reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .featured-play,
+  .puzzle-card,
+  .new-game-cta {
+    transition: none;
+  }
+
+  .featured-play:hover,
+  .puzzle-card:hover,
+  .new-game-cta:hover {
+    transform: none;
+  }
 }

@@ -349,6 +349,7 @@ function GameActive({
     writeValue: wrappedWriteValue,
     eraseValue: wrappedEraseValue,
     enabled: !gameIsLocked,
+    game,
   });
 
   const handleCellClick = useCallback((r: number, c: number) => {
@@ -415,6 +416,7 @@ function GameActive({
           stateVersion={stateVersion}
           onNumberClick={handleNumberClick}
           onErase={handleErase}
+          game={game}
         />
       )}
 
