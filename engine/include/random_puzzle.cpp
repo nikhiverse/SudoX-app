@@ -18,6 +18,8 @@ public:
     int* gridMap = nullptr;
     int* altGridMap = nullptr;
     bool* activeMap = nullptr;
+    const CustomWindow* customWindows = nullptr;
+    int numCustomWindows = 0;
     std::function<bool(const int*, const PuzzleConfig&)> customConstraints = nullptr;
 
 private:
@@ -59,7 +61,14 @@ private:
                         if (r == c) diag1Count++;
                         if (r + c == SIZE - 1) diag2Count++;
                     }
-                    if (config.check_windows) {
+                    if (customWindows && numCustomWindows > 0) {
+                        for (int w = 0; w < numCustomWindows; w++) {
+                            if (r >= customWindows[w].r1 && r <= customWindows[w].r2 &&
+                                c >= customWindows[w].c1 && c <= customWindows[w].c2) {
+                                winCounts[w]++;
+                            }
+                        }
+                    } else if (config.check_windows) {
                         const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                         for (int w = 0; w < 4; w++) {
                             if (r >= windows[w].first && r < windows[w].first + 3 &&
@@ -136,6 +145,10 @@ public:
         checker.activeMap = this->activeMap;
         checker.check_diagonals = config.check_diagonals;
         checker.check_windows = config.check_windows;
+        checker.check_king = config.check_king;
+        checker.check_queens = config.check_queens;
+        checker.customWindows = this->customWindows;
+        checker.numCustomWindows = this->numCustomWindows;
 
         while (attempts < 250) {
             attempts++;
@@ -152,7 +165,10 @@ public:
                 }
             }
 
-            int currentClues = SIZE * SIZE;
+            int currentClues = 0;
+            for (int i = 0; i < SIZE * SIZE; i++) {
+                if (board[i] != 0 && (!activeMap || activeMap[i])) currentClues++;
+            }
             int stuckCount = 0;
 
             // Jab tak clues desired number se zyada hain, hum cells hataane ki koshish karenge
@@ -173,7 +189,14 @@ public:
                                 if (r == c) diag1Count++;
                                 if (r + c == SIZE - 1) diag2Count++;
                             }
-                            if (config.check_windows) {
+                            if (customWindows && numCustomWindows > 0) {
+                                for (int w = 0; w < numCustomWindows; w++) {
+                                    if (r >= customWindows[w].r1 && r <= customWindows[w].r2 &&
+                                        c >= customWindows[w].c1 && c <= customWindows[w].c2) {
+                                        winCounts[w]++;
+                                    }
+                                }
+                            } else if (config.check_windows) {
                                 const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                                 for (int w = 0; w < 4; w++) {
                                     if (r >= windows[w].first && r < windows[w].first + 3 &&
@@ -199,7 +222,13 @@ public:
                                 if (r == c && diag1Count <= target_d1) can_remove = false;
                                 if (r + c == SIZE - 1 && diag2Count <= target_d2) can_remove = false;
                             }
-                            if (can_remove && config.check_windows) {
+                            if (can_remove && customWindows && numCustomWindows > 0) {
+                                for (int w = 0; w < numCustomWindows; w++) {
+                                    if (r >= customWindows[w].r1 && r <= customWindows[w].r2 && c >= customWindows[w].c1 && c <= customWindows[w].c2) {
+                                        if (winCounts[w] <= min_win) can_remove = false;
+                                    }
+                                }
+                            } else if (can_remove && config.check_windows) {
                                 const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                                 for (int w = 0; w < 4; w++) {
                                     if (r >= windows[w].first && r < windows[w].first + 3 && c >= windows[w].second && c < windows[w].second + 3) {
@@ -227,7 +256,12 @@ public:
                         if (rB == cB) scoreB += diag1Count;
                         if (rB + cB == SIZE - 1) scoreB += diag2Count;
                     }
-                    if (config.check_windows) {
+                    if (customWindows && numCustomWindows > 0) {
+                        for (int w = 0; w < numCustomWindows; w++) {
+                            if (rA >= customWindows[w].r1 && rA <= customWindows[w].r2 && cA >= customWindows[w].c1 && cA <= customWindows[w].c2) scoreA += winCounts[w];
+                            if (rB >= customWindows[w].r1 && rB <= customWindows[w].r2 && cB >= customWindows[w].c1 && cB <= customWindows[w].c2) scoreB += winCounts[w];
+                        }
+                    } else if (config.check_windows) {
                         const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                         for (int w = 0; w < 4; w++) {
                             if (rA >= windows[w].first && rA < windows[w].first + 3 && cA >= windows[w].second && cA < windows[w].second + 3) scoreA += winCounts[w];

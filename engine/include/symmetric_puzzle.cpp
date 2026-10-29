@@ -117,6 +117,8 @@ public:
         checker.activeMap = this->activeMap;
         checker.check_diagonals = config.check_diagonals;
         checker.check_windows = config.check_windows;
+        checker.check_king = config.check_king;
+        checker.check_queens = config.check_queens;
 
         while (attempts < 1000) {
             attempts++;

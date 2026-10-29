@@ -29,6 +29,7 @@ interface GridCellProps {
   borderRight: 'outer' | 'thick' | 'thin' | 'none';
   onClick: (r: number, c: number) => void;
   game?: string;
+  cageSum?: number;
 }
 
 function borderStyle(type: 'outer' | 'thick' | 'thin' | 'none'): string {
@@ -43,7 +44,7 @@ function GridCellInner({
   isCursor, isCrosshair, isActive, isAltBlock,
   isDiagonal, isWindow, isBothCell, cellSize,
   borderTop: bt, borderBottom: bb, borderLeft: bl, borderRight: br,
-  onClick, game,
+  onClick, game, cageSum,
 }: GridCellProps) {
   if (!isActive) {
     return (
@@ -60,7 +61,8 @@ function GridCellInner({
 
   const isChessPiece =
     (game === 'sudox_king' && value === 1) ||
-    (game === 'sudox_queen' && value === 9);
+    (game === 'sudox_queen' && value === 9) ||
+    (game === 'sudox_royal' && (value === 1 || value === 9));
 
   const classes = ['grid-cell'];
   if (isClue) classes.push('clue');
@@ -85,6 +87,7 @@ function GridCellInner({
       aria-selected={isCursor}
       className={classes.join(' ')}
       style={{
+        position: 'relative',
         width: cellSize,
         height: cellSize,
         fontSize: isChessPiece ? cellSize * 0.58 : cellSize * 0.48,
@@ -95,6 +98,24 @@ function GridCellInner({
       }}
       onClick={() => onClick(row, col)}
     >
+      {cageSum !== undefined && (
+        <span
+          className="cage-sum"
+          style={{
+            position: 'absolute',
+            top: 2,
+            left: 3,
+            fontSize: Math.max(9, Math.round(cellSize * 0.24)),
+            lineHeight: 1,
+            fontWeight: 700,
+            opacity: 0.85,
+            color: 'var(--text-muted, #94a3b8)',
+            pointerEvents: 'none',
+          }}
+        >
+          {cageSum}
+        </span>
+      )}
       {formattedVal}
     </div>
   );

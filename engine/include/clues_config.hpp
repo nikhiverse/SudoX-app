@@ -143,6 +143,8 @@ struct PuzzleConfig {
   int max_per_window;
   bool check_windows;
   bool exact_window;
+  bool check_king = false;
+  bool check_queens = false;
 };
 
 // ==========================================
@@ -153,9 +155,118 @@ struct PuzzleConfig {
 const PuzzleConfig SUDOKU_EASY_CONFIG = {45,    5,     5, 5,     9,
                                          false, false, 9, false, false};
 
-// Sudoku 9: 9x9 puzzle. Total clues = 36, max per row/col/grid = 5
-const PuzzleConfig SUDOKU_9_CONFIG = {36,    5,     5, 5,     9,
+// Sudoku 9: 9x9 puzzle. Total clues = 40, max per row/col/grid = 5
+const PuzzleConfig SUDOKU_9_CONFIG = {40,    5,     5, 5,     9,
                                       false, false, 9, false, false};
+
+// Sudoku Medium: 9x9 puzzle. Total clues = 36, max per row/col/grid = 5
+const PuzzleConfig SUDOKU_MEDIUM_CONFIG = {36,    5,     5, 5,     9,
+                                           false, false, 9, false, false};
+
+// Sudoku Hard: 9x9 puzzle. Total clues = 27, max per row/col/grid = 4
+const PuzzleConfig SUDOKU_HARD_CONFIG = {27,    4,     4, 4,     9,
+                                         false, false, 9, false, false};
+
+// Sudoku A: 9x9 puzzle. Total clues = 18, max per row/col/grid = 4
+const PuzzleConfig SUDOKU_A_CONFIG = {18,    4,     4, 4,     9,
+                                      false, false, 9, false, false};
+
+inline const PuzzleConfig &getSudokuEasyConfig() { return SUDOKU_EASY_CONFIG; }
+inline const PuzzleConfig &getSudoku9Config() { return SUDOKU_9_CONFIG; }
+inline const PuzzleConfig &getSudokuMediumConfig() { return SUDOKU_MEDIUM_CONFIG; }
+inline const PuzzleConfig &getSudokuHardConfig() { return SUDOKU_HARD_CONFIG; }
+inline const PuzzleConfig &getSudokuAConfig() { return SUDOKU_A_CONFIG; }
+
+// Crossdoku: 9x9 puzzle with bishop-diagonal + 3x3 box constraints. Total clues = 40, max per row/col/grid = 5
+const PuzzleConfig CROSSDOKU_CONFIG = {40,    5,     5, 5,     9,
+                                       false, false, 9, false, false};
+
+// Sudoku Centroid: 9x9 puzzle. Total clues = 30-38 (dynamic), max per row/col/grid = 5.
+// Clues are never placed in the center cell of each 3x3 subgrid.
+inline const PuzzleConfig &getSudokuCentroidConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("sudoku_centroid", 30, 38),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false};
+  return config;
+}
+#define SUDOKU_CENTROID_CONFIG getSudokuCentroidConfig()
+
+// Twodoku 6 Jigsaw: Overlapping 6x6 jigsaw grids. Total clues = 18-28, max per row/col/group = 3
+inline const PuzzleConfig &getTwodoku6JigsawConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku6_jigsaw", 18, 28),
+                   3,
+                   3,
+                   3,
+                   6,
+                   false,
+                   false,
+                   6,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU6_JIGSAW_CONFIG getTwodoku6JigsawConfig()
+
+// Twodoku 8 Jigsaw: Overlapping 8x8 jigsaw grids. Total clues = 54-62, max per row/col/group = 4
+inline const PuzzleConfig &getTwodoku8JigsawConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku8_jigsaw", 54, 62),
+                   4,
+                   4,
+                   4,
+                   8,
+                   false,
+                   false,
+                   8,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU8_JIGSAW_CONFIG getTwodoku8JigsawConfig()
+
+// Twodoku 9 Jigsaw: Overlapping 9x9 jigsaw grids. Total clues = 72-81, max per row/col/group = 5
+inline const PuzzleConfig &getTwodoku9JigsawConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku9_jigsaw", 72, 81),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU9_JIGSAW_CONFIG getTwodoku9JigsawConfig()
+
+// Killer Sudoku: 9x9 puzzle with cages of size 2..6.
+// Total clues = 16-24 (dynamic), max per row/col/grid = 5
+inline const PuzzleConfig &getKillerSudokuConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("killer_sudoku", 16, 24),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false};
+  return config;
+}
+#define KILLER_SUDOKU_CONFIG getKillerSudokuConfig()
 
 // ==========================================
 // DYNAMIC CONFIGURATIONS (Macro Definitions)
@@ -177,23 +288,6 @@ inline const PuzzleConfig &getSudokuMiniConfig() {
   return config;
 }
 #define SUDOKU_MINI_CONFIG getSudokuMiniConfig()
-
-// Sudoku A: 9x9 puzzle.
-inline const PuzzleConfig &getSudokuAConfig() {
-  static const PuzzleConfig config =
-      PuzzleConfig{getRandomClues("sudoku_a", 18, 27),
-                   4,
-                   4,
-                   4,
-                   9,
-                   false,
-                   false,
-                   9,
-                   false,
-                   false};
-  return config;
-}
-#define SUDOKU_A_CONFIG getSudokuAConfig()
 
 // Sudoku X: 9x9 puzzle.
 inline const PuzzleConfig &getSudokuXConfig() {
@@ -398,5 +492,201 @@ inline const PuzzleConfig &getTwodoku9Config() {
   return config;
 }
 #define TWODOKU_9_CONFIG getTwodoku9Config()
+
+// Twodoku 84: 8x8 grids with 2x2 overlap.
+inline const PuzzleConfig &getTwodoku84Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku84", 54, 62),
+                   5,
+                   5,
+                   5,
+                   8,
+                   false,
+                   false,
+                   8,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU_84_CONFIG getTwodoku84Config()
+
+// Twodoku 86: 8x8 and 6x6 hybrid grids with 2x2 overlap.
+inline const PuzzleConfig &getTwodoku86Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku86", 40, 48),
+                   5,
+                   5,
+                   5,
+                   8,
+                   false,
+                   false,
+                   8,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU_86_CONFIG getTwodoku86Config()
+
+// Twodoku 89: 8x8 grids with 3x3 overlap.
+inline const PuzzleConfig &getTwodoku89Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku89", 52, 60),
+                   5,
+                   5,
+                   5,
+                   8,
+                   false,
+                   false,
+                   8,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU_89_CONFIG getTwodoku89Config()
+
+// Twodoku 98: 9x9 and 8x8 hybrid grids with 2x2 overlap.
+inline const PuzzleConfig &getTwodoku98Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("twodoku98", 61, 70),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false};
+  return config;
+}
+#define TWODOKU_98_CONFIG getTwodoku98Config()
+
+// SudoX King: 9x9 puzzle.
+inline const PuzzleConfig &getSudoXKingConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("sudox_king", 28, 40),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false,
+                   true,
+                   false};
+  return config;
+}
+#define SUDOX_KING_CONFIG getSudoXKingConfig()
+
+// SudoX Queen: 9x9 puzzle.
+inline const PuzzleConfig &getSudoXQueenConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("sudox_queen", 28, 40),
+                   5,
+                   5,
+                   5,
+                   5,
+                   true,
+                   false,
+                   9,
+                   false,
+                   false,
+                   false,
+                   true};
+  return config;
+}
+#define SUDOX_QUEEN_CONFIG getSudoXQueenConfig()
+
+// SudoX Royal: 9x9 puzzle. Total clues = 28-38, max per row/col/subgrid = 5.
+inline const PuzzleConfig &getSudoXRoyalConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("sudox_royal", 28, 38),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   9,
+                   false,
+                   false,
+                   true,
+                   true};
+  return config;
+}
+#define SUDOX_ROYAL_CONFIG getSudoXRoyalConfig()
+
+// Jigsaw Mini: 6x6 puzzle.
+inline const PuzzleConfig &getJigsawMiniConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("jigsaw_mini", 10, 15),
+                   3,
+                   3,
+                   3,
+                   6,
+                   false,
+                   false,
+                   6,
+                   false,
+                   false};
+  return config;
+}
+#define JIGSAW_MINI_CONFIG getJigsawMiniConfig()
+
+// Windoku 6: 9x9 puzzle with four 6-cell windows (2x3 and 3x2).
+// Total clues = 32-40, max per row/col/grid = 5, max per window = 3
+inline const PuzzleConfig &getWindoku6Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("windoku6", 32, 40),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   3,
+                   true,
+                   false};
+  return config;
+}
+#define WINDOKU6_CONFIG getWindoku6Config()
+
+// Windoku 8: 9x9 puzzle with four 8-cell pinwheel windows (2x4 and 4x2).
+// Total clues = 32-40, max per row/col/grid = 5, max per window = 4
+inline const PuzzleConfig &getWindoku8Config() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("windoku8", 32, 40),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   4,
+                   true,
+                   false};
+  return config;
+}
+#define WINDOKU8_CONFIG getWindoku8Config()
+
+// Windoku Mixed: 9x9 puzzle with four mixed windows (4x2, 2x4, 3x3, 2x3).
+// Total clues = 32-40, max per row/col/grid = 5, default window max = 4
+inline const PuzzleConfig &getWindokuMixedConfig() {
+  static const PuzzleConfig config =
+      PuzzleConfig{getRandomClues("windoku_mixed", 32, 40),
+                   5,
+                   5,
+                   5,
+                   9,
+                   false,
+                   false,
+                   4,
+                   true,
+                   false};
+  return config;
+}
+#define WINDOKU_MIXED_CONFIG getWindokuMixedConfig()
 
 #endif

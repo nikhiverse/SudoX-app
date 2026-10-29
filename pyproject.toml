@@ -1,0 +1,9 @@
+[tool.pyrefly]
+search-path = [
+  "C:/Users/ASUS/AppData/Local/Programs/Python/Python39/Lib/site-packages",
+  "C:/Users/ASUS/anaconda3/Lib/site-packages"
+]
+ignore-missing-imports = ["pymongo.*", "PIL.*"]
+
+[tool.pyrefly.errors]
+missing-import = "ignore"

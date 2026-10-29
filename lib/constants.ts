@@ -21,12 +21,26 @@ export const VALID_GAMES: GameVariant[] = [
   'twodoku_mini',
   'twodoku8',
   'twodoku9',
+  'twodoku84',
+  'twodoku86',
+  'twodoku89',
+  'twodoku98',
   'sudoku12',
   'jigsaw_mini',
   'sudox_king',
   'sudox_queen',
+  'windoku6',
+  'windoku8',
+  'windoku_mixed',
   'queendoku',
-  'snakedoku',
+  'flagdoku',
+  'crossdoku',
+  'sudoku_centroid',
+  'twodoku6_jigsaw',
+  'twodoku8_jigsaw',
+  'twodoku9_jigsaw',
+  'killer_sudoku',
+  'sudox_royal',
 ];
 
 // ── Display names for each variant ──
@@ -37,7 +51,7 @@ export const GAME_NAMES: Record<GameVariant, string> = {
   sudoku_a: 'Sudoku A',
   sudokuX: 'Sudoku X',
   dozaku: 'Dozaku',
-  windoku: 'Windoku',
+  windoku: 'Windoku 9',
   windokuX: 'Windoku X',
   windoku_jigsaw: 'Windoku Jigsaw',
   jigsaw8: 'Jigsaw 8',
@@ -46,12 +60,26 @@ export const GAME_NAMES: Record<GameVariant, string> = {
   twodoku_mini: 'Twodoku Mini',
   twodoku8: 'Twodoku 8',
   twodoku9: 'Twodoku 9',
+  twodoku84: 'Twodoku 84',
+  twodoku86: 'Twodoku 86',
+  twodoku89: 'Twodoku 89',
+  twodoku98: 'Twodoku 98',
   sudoku12: 'Sudoku 12',
   jigsaw_mini: 'Jigsaw Mini',
   sudox_king: 'SudoX King',
   sudox_queen: 'SudoX Queen',
+  windoku6: 'Windoku 6',
+  windoku8: 'Windoku 8',
+  windoku_mixed: 'Windoku Mixed',
   queendoku: 'Queendoku',
-  snakedoku: 'Snakedoku',
+  flagdoku: 'Flagdoku',
+  crossdoku: 'Crossdoku',
+  sudoku_centroid: 'Sudoku Centroid',
+  twodoku6_jigsaw: 'Twodoku 6 Jigsaw',
+  twodoku8_jigsaw: 'Twodoku 8 Jigsaw',
+  twodoku9_jigsaw: 'Twodoku 9 Jigsaw',
+  killer_sudoku: 'Killer Sudoku',
+  sudox_royal: 'SudoX Royal',
 };
 
 // ── Variation codes for puzzle ID generation ──
@@ -71,12 +99,26 @@ export const GAME_CODES: Record<GameVariant, string> = {
   twodoku_mini: '07',
   twodoku8: '14',
   twodoku9: '15',
+  twodoku84: '84',
+  twodoku86: '86',
+  twodoku89: '89',
+  twodoku98: '81',
   sudoku12: '12',
   jigsaw_mini: '05',
   sudox_king: '01',
   sudox_queen: '02',
+  windoku6: '60',
+  windoku8: '80',
+  windoku_mixed: '87',
   queendoku: '03',
-  snakedoku: '50',
+  flagdoku: '50',
+  crossdoku: '16',
+  sudoku_centroid: '17',
+  twodoku6_jigsaw: '62',
+  twodoku8_jigsaw: '82',
+  twodoku9_jigsaw: '97',
+  killer_sudoku: '18',
+  sudox_royal: '04',
 };
 
 // ── Aliases: games that use another game's binary ──
@@ -101,38 +143,58 @@ export const GAME_GRID_SIZE: Record<GameVariant, number> = {
   twodoku_mini: 6,
   twodoku8: 8,
   twodoku9: 9,
+  twodoku84: 8,
+  twodoku86: 8,
+  twodoku89: 8,
+  twodoku98: 9,
   sudoku12: 12,
   jigsaw_mini: 6,
   sudox_king: 9,
   sudox_queen: 9,
+  windoku6: 9,
+  windoku8: 9,
+  windoku_mixed: 9,
   queendoku: 10,
-  snakedoku: 10,
+  flagdoku: 10,
+  crossdoku: 9,
+  sudoku_centroid: 9,
+  twodoku6_jigsaw: 6,
+  twodoku8_jigsaw: 8,
+  twodoku9_jigsaw: 9,
+  killer_sudoku: 9,
+  sudox_royal: 9,
 };
 
-// ── Home page variant grid — display order ──
-export const HOME_VARIANTS: GameVariant[] = [
+// ── Variants featured on the homepage ──
+export const HOMEPAGE_VARIANTS: GameVariant[] = [
   'sudoku_mini',
   'jigsaw_mini',
+  'twodoku_mini',
   'sudoku_easy',
   'sudoku9',
   'sudoku_a',
-  'sudokuX',
+  'windoku8',
   'windoku',
   'windokuX',
   'jigsaw8',
   'jigsaw9',
   'jigsawX',
-  'windoku_jigsaw',
-  'sudoku12',
-  'dozaku',
-  'twodoku_mini',
-  'twodoku8',
+  'sudokuX',
+  'twodoku86',
+  'twodoku98',
   'twodoku9',
   'sudox_king',
   'sudox_queen',
-  'queendoku',
-  'snakedoku',
+  'flagdoku',
 ];
+
+// ── Explore page variant grid — only variations not on the home page ──
+export const EXPLORE_VARIANTS: GameVariant[] = VALID_GAMES.filter(
+  (variant) => !HOMEPAGE_VARIANTS.includes(variant)
+);
+
+// ── Home page variant grid — display order (legacy alias) ──
+export const HOME_VARIANTS: GameVariant[] = VALID_GAMES;
 
 // ── Rate limiting ──
 export const RATE_LIMIT = {
@@ -161,11 +223,13 @@ export const PUZZLE_LAUNCH_DATE = '2026-08-08';
 export function getVariantUrl(variant: string): string {
   if (variant === 'sudoku_easy') return 'sudoku_eazy';
   if (variant === 'sudoku_a') return 'sudokuA';
+  if (variant === 'windoku') return 'windoku9';
   return variant;
 }
 
 export function getVariantFromUrl(url: string): string {
   if (url === 'sudoku_eazy') return 'sudoku_easy';
   if (url === 'sudokuA') return 'sudoku_a';
+  if (url === 'windoku9') return 'windoku';
   return url;
 }

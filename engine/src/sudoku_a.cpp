@@ -4,7 +4,6 @@
 #include <random>
 #include <numeric>
 #include "../include/random_puzzle.cpp"
-#include "../include/symmetric_puzzle.cpp"
 
 using namespace std;
 
@@ -102,23 +101,21 @@ private:
 public:
     Sudoku9x9() : rng(random_device{}()) {}
 
-    // generate(): Yeh continuously full grid fill aur clues randomly hatane ka kaam trigger karta hai
-    void generate() {
+    // generate(): Yeh continuously full grid fill aur clues randomly hatane ka kaam trigger karta hai (random puzzle generator)
+    bool generate() {
+        PuzzleGenerator<SIZE, 3, 3> clueGen;
         bool success = false;
-        while (!success) {
+        int attempts = 0;
+        const int MAX_ATTEMPTS = 1000;
+
+        while (!success && attempts < MAX_ATTEMPTS) {
+            attempts++;
             reset();
             solve();
-            for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
-            
-            PuzzleConfig config = SUDOKU_A_CONFIG;
-            if (config.target_clues % 2 == 0) {
-                SymmetricPuzzleGenerator<SIZE, 3, 3> clueGen;
-                success = clueGen.generate(board, config);
-            } else {
-                PuzzleGenerator<SIZE, 3, 3> clueGen;
-                success = clueGen.generate(board, config);
-            }
+            for (int i = 0; i < SIZE * SIZE; i++) solution[i] = board[i];
+            success = clueGen.generate(board, SUDOKU_A_CONFIG);
         }
+        return success;
     }
 
     void printJSON() {
@@ -148,7 +145,11 @@ public:
 
 int main() {
     Sudoku9x9 game;
-    game.generate();
-    game.printJSON();
+    if (game.generate()) {
+        game.printJSON();
+    } else {
+        cerr << "{\"error\": \"Generation timed out. Adjust config or check constraints.\"}" << endl;
+        return 1;
+    }
     return 0;
 }

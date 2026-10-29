@@ -10,8 +10,8 @@
  */
 export function displayVal(v: number, game?: string): string {
   if (v === 0) return '';
-  if (game === 'sudox_king' && v === 1) return '♔';
-  if (game === 'sudox_queen' && v === 9) return '♕';
+  if ((game === 'sudox_king' || game === 'sudox_royal') && v === 1) return '♔';
+  if ((game === 'sudox_queen' || game === 'sudox_royal') && v === 9) return '♕';
   if (v <= 9) return String(v);
   return String.fromCharCode(65 + v - 10); // 10→A, 11→B, 12→C …
 }

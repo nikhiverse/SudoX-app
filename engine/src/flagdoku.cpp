@@ -9,7 +9,7 @@ using namespace std;
 
 const int N = 10;
 
-// 8 directions (snake exclusion bubble - no touching, even diagonally)
+// 8 directions (flag exclusion bubble - no touching, even diagonally)
 const int dr8[] = {-1, -1, -1,  0, 0,  1, 1, 1};
 const int dc8[] = {-1,  0,  1, -1, 1, -1, 0, 1};
 
@@ -17,8 +17,8 @@ const int dc8[] = {-1,  0,  1, -1, 1, -1, 0, 1};
 const int dr4[] = {-1, 1, 0, 0};
 const int dc4[] = {0, 0, -1, 1};
 
-// Checks if placing a snake at (row, col) is safe (1 per col + no 8-adjacency)
-bool isSnakeSafe(const vector<vector<int>>& board, int row, int col) {
+// Checks if placing a flag at (row, col) is safe (1 per col + no 8-adjacency)
+bool isFlagSafe(const vector<vector<int>>& board, int row, int col) {
     for (int r = 0; r < row; r++) {
         if (board[r][col] == 1) return false;
     }
@@ -32,8 +32,8 @@ bool isSnakeSafe(const vector<vector<int>>& board, int row, int col) {
     return true;
 }
 
-// Backtracking solver to place 10 non-touching snakes (1 per row and col)
-bool placeSnakes(vector<vector<int>>& board, int row, mt19937& rng) {
+// Backtracking solver to place 10 non-touching flags (1 per row and col)
+bool placeFlags(vector<vector<int>>& board, int row, mt19937& rng) {
     if (row == N) return true;
 
     vector<int> cols(N);
@@ -41,9 +41,9 @@ bool placeSnakes(vector<vector<int>>& board, int row, mt19937& rng) {
     shuffle(cols.begin(), cols.end(), rng);
 
     for (int col : cols) {
-        if (isSnakeSafe(board, row, col)) {
+        if (isFlagSafe(board, row, col)) {
             board[row][col] = 1;
-            if (placeSnakes(board, row + 1, rng)) {
+            if (placeFlags(board, row + 1, rng)) {
                 return true;
             }
             board[row][col] = 0;
@@ -52,7 +52,7 @@ bool placeSnakes(vector<vector<int>>& board, int row, mt19937& rng) {
     return false;
 }
 
-// Generates 10 contiguous irregular zones anchored around each snake position
+// Generates 10 contiguous irregular zones anchored around each flag position
 vector<vector<int>> buildIrregularZones(const vector<vector<int>>& board, mt19937& rng) {
     vector<vector<int>> regions(N, vector<int>(N, -1));
     queue<pair<int, int>> q;
@@ -68,7 +68,9 @@ vector<vector<int>> buildIrregularZones(const vector<vector<int>>& board, mt1993
     }
 
     while (!q.empty()) {
-        auto [r, c] = q.front();
+        pair<int, int> curr = q.front();
+        int r = curr.first;
+        int c = curr.second;
         q.pop();
 
         vector<int> dirs = {0, 1, 2, 3};
@@ -94,7 +96,7 @@ void printJSON(const vector<vector<int>>& regions, const vector<vector<int>>& so
         cout << "[";
         for (int c = 0; c < N; c++) {
             if (c) cout << ",";
-            cout << 0; // Empty grid for player to place Snakes
+            cout << 0; // Empty grid for player to place Flags
         }
         cout << "]";
     }
@@ -127,13 +129,13 @@ int main() {
 
     vector<vector<int>> board(N, vector<int>(N, 0));
 
-    // Place 10 non-touching snakes (instantaneous execution)
-    if (!placeSnakes(board, 0, rng)) {
-        cerr << "Failed to place snakes.\n";
+    // Place 10 non-touching flags (instantaneous execution)
+    if (!placeFlags(board, 0, rng)) {
+        cerr << "Failed to place flags.\n";
         return 1;
     }
 
-    // Build 10 irregular contiguous regions around snake anchors
+    // Build 10 irregular contiguous regions around flag anchors
     vector<vector<int>> regions = buildIrregularZones(board, rng);
 
     printJSON(regions, board);

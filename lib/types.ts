@@ -13,6 +13,13 @@ export interface GridMeta {
 
 // ── Puzzle types — derived from C++ JSON output ──
 
+export interface CageInfo {
+  id: number;
+  sum: number;
+  firstCell: [number, number];
+  cells: [number, number][];
+}
+
 export interface StandardPuzzle {
   type: 'standard';
   size: number;
@@ -21,9 +28,12 @@ export interface StandardPuzzle {
   grid: number[][];
   solution?: number[][];
   diagonals?: boolean;
-  windows?: [number, number][];
+  windows?: ([number, number] | [number, number, number, number])[];
   altSubRows?: number;
   altSubCols?: number;
+  variant?: string;
+  cages?: CageInfo[];
+  cageMap?: number[][];
 }
 
 export interface JigsawPuzzle {
@@ -33,7 +43,7 @@ export interface JigsawPuzzle {
   solution?: number[][];
   groups: number[][];
   diagonals?: boolean;
-  windows?: [number, number][];
+  windows?: ([number, number] | [number, number, number, number])[];
 }
 
 export interface TwodokuPuzzle {
@@ -46,6 +56,8 @@ export interface TwodokuPuzzle {
   grids: GridMeta[];
   blocks?: number[][];
   overlap?: boolean[][];
+  g1Groups?: number[][];
+  g2Groups?: number[][];
 }
 
 export type PuzzleData = StandardPuzzle | JigsawPuzzle | TwodokuPuzzle;
@@ -157,9 +169,23 @@ export type GameVariant =
   | 'twodoku_mini'
   | 'twodoku8'
   | 'twodoku9'
+  | 'twodoku84'
+  | 'twodoku86'
+  | 'twodoku89'
+  | 'twodoku98'
   | 'sudoku12'
   | 'jigsaw_mini'
   | 'sudox_king'
   | 'sudox_queen'
+  | 'windoku6'
+  | 'windoku8'
+  | 'windoku_mixed'
   | 'queendoku'
-  | 'snakedoku';
+  | 'flagdoku'
+  | 'crossdoku'
+  | 'sudoku_centroid'
+  | 'twodoku6_jigsaw'
+  | 'twodoku8_jigsaw'
+  | 'twodoku9_jigsaw'
+  | 'killer_sudoku'
+  | 'sudox_royal';

@@ -26,7 +26,8 @@ export function NumberPanel({ manager, stateVersion, onNumberClick, onErase, gam
       const exhausted = manager.isExhausted(v);
       const isChessPiece =
         (game === 'sudox_king' && v === 1) ||
-        (game === 'sudox_queen' && v === 9);
+        (game === 'sudox_queen' && v === 9) ||
+        (game === 'sudox_royal' && (v === 1 || v === 9));
       const labelVal = displayVal(v, game);
 
       btns.push(

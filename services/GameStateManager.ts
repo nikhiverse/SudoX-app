@@ -183,7 +183,9 @@ export class GameStateManager {
    * based on the current cursor position.
    */
   // Variants where the sub-block cursor highlight should be suppressed.
-  private static readonly NO_BLOCK_HIGHLIGHT_GAMES = new Set(['windoku', 'windokuX', 'dozaku']);
+  private static readonly NO_BLOCK_HIGHLIGHT_GAMES = new Set([
+    'windoku', 'windokuX', 'dozaku', 'windoku6', 'windoku8', 'windoku_mixed'
+  ]);
 
   getHighlightedCells(game?: string): Set<string> {
     const highlighted = new Set<string>();
@@ -202,6 +204,24 @@ export class GameStateManager {
     const isCellRelevant = (r: number, c: number) => {
       if (this.puzzleData.type !== 'twodoku') return true;
       return this.isCellInGivenGrids(r, c, invGrids);
+    };
+
+    const isSameWindow = (r: number, c: number, cr: number, cc: number) => {
+      if (this.puzzleData.type === 'standard' || this.puzzleData.type === 'jigsaw') {
+        const d = this.puzzleData as import('@/lib/types').StandardPuzzle;
+        if (d.windows) {
+          for (const w of d.windows) {
+            const wr = w[0];
+            const wc = w[1];
+            const wh = typeof w[2] === 'number' ? w[2] : 3;
+            const ww = typeof w[3] === 'number' ? w[3] : 3;
+            const inW1 = r >= wr && r < wr + wh && c >= wc && c < wc + ww;
+            const inW2 = cr >= wr && cr < wr + wh && cc >= wc && cc < wc + ww;
+            if (inW1 && inW2) return true;
+          }
+        }
+      }
+      return false;
     };
 
     const isSameGroup = (r: number, c: number, cr: number, cc: number) => {
@@ -275,20 +295,29 @@ export class GameStateManager {
     };
 
     // Whether to suppress the sub-block (group) highlight for this variant.
-    const suppressBlockHighlight = game !== undefined && GameStateManager.NO_BLOCK_HIGHLIGHT_GAMES.has(game);
+    const isSudoxKing = game === 'sudox_king' || game === 'sudox_royal';
+    const isSudoxQueen = game === 'sudox_queen' || game === 'sudox_royal';
+    const suppressBlockHighlight =
+      (game !== undefined && GameStateManager.NO_BLOCK_HIGHLIGHT_GAMES.has(game)) ||
+      isSudoxKing;
 
     if (currentVal === 0) {
-      // Empty cell: highlight same row + col + box/group + diagonals
+      // Empty cell: highlight same row + col + adjacent squares (in sudox_king)
+      // For sudox_king: highlight adjacent squares (8 surrounding cells), same row, same col, but NOT 3x3 sub-grids.
       for (let r = 0; r < totalRows; r++) {
         for (let c = 0; c < totalCols; c++) {
           if (r === cursorR && c === cursorC) continue;
           if (!activeMap[r][c]) continue;
           if (!isCellRelevant(r, c)) continue;
           
+          const isAdjacentKing = isSudoxKing && Math.abs(r - cursorR) <= 1 && Math.abs(c - cursorC) <= 1;
+
           if (
             r === cursorR || 
             c === cursorC || 
+            isAdjacentKing ||
             (!suppressBlockHighlight && isSameGroup(r, c, cursorR, cursorC)) ||
+            isSameWindow(r, c, cursorR, cursorC) ||
             isSameDiagonal(r, c)
           ) {
             highlighted.add(`${r},${c}`);
@@ -296,14 +325,30 @@ export class GameStateManager {
         }
       }
     } else {
-      // Numbered cell: highlight all cells with same number
+      // Numbered cell:
+      // In sudox_queen when on a Queen (value === 9):
+      //   highlight entire Queen move reach (row, column, all diagonals originating from cursor) + other Queens (matching number)
+      // In sudox_king:
+      //   highlight matching numbers AND adjacent squares around cursor
+      // In other variants / numbers:
+      //   highlight all cells with same number
+      const isQueenPiece = isSudoxQueen && currentVal === 9;
+
       for (let r = 0; r < totalRows; r++) {
         for (let c = 0; c < totalCols; c++) {
           if (r === cursorR && c === cursorC) continue;
           if (!activeMap[r][c]) continue;
           if (!isCellRelevant(r, c)) continue;
           
-          if (cellValues[r][c] === currentVal) {
+          const isMatchingNumber = cellValues[r][c] === currentVal;
+          const isAdjacentKing = isSudoxKing && Math.abs(r - cursorR) <= 1 && Math.abs(c - cursorC) <= 1;
+          const isQueenMove = isQueenPiece && (
+            r === cursorR ||
+            c === cursorC ||
+            Math.abs(r - cursorR) === Math.abs(c - cursorC)
+          );
+
+          if (isMatchingNumber || isAdjacentKing || isQueenMove) {
             highlighted.add(`${r},${c}`);
           }
         }

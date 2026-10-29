@@ -105,6 +105,7 @@ const icons = {
       <line x1="23" y1="11" x2="17" y2="11" />
     </svg>
   ),
+
 };
 
 export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
@@ -168,6 +169,7 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
     },
     { label: "Follow Us", icon: icons.follow, action: "follow" },
     { label: "Login", icon: icons.login, action: "login" },
+
   ];
 
   const items = isGameActive ? gameItems : homeItems;
@@ -636,6 +638,96 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
             <li>Use the eraser (or Backspace) to clear a cell.</li>
             <li>Complete all cells correctly to solve the puzzle!</li>
           </ol>
+        ) : variant === "windoku6" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill the 9x9 grid ensuring every horizontal row, vertical column,
+              and 3x3 block contains the numbers 1 to 9 exactly once.
+            </li>
+            <li>
+              The puzzle features four 6-cell colored windows: two <b>2x3</b>{" "}
+              and two <b>3x2</b> regions.
+            </li>
+            <li>
+              Every 6-cell window must contain only the numbers <b>1 to 6</b>{" "}
+              without any repeats (digits 7, 8, and 9 cannot appear inside these
+              windows).
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "windoku8" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill the 9x9 grid ensuring every horizontal row, vertical column,
+              and 3x3 block contains the numbers 1 to 9 exactly once.
+            </li>
+            <li>
+              The puzzle features four 8-cell pinwheel windows: two <b>2x4</b>{" "}
+              and two <b>4x2</b> rectangular regions.
+            </li>
+            <li>
+              Every 8-cell window must contain only the numbers <b>1 to 8</b>{" "}
+              without any repeats (digit 9 cannot appear inside these windows).
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "windoku_mixed" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill the 9x9 grid ensuring every horizontal row, vertical column,
+              and 3x3 block contains the numbers 1 to 9 exactly once.
+            </li>
+            <li>
+              The puzzle features four diverse window regions of different
+              dimensions:
+              <ul style={{ paddingLeft: "1rem", marginTop: "0.25rem" }}>
+                <li><b>4x2 and 2x4</b> windows: digits <b>1 to 8</b>.</li>
+                <li><b>3x3</b> window: digits <b>1 to 9</b>.</li>
+                <li><b>2x3</b> window: digits <b>1 to 6</b>.</li>
+              </ul>
+            </li>
+            <li>
+              Each window must contain unique numbers within its specified
+              number range.
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
         ) : variant === "sudoku12" ? (
           <ol
             style={{
@@ -746,6 +838,122 @@ export function MenuDrawer({ isOpen, onClose }: MenuDrawerProps) {
               Make sure every <b>rectangular subgrid</b> in both grids,
               featuring a mixture of <b>2x4</b> and <b>4x2</b> layouts, also
               contains each number without any repeats.
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "twodoku84" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill both 8x8 grids ensuring that every horizontal row and
+              vertical column contains the numbers 1 to 8 exactly once.
+            </li>
+            <li>
+              The puzzle consists of two separate 8x8 grids that overlap on a
+              shared 2x2 square region (4 cells), which must correctly solve both
+              intersecting boards.
+            </li>
+            <li>
+              Make sure every <b>2x4</b> and <b>4x2</b> rectangular subgrid in both
+              grids also contains each number without repeats.
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "twodoku86" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill the top-left 8x8 grid with numbers 1 to 8, and the bottom-right
+              6x6 grid with numbers 1 to 6.
+            </li>
+            <li>
+              The puzzle features a hybrid design where the two grids overlap on a
+              shared 2x2 square region (4 cells), which must satisfy the constraints
+              of both intersecting boards.
+            </li>
+            <li>
+              Ensure all subgrids (2x4 / 4x2 in the 8x8 grid and 2x3 / 3x2 in the
+              6x6 grid) contain unique numbers.
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "twodoku89" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill both 8x8 grids ensuring that every horizontal row and
+              vertical column contains the numbers 1 to 8 exactly once.
+            </li>
+            <li>
+              The puzzle consists of two 8x8 grids that overlap on a shared 3x3
+              square region (9 cells), which must correctly solve both
+              intersecting boards.
+            </li>
+            <li>
+              Make sure every rectangular subgrid in both grids also contains
+              each number without any repeats.
+            </li>
+            <li>
+              <strong>Green</strong> = correct, <strong>Red</strong> = wrong.
+            </li>
+            <li>Use the eraser (or Backspace) to clear a cell.</li>
+            <li>Complete all cells correctly to solve the puzzle!</li>
+          </ol>
+        ) : variant === "twodoku98" ? (
+          <ol
+            style={{
+              paddingLeft: "1.2rem",
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem",
+            }}
+          >
+            <li>
+              Fill the top-left 9x9 grid with numbers 1 to 9, and the bottom-right
+              8x8 grid with numbers 1 to 8.
+            </li>
+            <li>
+              The puzzle features an asymmetric hybrid layout where both grids
+              overlap on a shared 2x2 square region (4 cells) that must satisfy
+              both intersecting boards.
+            </li>
+            <li>
+              Make sure every 3x3 subgrid in the 9x9 grid and rectangular subgrid
+              in the 8x8 grid contains unique numbers.
             </li>
             <li>
               <strong>Green</strong> = correct, <strong>Red</strong> = wrong.

@@ -7,6 +7,11 @@
 // UniquenessChecker class: Yeh ensure karta hai ki puzzle ka sirf aur sirf 1 hi valid solution ho.
 // Multiple solutions allow nahi kiye jaate hain.
 using namespace std;
+struct CustomWindow {
+    int r1, r2, c1, c2; // Inclusive bounds
+    int maxVal;         // Maximum allowed digit (e.g. 6, 8, 9)
+};
+
 template <int SIZE, int SUB_R, int SUB_C>
 class UniquenessChecker {
 private:
@@ -19,7 +24,9 @@ private:
     
     // Bitmasks array: Fast uniqueness constraint checking ke liye mask use karte hain (O(1) time complexity)
     uint16_t rowMask[SIZE], colMask[SIZE], gridMasks[NUM_GRIDS], altGridMasks[NUM_GRIDS];
-    uint16_t diag1Mask, diag2Mask, winMasks[4];
+    uint16_t diag1Mask, diag2Mask, winMasks[16];
+    int winMap[SIZE * SIZE];
+    uint16_t winDomain[16];
     int solutionCount;
     int evalCount;
 
@@ -27,6 +34,10 @@ public:
     // Game variants modifiers
     bool check_diagonals = false;
     bool check_windows = false;
+    bool check_king = false;
+    bool check_queens = false;
+    const CustomWindow* customWindows = nullptr;
+    int numCustomWindows = 0;
     int* gridMap = nullptr;
     int* altGridMap = nullptr;
     bool* activeMap = nullptr;
@@ -60,16 +71,51 @@ private:
                         if (r == c) used |= diag1Mask;
                         if (r + c == SIZE - 1) used |= diag2Mask;
                     }
-                    if (check_windows) {
+                    if (customWindows && numCustomWindows > 0) {
+                        int w = winMap[pos];
+                        if (w != -1) used |= winMasks[w];
+                    } else if (check_windows) {
                         const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                         for (int w = 0; w < 4; w++) {
                             if (r >= windows[w].first && r < windows[w].first + 3 &&
                                 c >= windows[w].second && c < windows[w].second + 3) used |= winMasks[w];
                         }
                     }
+                    if (check_king) {
+                        const int dr[] = {-1, -1, 1, 1};
+                        const int dc[] = {-1,  1, -1, 1};
+                        for (int k = 0; k < 4; k++) {
+                            int nr = r + dr[k], nc = c + dc[k];
+                            if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE) {
+                                int nbVal = board[nr * SIZE + nc];
+                                if (nbVal != 0) used |= (1 << (nbVal - 1));
+                            }
+                        }
+                    }
 
                     // Mask inversion (~): Used mask ko invert karke valid (allowed) choices nikal rahe hain
-                    uint16_t mask = (~used) & ((1 << SIZE) - 1);
+                    uint16_t domain = (1 << SIZE) - 1;
+                    if (customWindows && numCustomWindows > 0) {
+                        int w = winMap[pos];
+                        if (w != -1) domain = winDomain[w];
+                    }
+                    uint16_t mask = (~used) & domain;
+                    if (check_queens && SIZE == 9 && (mask & (1 << 8))) {
+                        // Check if placing 9 would attack any existing 9 on diagonals
+                        bool queenConflict = false;
+                        for (int qr = 0; qr < 9 && !queenConflict; qr++) {
+                            if (qr == r) continue;
+                            for (int qc = 0; qc < 9; qc++) {
+                                if (board[qr * 9 + qc] == 9) {
+                                    if (abs(r - qr) == abs(c - qc)) {
+                                        queenConflict = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (queenConflict) mask &= ~(1 << 8);
+                    }
                     cellMask[pos] = mask;
                     
                     // builtin_popcount CPU instruction use karta hai direct set bits calculate karne ke liye (fast)
@@ -171,7 +217,10 @@ private:
                 if (r == c) diag1Mask |= bit;
                 if (r + c == SIZE - 1) diag2Mask |= bit;
             }
-            if (check_windows) {
+            if (customWindows && numCustomWindows > 0) {
+                int w = winMap[bestPos];
+                if (w != -1) winMasks[w] |= bit;
+            } else if (check_windows) {
                 const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                 for (int w = 0; w < 4; w++) {
                     if (r >= windows[w].first && r < windows[w].first + 3 &&
@@ -184,7 +233,10 @@ private:
 
             // Recursion wapas aagayi, ab changes revert (UNDO) karo 
             // saare states ussi halat mein waapis chhod do previous node par.
-            if (check_windows) {
+            if (customWindows && numCustomWindows > 0) {
+                int w = winMap[bestPos];
+                if (w != -1) winMasks[w] &= ~bit;
+            } else if (check_windows) {
                 const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                 for (int w = 0; w < 4; w++) {
                     if (r >= windows[w].first && r < windows[w].first + 3 &&
@@ -207,7 +259,23 @@ public:
     // Board solution count ginraha hai 
     int count(const int* inputBoard) {
         diag1Mask = diag2Mask = 0;
-        for(int i=0; i<4; i++) winMasks[i] = 0;
+        for(int i=0; i<16; i++) winMasks[i] = 0;
+        if (customWindows && numCustomWindows > 0) {
+            for (int w = 0; w < numCustomWindows; w++) {
+                winDomain[w] = (1 << customWindows[w].maxVal) - 1;
+            }
+            for (int pos = 0; pos < SIZE * SIZE; pos++) {
+                int r = pos / SIZE, c = pos % SIZE;
+                winMap[pos] = -1;
+                for (int w = 0; w < numCustomWindows; w++) {
+                    if (r >= customWindows[w].r1 && r <= customWindows[w].r2 &&
+                        c >= customWindows[w].c1 && c <= customWindows[w].c2) {
+                        winMap[pos] = w;
+                        break;
+                    }
+                }
+            }
+        }
 
         // Pre-compute grid lookup table: taaki calculation repeat na karni padhe
         for(int r=0; r<SIZE; r++) {
@@ -246,7 +314,10 @@ public:
                         if (i == j) diag1Mask |= bit;
                         if (i + j == SIZE - 1) diag2Mask |= bit;
                     }
-                    if (check_windows) {
+                    if (customWindows && numCustomWindows > 0) {
+                        int w = winMap[pos];
+                        if (w != -1) winMasks[w] |= bit;
+                    } else if (check_windows) {
                         const pair<int, int> windows[4] = {{1, 1}, {1, 5}, {5, 1}, {5, 5}};
                         for (int w = 0; w < 4; w++) {
                             if (i >= windows[w].first && i < windows[w].first + 3 &&

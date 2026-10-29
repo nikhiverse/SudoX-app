@@ -25,10 +25,12 @@ export function validatePuzzleData(data: unknown): ValidationResult {
 
   switch (d.type) {
     case 'standard':
+    case 'crossdoku':
       return validateStandard(d);
     case 'jigsaw':
       return validateJigsaw(d);
     case 'twodoku':
+    case 'twodoku_jigsaw':
       return validateTwodoku(d);
     default:
       return { valid: false, error: `Unknown puzzle type: ${d.type}` };

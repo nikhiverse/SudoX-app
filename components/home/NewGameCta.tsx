@@ -1,14 +1,17 @@
 // Centered "New Game" pale-blue CTA.
 // Visually distinct from all other sections — palette contrast signals user intent.
-// Links to /variants as a placeholder; future implementation will open a
-// game-configuration modal (variant, difficulty, clue count).
 
 import Link from 'next/link';
 
-export function NewGameCta() {
+export interface NewGameCtaProps {
+  href?: string;
+  onClick?: () => void;
+}
+
+export function NewGameCta({ href = '/play/sudoku_eazy', onClick }: NewGameCtaProps) {
   return (
     <div className="new-game-wrap">
-      <Link href="/variants" className="new-game-cta">
+      <Link href={href} onClick={onClick} className="new-game-cta">
         <span className="new-game-icon" aria-hidden="true">
           {/* Pencil / edit icon */}
           <svg

@@ -42,17 +42,17 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
     const active = new Set<string>();
 
     if (game.startsWith('twodoku')) {
-      if (game === 'twodoku_mini') {
+      if (game === 'twodoku_mini' || game === 'twodoku6_jigsaw') {
         rows = 10;
         cols = 10;
         for (let r = 0; r < 10; r++) {
           for (let c = 0; c < 10; c++) {
-            if ((r < 6 && c < 6) || (r >= 4 && c >= 4)) {
+            if ((r < 6 && c < 6) || (r >= 4 && c >= 4 && r < 10 && c < 10)) {
               active.add(`${r},${c}`);
             }
           }
         }
-      } else if (game === 'twodoku8') {
+      } else if (game === 'twodoku8' || game === 'twodoku8_jigsaw') {
         rows = 12;
         cols = 12;
         for (let r = 0; r < 12; r++) {
@@ -62,7 +62,47 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
             }
           }
         }
-      } else if (game === 'twodoku9') {
+      } else if (game === 'twodoku84') {
+        rows = 14;
+        cols = 14;
+        for (let r = 0; r < 14; r++) {
+          for (let c = 0; c < 14; c++) {
+            if ((r < 8 && c < 8) || (r >= 6 && c >= 6 && r < 14 && c < 14)) {
+              active.add(`${r},${c}`);
+            }
+          }
+        }
+      } else if (game === 'twodoku86') {
+        rows = 12;
+        cols = 12;
+        for (let r = 0; r < 12; r++) {
+          for (let c = 0; c < 12; c++) {
+            if ((r < 8 && c < 8) || (r >= 6 && c >= 6 && r < 12 && c < 12)) {
+              active.add(`${r},${c}`);
+            }
+          }
+        }
+      } else if (game === 'twodoku89') {
+        rows = 13;
+        cols = 13;
+        for (let r = 0; r < 13; r++) {
+          for (let c = 0; c < 13; c++) {
+            if ((r < 8 && c < 8) || (r >= 5 && c >= 5 && r < 13 && c < 13)) {
+              active.add(`${r},${c}`);
+            }
+          }
+        }
+      } else if (game === 'twodoku98') {
+        rows = 15;
+        cols = 15;
+        for (let r = 0; r < 15; r++) {
+          for (let c = 0; c < 15; c++) {
+            if ((r < 9 && c < 9) || (r >= 7 && c >= 7 && r < 15 && c < 15)) {
+              active.add(`${r},${c}`);
+            }
+          }
+        }
+      } else if (game === 'twodoku9' || game === 'twodoku9_jigsaw') {
         rows = 15;
         cols = 15;
         for (let r = 0; r < 15; r++) {
@@ -130,7 +170,7 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
         let br: 'outer' | 'thick' | 'thin' | 'none' = 'thin';
 
         if (game.startsWith('twodoku')) {
-          let size = 9;
+          let g1Size = 9, g2Size = 9;
           const g1R = 0;
           const g1C = 0;
           let g2R = 0;
@@ -138,28 +178,48 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
           let g1SubR = 3, g1SubC = 3, g2SubR = 3, g2SubC = 3;
 
           if (game === 'twodoku_mini') {
-            size = 6;
+            g1Size = 6; g2Size = 6;
             g2R = 4; g2C = 4;
             g1SubR = 2; g1SubC = 3;
             g2SubR = 3; g2SubC = 2;
           } else if (game === 'twodoku8') {
-            size = 8;
+            g1Size = 8; g2Size = 8;
             g2R = 4; g2C = 4;
             g1SubR = 4; g1SubC = 4;
             g2SubR = 4; g2SubC = 4;
+          } else if (game === 'twodoku84') {
+            g1Size = 8; g2Size = 8;
+            g2R = 6; g2C = 6;
+            g1SubR = 4; g1SubC = 4;
+            g2SubR = 4; g2SubC = 4;
+          } else if (game === 'twodoku86') {
+            g1Size = 8; g2Size = 6;
+            g2R = 6; g2C = 6;
+            g1SubR = 4; g1SubC = 4;
+            g2SubR = 3; g2SubC = 2;
+          } else if (game === 'twodoku89') {
+            g1Size = 8; g2Size = 8;
+            g2R = 5; g2C = 5;
+            g1SubR = 4; g1SubC = 4;
+            g2SubR = 4; g2SubC = 4;
+          } else if (game === 'twodoku98') {
+            g1Size = 9; g2Size = 8;
+            g2R = 7; g2C = 7;
+            g1SubR = 3; g1SubC = 3;
+            g2SubR = 4; g2SubC = 4;
           } else if (game === 'twodoku9') {
-            size = 9;
+            g1Size = 9; g2Size = 9;
             g2R = 6; g2C = 6;
             g1SubR = 3; g1SubC = 3;
             g2SubR = 3; g2SubC = 3;
           }
 
-          const isG1 = r >= g1R && r < g1R + size && c >= g1C && c < g1C + size;
-          const isG2 = r >= g2R && r < g2R + size && c >= g2C && c < g2C + size;
+          const isG1 = r >= g1R && r < g1R + g1Size && c >= g1C && c < g1C + g1Size;
+          const isG2 = r >= g2R && r < g2R + g2Size && c >= g2C && c < g2C + g2Size;
 
           const parentActive = (row: number, col: number) => {
-            return (row >= g1R && row < g1R + size && col >= g1C && col < g1C + size) ||
-                   (row >= g2R && row < g2R + size && col >= g2C && col < g2C + size);
+            return (row >= g1R && row < g1R + g1Size && col >= g1C && col < g1C + g1Size) ||
+                   (row >= g2R && row < g2R + g2Size && col >= g2C && col < g2C + g2Size);
           };
 
           bt = !parentActive(r - 1, c) ? 'outer' : 'thin';
@@ -169,15 +229,15 @@ export function PuzzleSkeleton({ game, gameName }: PuzzleSkeletonProps) {
 
           if (isG1) {
             if (r > g1R && (r - g1R) % g1SubR === 0) bt = 'thick';
-            if (r < g1R + size - 1 && (r - g1R + 1) % g1SubR === 0) bb = 'thick';
+            if (r < g1R + g1Size - 1 && (r - g1R + 1) % g1SubR === 0) bb = 'thick';
             if (c > g1C && (c - g1C) % g1SubC === 0) bl = 'thick';
-            if (c < g1C + size - 1 && (c - g1C + 1) % g1SubC === 0) br = 'thick';
+            if (c < g1C + g1Size - 1 && (c - g1C + 1) % g1SubC === 0) br = 'thick';
           }
           if (isG2) {
             if (r > g2R && (r - g2R) % g2SubR === 0) bt = 'thick';
-            if (r < g2R + size - 1 && (r - g2R + 1) % g2SubR === 0) bb = 'thick';
+            if (r < g2R + g2Size - 1 && (r - g2R + 1) % g2SubR === 0) bb = 'thick';
             if (c > g2C && (c - g2C) % g2SubC === 0) bl = 'thick';
-            if (c < g2C + size - 1 && (c - g2C + 1) % g2SubC === 0) br = 'thick';
+            if (c < g2C + g2Size - 1 && (c - g2C + 1) % g2SubC === 0) br = 'thick';
           }
         } else {
           // Standard block layout

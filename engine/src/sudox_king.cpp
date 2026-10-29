@@ -3,6 +3,9 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
+#include "../include/clues_config.hpp"
 
 using namespace std;
 
@@ -106,7 +109,7 @@ int main() {
     random_device rd;
     mt19937 rng(rd());
 
-    for (int trial = 0; trial < 100; trial++) {
+    while (true) {
         for (int r = 0; r < 9; r++) {
             rowMask[r] = colMask[r] = boxMask[r] = 0;
             for (int c = 0; c < 9; c++) board[r][c] = 0;
@@ -114,29 +117,36 @@ int main() {
 
         if (solveAntiKingMRV(rng)) {
             vector<vector<int>> solution(9, vector<int>(9, 0));
+            int flatBoard[81];
             for (int r = 0; r < 9; r++) {
                 for (int c = 0; c < 9; c++) {
                     solution[r][c] = board[r][c];
+                    flatBoard[r * 9 + c] = board[r][c];
                 }
             }
 
-            // Initial clues: 32 given clues for first iteration
-            vector<vector<int>> puzzle = solution;
-            vector<int> positions(81);
-            iota(positions.begin(), positions.end(), 0);
-            shuffle(positions.begin(), positions.end(), rng);
-
-            for (int i = 0; i < 49; i++) {
-                int r = positions[i] / 9;
-                int c = positions[i] % 9;
-                puzzle[r][c] = 0;
+            PuzzleConfig config = SUDOX_KING_CONFIG;
+            bool success = false;
+            if (config.target_clues % 2 == 0) {
+                SymmetricPuzzleGenerator<9, 3, 3> clueGen;
+                success = clueGen.generate(flatBoard, config);
+            } else {
+                PuzzleGenerator<9, 3, 3> clueGen;
+                success = clueGen.generate(flatBoard, config);
             }
 
-            printJSON(puzzle, solution);
-            return 0;
+            if (success) {
+                vector<vector<int>> puzzle(9, vector<int>(9, 0));
+                for (int r = 0; r < 9; r++) {
+                    for (int c = 0; c < 9; c++) {
+                        puzzle[r][c] = flatBoard[r * 9 + c];
+                    }
+                }
+                printJSON(puzzle, solution);
+                return 0;
+            }
         }
     }
 
-    cerr << "Failed to generate Anti-King grid.\n";
-    return 1;
+    return 0;
 }

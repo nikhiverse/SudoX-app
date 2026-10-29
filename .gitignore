@@ -88,3 +88,7 @@ check_db.mjs
 
 # Important Documents
 imp/
+
+# Admin panel
+admin/
+

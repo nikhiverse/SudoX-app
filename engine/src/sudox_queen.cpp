@@ -4,6 +4,9 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include "../include/random_puzzle.cpp"
+#include "../include/symmetric_puzzle.cpp"
+#include "../include/clues_config.hpp"
 
 using namespace std;
 
@@ -111,7 +114,7 @@ found:
 }
 
 void printJSON(const vector<vector<int>>& puzzle, const vector<vector<int>>& solution) {
-    cout << "{\"type\":\"standard\",\"size\":9,\"subRows\":3,\"subCols\":3,\"diagonals\":true,\"grid\":[";
+    cout << "{\"type\":\"standard\",\"size\":9,\"subRows\":3,\"subCols\":3,\"grid\":[";
     for (int r = 0; r < 9; r++) {
         if (r) cout << ",";
         cout << "[";
@@ -139,7 +142,7 @@ int main() {
     mt19937 rng(rd());
 
     vector<int> queenCol(9, -1);
-    for (int trial = 0; trial < 1000; trial++) {
+    while (true) {
         fill(queenCol.begin(), queenCol.end(), -1);
         if (placeQueens(queenCol, 0, rng)) {
             for (int r = 0; r < 9; r++) {
@@ -155,29 +158,37 @@ int main() {
             workNodes = 0;
             if (solveRemaining(rng)) {
                 vector<vector<int>> solution(9, vector<int>(9, 0));
+                int flatBoard[81];
                 for (int r = 0; r < 9; r++) {
                     for (int c = 0; c < 9; c++) {
                         solution[r][c] = board[r][c];
+                        flatBoard[r * 9 + c] = board[r][c];
                     }
                 }
 
-                // Initial clues: 32 given clues for first iteration
-                vector<vector<int>> puzzle = solution;
-                vector<int> positions(81);
-                iota(positions.begin(), positions.end(), 0);
-                shuffle(positions.begin(), positions.end(), rng);
-                for (int i = 0; i < 49; i++) {
-                    int r = positions[i] / 9;
-                    int c = positions[i] % 9;
-                    puzzle[r][c] = 0;
+                PuzzleConfig config = SUDOX_QUEEN_CONFIG;
+                bool success = false;
+                if (config.target_clues % 2 == 0) {
+                    SymmetricPuzzleGenerator<9, 3, 3> clueGen;
+                    success = clueGen.generate(flatBoard, config);
+                } else {
+                    PuzzleGenerator<9, 3, 3> clueGen;
+                    success = clueGen.generate(flatBoard, config);
                 }
 
-                printJSON(puzzle, solution);
-                return 0;
+                if (success) {
+                    vector<vector<int>> puzzle(9, vector<int>(9, 0));
+                    for (int r = 0; r < 9; r++) {
+                        for (int c = 0; c < 9; c++) {
+                            puzzle[r][c] = flatBoard[r * 9 + c];
+                        }
+                    }
+                    printJSON(puzzle, solution);
+                    return 0;
+                }
             }
         }
     }
 
-    cerr << "Failed to generate SudoX Queen board.\n";
-    return 1;
+    return 0;
 }

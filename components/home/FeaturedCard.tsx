@@ -1,49 +1,54 @@
-// Premium pale-gold featured puzzle card.
-// Used for "Today's Challenge" and "SudoX Special" on the Today homepage.
-// These are UI-first placeholders — no real daily-selection logic is implemented.
+// SudoX Featured Puzzle Card (Sudoku X, Windoku)
+// Strictly uniform height, visible frosted glass container, faint 9x9 watermark,
+// and empty invisible structural footer placeholder for countdown timer stability.
 
 import Link from 'next/link';
-import { GridThumb } from './GridThumb';
+import { GridWatermark } from './GridWatermark';
 
 export interface FeaturedCardProps {
-  /** Small uppercase section label e.g. "TODAY'S CHALLENGE" */
-  category: string;
-  /** Puzzle display name e.g. "Sudoku X" */
+  id: string;
+  badge: string;
   title: string;
-  /** One or two sentence description */
   description: string;
-  /** Play route */
   href: string;
-  /** Which decorative grid number pattern to show */
-  thumbPattern: 'challenge' | 'special';
+  pattern?: 'x' | 'windows' | 'standard' | 'dozaku';
 }
 
 export function FeaturedCard({
-  category,
+  badge,
   title,
   description,
   href,
-  thumbPattern,
+  pattern = 'standard',
 }: FeaturedCardProps) {
   return (
-    <article className="featured-card">
-      <div className="featured-card-content">
-        <p className="featured-card-category">{category}</p>
-        <h3 className="featured-card-title">{title}</h3>
-        <p className="featured-card-description">{description}</p>
-        <Link
-          href={href}
-          className="featured-play"
-          aria-label={`Play ${title}`}
-        >
-          <span aria-hidden="true">▶</span>
-          Play
-        </Link>
+    <Link
+      href={href}
+      className="group relative flex flex-col h-full p-6 md:p-8 rounded-2xl bg-white/70 hover:bg-white/90 active:bg-white backdrop-blur-md border border-black/10 hover:border-black/20 shadow-sm hover:shadow-md transition-all duration-300 ease-out hover:-translate-y-1 overflow-hidden no-underline text-left cursor-pointer"
+      aria-label={`${badge}: Play ${title} — ${description}`}
+    >
+      {/* Top content: Badge, Title, Description */}
+      <div className="relative z-10 flex flex-col gap-1.5 max-w-[85%]">
+        <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
+          {badge}
+        </span>
+        <h3 className="font-sans text-xl md:text-2xl font-bold text-stone-900 tracking-tight leading-snug">
+          {title}
+        </h3>
+        <p className="text-sm text-stone-600 leading-relaxed mt-1">
+          {description}
+        </p>
       </div>
 
-      <div className="featured-card-preview">
-        <GridThumb variant="featured" pattern={thumbPattern} />
-      </div>
-    </article>
+      {/* Reserved invisible structural footer placeholder for countdown timer */}
+      <div
+        className="mt-auto min-h-[2rem] pointer-events-none"
+        aria-hidden="true"
+      />
+
+      {/* Faint Watermark Grid */}
+      <GridWatermark pattern={pattern} />
+    </Link>
   );
 }
+

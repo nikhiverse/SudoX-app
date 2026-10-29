@@ -114,7 +114,6 @@ public:
             reset(); // Har attempt per full reset
             solve();
             for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
-            for(int i=0; i<SIZE*SIZE; i++) solution[i] = board[i];
             // Clue generator use karke numbers gayab karo rules ke sath (180 deg symmetric type)
             success = clueGen.generate(board, SUDOKU_9_CONFIG); 
         }

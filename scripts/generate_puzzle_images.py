@@ -8,19 +8,23 @@ from datetime import datetime, timedelta, timezone
 
 # Optional MongoDB dependency
 try:
-    from pymongo import MongoClient
+    from pymongo import MongoClient  # pyrefly: ignore[missing-import] # type: ignore
     HAS_PYMONGO = True
 except ImportError:
     HAS_PYMONGO = False
 
 # PIL/Pillow for image rendering
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont  # pyrefly: ignore[missing-import] # type: ignore
 
 # Define Supported Game Variants
 VALID_GAMES = [
     'sudoku_mini', 'sudoku_easy', 'sudoku9', 'sudoku_a', 'sudokuX', 'dozaku',
-    'windoku', 'windokuX', 'windoku_jigsaw', 'jigsaw8', 'jigsaw9', 'jigsawX',
-    'twodoku_mini', 'twodoku8', 'twodoku9', 'sudoku12'
+    'windoku', 'windokuX', 'windoku_jigsaw', 'windoku6', 'windoku8', 'windoku_mixed',
+    'jigsaw8', 'jigsaw9', 'jigsawX',
+    'twodoku_mini', 'twodoku8', 'twodoku84', 'twodoku86', 'twodoku89', 'twodoku9', 'twodoku98', 'sudoku12',
+    'crossdoku', 'sudoku_centroid', 'twodoku6_jigsaw', 'twodoku8_jigsaw', 'twodoku9_jigsaw',
+    'killer_sudoku',
+    'sudox_royal'
 ]
 
 GAME_NAMES = {
@@ -33,13 +37,27 @@ GAME_NAMES = {
     'windoku': 'Windoku',
     'windokuX': 'Windoku X',
     'windoku_jigsaw': 'Windoku Jigsaw',
+    'windoku6': 'Windoku 6',
+    'windoku8': 'Windoku 8',
+    'windoku_mixed': 'Windoku Mixed',
     'jigsaw8': 'Jigsaw 8',
     'jigsaw9': 'Jigsaw 9',
     'jigsawX': 'Jigsaw X',
     'twodoku_mini': 'Twodoku Mini',
     'twodoku8': 'Twodoku 8',
+    'twodoku84': 'Twodoku 84',
+    'twodoku86': 'Twodoku 86',
+    'twodoku89': 'Twodoku 89',
     'twodoku9': 'Twodoku 9',
-    'sudoku12': 'Sudoku 12'
+    'twodoku98': 'Twodoku 98',
+    'sudoku12': 'Sudoku 12',
+    'crossdoku': 'Crossdoku',
+    'sudoku_centroid': 'Sudoku Centroid',
+    'twodoku6_jigsaw': 'Twodoku 6 Jigsaw',
+    'twodoku8_jigsaw': 'Twodoku 8 Jigsaw',
+    'twodoku9_jigsaw': 'Twodoku 9 Jigsaw',
+    'killer_sudoku': 'Killer Sudoku',
+    'sudox_royal': 'SudoX Royal'
 }
 
 GAME_CODES = {
@@ -52,13 +70,27 @@ GAME_CODES = {
     'windoku': '94',
     'windokuX': '95',
     'windoku_jigsaw': '11',
+    'windoku6': '60',
+    'windoku8': '80',
+    'windoku_mixed': '87',
     'jigsaw8': '08',
     'jigsaw9': '09',
     'jigsawX': '10',
     'twodoku_mini': '07',
     'twodoku8': '14',
+    'twodoku84': '84',
+    'twodoku86': '86',
+    'twodoku89': '89',
     'twodoku9': '15',
-    'sudoku12': '12'
+    'twodoku98': '81',
+    'sudoku12': '12',
+    'crossdoku': '16',
+    'sudoku_centroid': '17',
+    'twodoku6_jigsaw': '62',
+    'twodoku8_jigsaw': '82',
+    'twodoku9_jigsaw': '97',
+    'killer_sudoku': '18',
+    'sudox_royal': '04'
 }
 
 GAME_ALIASES = {}
@@ -391,13 +423,11 @@ def render_puzzle_image(puzzle_data, game, output_path, theme="light", style="so
             
             is_window = False
             if "windows" in puzzle_data:
-                for wr, wc in puzzle_data["windows"]:
-                    if wr <= r < wr + 3 and wc <= c < wc + 3:
-                        is_window = True
-                        break
-            if ptype == "jigsaw" and "windows" in puzzle_data:
-                for wr, wc in puzzle_data["windows"]:
-                    if wr <= r < wr + 3 and wc <= c < wc + 3:
+                for w in puzzle_data["windows"]:
+                    wr, wc = w[0], w[1]
+                    wh = w[2] if len(w) >= 4 else 3
+                    ww = w[3] if len(w) >= 4 else 3
+                    if wr <= r < wr + wh and wc <= c < wc + ww:
                         is_window = True
                         break
                         

@@ -154,15 +154,7 @@ public:
                 if (solve()) {
                     for (int i = 0; i < SIZE * SIZE; i++) solution[i] = board[i];
                     clueGen.gridMap = groupGrid;
-                    PuzzleConfig config = {
-                        14,    // target clues (out of 36)
-                        4,     // max_per_row
-                        4,     // max_per_col
-                        4,     // max_per_grid
-                        6,     // max_per_diagonal
-                        false, false, 6, false, false
-                    };
-                    success = clueGen.generate(board, config);
+                    success = clueGen.generate(board, JIGSAW_MINI_CONFIG);
                 }
             }
         }

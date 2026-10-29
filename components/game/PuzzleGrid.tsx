@@ -60,6 +60,16 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
 
     const cellSize = getResponsiveCellSize(totalCols, maxCell, containerWidth);
 
+    const cageSumsMap = new Map<string, number>();
+    if (puzzleData.type === 'standard') {
+      const std = puzzleData as StandardPuzzle;
+      if (std.cages) {
+        for (const cg of std.cages) {
+          cageSumsMap.set(`${cg.firstCell[0]},${cg.firstCell[1]}`, cg.sum);
+        }
+      }
+    }
+
     const cellArray: React.ReactNode[] = [];
 
     for (let r = 0; r < totalRows; r++) {
@@ -103,6 +113,7 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
             borderRight={borders.right}
             onClick={onCellClick}
             game={game}
+            cageSum={cageSumsMap.get(`${r},${c}`)}
           />
         );
       }
@@ -112,7 +123,7 @@ export function PuzzleGrid({ manager, stateVersion, onCellClick, game }: PuzzleG
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manager, stateVersion, containerWidth, puzzleData, game, highlighted, onCellClick]);
 
-  const isChess = game === 'sudox_king' || game === 'sudox_queen';
+  const isChess = game === 'sudox_king' || game === 'sudox_queen' || game === 'sudox_royal';
 
   return (
     <div className="puzzle-output" ref={containerRef}>
@@ -144,7 +155,7 @@ function computeCellFlags(
   let isWindow = false;
   let isBothCell = false;
 
-  const isChess = game === 'sudox_king' || game === 'sudox_queen';
+  const isChess = game === 'sudox_king' || game === 'sudox_queen' || game === 'sudox_royal';
 
   if (data.type === 'standard') {
     const d = data as StandardPuzzle;
@@ -152,8 +163,12 @@ function computeCellFlags(
 
     // Window cells
     if (windows) {
-      for (const [wr, wc] of windows) {
-        if (r >= wr && r < wr + 3 && c >= wc && c < wc + 3) {
+      for (const w of windows) {
+        const wr = w[0];
+        const wc = w[1];
+        const wh = typeof w[2] === 'number' ? w[2] : 3;
+        const ww = typeof w[3] === 'number' ? w[3] : 3;
+        if (r >= wr && r < wr + wh && c >= wc && c < wc + ww) {
           isWindow = true;
           break;
         }
@@ -173,7 +188,9 @@ function computeCellFlags(
     }
 
     // Alt-block (checker pattern)
-    if (isChess) {
+    if (d.cageMap) {
+      isAltBlock = false;
+    } else if (isChess) {
       isAltBlock = (r + c) % 2 === 1;
     } else if (altSubRows && altSubCols) {
       isAltBlock = (Math.floor(r / altSubRows) + Math.floor(c / altSubCols)) % 2 === 0;
@@ -184,8 +201,12 @@ function computeCellFlags(
     const d = data as JigsawPuzzle;
     if (d.diagonals) isDiagonal = r === c || r + c === d.size - 1;
     if (d.windows) {
-      for (const [wr, wc] of d.windows) {
-        if (r >= wr && r < wr + 3 && c >= wc && c < wc + 3) {
+      for (const w of d.windows) {
+        const wr = w[0];
+        const wc = w[1];
+        const wh = typeof w[2] === 'number' ? w[2] : 3;
+        const ww = typeof w[3] === 'number' ? w[3] : 3;
+        if (r >= wr && r < wr + wh && c >= wc && c < wc + ww) {
           isWindow = true;
           break;
         }
@@ -224,11 +245,33 @@ function computeBorders(
 
   if (data.type === 'standard') {
     const d = data as StandardPuzzle;
-    const { size, subRows, subCols } = d;
-    if (r % subRows === 0) result.top = r === 0 ? 'outer' : 'thick';
-    if ((r + 1) % subRows === 0 || r === size - 1) result.bottom = r === size - 1 ? 'outer' : 'thick';
-    if (c % subCols === 0) result.left = c === 0 ? 'outer' : 'thick';
-    if ((c + 1) % subCols === 0 || c === size - 1) result.right = c === size - 1 ? 'outer' : 'thick';
+    const { size, subRows, subCols, cageMap } = d;
+    if (cageMap) {
+      if (r === 0) result.top = 'outer';
+      else if (r % subRows === 0) result.top = 'thick';
+      else if (cageMap[r][c] !== cageMap[r - 1][c]) result.top = 'thin';
+      else result.top = 'none';
+
+      if (r === size - 1) result.bottom = 'outer';
+      else if ((r + 1) % subRows === 0) result.bottom = 'thick';
+      else if (cageMap[r][c] !== cageMap[r + 1][c]) result.bottom = 'thin';
+      else result.bottom = 'none';
+
+      if (c === 0) result.left = 'outer';
+      else if (c % subCols === 0) result.left = 'thick';
+      else if (cageMap[r][c] !== cageMap[r][c - 1]) result.left = 'thin';
+      else result.left = 'none';
+
+      if (c === size - 1) result.right = 'outer';
+      else if ((c + 1) % subCols === 0) result.right = 'thick';
+      else if (cageMap[r][c] !== cageMap[r][c + 1]) result.right = 'thin';
+      else result.right = 'none';
+    } else {
+      if (r % subRows === 0) result.top = r === 0 ? 'outer' : 'thick';
+      if ((r + 1) % subRows === 0 || r === size - 1) result.bottom = r === size - 1 ? 'outer' : 'thick';
+      if (c % subCols === 0) result.left = c === 0 ? 'outer' : 'thick';
+      if ((c + 1) % subCols === 0 || c === size - 1) result.right = c === size - 1 ? 'outer' : 'thick';
+    }
   } else if (data.type === 'jigsaw') {
     const d = data as JigsawPuzzle;
     const { size, groups } = d;

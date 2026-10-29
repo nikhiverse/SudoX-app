@@ -90,7 +90,9 @@ vector<vector<int>> buildIrregularZones(const vector<vector<int>>& board, mt1993
 
     // Random multi-source flood fill expands outward until board is covered
     while (!q.empty()) {
-        auto [r, c] = q.front();
+        pair<int, int> curr = q.front();
+        int r = curr.first;
+        int c = curr.second;
         q.pop();
 
         vector<int> dirs = {0, 1, 2, 3};
